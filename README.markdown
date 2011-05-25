@@ -135,7 +135,7 @@ use them with a framework like this. Still, I18N contains replacements for sever
 a base class for extending to build your own. These replacements function similarly to the originals, but use the
 `ILocalizing` interface; just use normally and any derived text will pass through the localization process. Any custom
 interactions that occur using these attributes elsewhere in the framework, however, will not work as expected. For the
-most part, you should be able to substitute `System.ComponentModel.DataAnnotations` with `i18n.DataAnnotations` namespaces
+most part, you should be able to swap `System.ComponentModel.DataAnnotations` and `i18n.DataAnnotations` namespaces
 cleanly.
 
 ### Contributing
