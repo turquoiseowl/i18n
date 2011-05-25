@@ -19,7 +19,7 @@ Here's an example of localizing text in a Razor view:
 
     <div id="content">
         <h2>@_("Welcome to my web app!")</h2>
-        <h3><span>@_("Amazing slogan here")</span><sup>™</sup></h3>
+        <h3><span>@_("Amazing slogan here")</span></h3>
         <p>@_("Ad copy that would make Hiten Shah fall off his chair!")</p>
         <span class="button">
             <a href="@Url.Action("Plans", "Home", new { area = "" })">
@@ -49,7 +49,7 @@ And here's an example in a controller:
 #### Installing a base WebViewPage for Razor
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
 Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
-you'll want to change the `~/Views/web.config` file to point Razor's `` to the base class containing the alias.
+you'll want to change the `~/Views/web.config` file to point Razor to the base class containing the alias.
 Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 
      <system.web.webPages.razor>
