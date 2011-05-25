@@ -124,7 +124,7 @@ specific URL, and the `Content-Language` header is set accordingly.
 
 If your user is surfing in the `fr` locale, but then explicitly asks for a route with `en` appended, their preference
 is persisted, and all subsequent requests will redirect to the `en` locale, making it simple to change language choice
-for the user. You may also optionally use '/?language=fr` style query string parameters to elicit the same redirection
+for the user. You may also optionally use `/?language=fr` style query string parameters to elicit the same redirection
 behavior. Route requests for languages you do not have resources for will _not_ redirect to a default resource, they
 will 404 as expected.
 
