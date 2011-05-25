@@ -63,7 +63,7 @@ Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 The central service is `ILocalizingService`; anywhere you need localization, implement the `ILocalizing` interface.
 The package comes with default base classes for convenience, including `I18NController`, `I18NWebViewPage`, and
 `I18NWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
-to `ILocalizingService'; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
+to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
 
     using System.Web.Mvc;
     using i18n;
