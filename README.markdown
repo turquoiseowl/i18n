@@ -107,7 +107,7 @@ If you change a PO file on the fly, I18N will update accordingly; you do _not_ n
 
 #### What if I don't want all of this reflection happening at boot time?
 A large web application may start up slowly due to analyzing the IL looking for localization text. You can optionally
-avoid this performance hit by passing false to `I18N.RebuildDatabase(bool compileViews)` command. It's up to you, then, to
+avoid this performance hit by passing `false` to `I18N.RebuildDatabase(bool compileViews)` command. It's up to you, then, to
 either ensure you're using precompiled Razor views, or that you've set `MvcBuildViews` to `true` in your project
 properties.
 
