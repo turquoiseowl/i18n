@@ -19,7 +19,7 @@ Here's an example of localizing text in a Razor view:
 
     <div id="content">
         <h2>@_("Welcome to my web app!")</h2>
-        <h3><span>@_("Amazing slogan here")</span><sup>™</sup></h3>
+        <h3><span>@_("Amazing slogan here")</span></h3>
         <p>@_("Ad copy that would make Hiten Shah fall off his chair!")</p>
         <span class="button">
             <a href="@Url.Action("Plans", "Home", new { area = "" })">
@@ -49,7 +49,7 @@ And here's an example in a controller:
 #### Installing a base WebViewPage for Razor
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
 Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
-you'll want to change the `~/Views/web.config` file to point Razor's `` to the base class containing the alias.
+you'll want to change the `~/Views/web.config` file to point Razor to the base class containing the alias.
 Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 
      <system.web.webPages.razor>
@@ -63,7 +63,7 @@ Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 The central service is `ILocalizingService`; anywhere you need localization, implement the `ILocalizing` interface.
 The package comes with default base classes for convenience, including `I18NController`, `I18NWebViewPage`, and
 `I18NWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
-to `ILocalizingService'; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
+to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
 
     using System.Web.Mvc;
     using i18n;
@@ -107,7 +107,7 @@ If you change a PO file on the fly, I18N will update accordingly; you do _not_ n
 
 #### What if I don't want all of this reflection happening at boot time?
 A large web application may start up slowly due to analyzing the IL looking for localization text. You can optionally
-avoid this performance hit by passing false to `I18N.RebuildDatabase(bool compileViews)` command. It's up to you, then, to
+avoid this performance hit by passing `false` to `I18N.RebuildDatabase(bool compileViews)` command. It's up to you, then, to
 either ensure you're using precompiled Razor views, or that you've set `MvcBuildViews` to `true` in your project
 properties.
 
@@ -124,7 +124,7 @@ specific URL, and the `Content-Language` header is set accordingly.
 
 If your user is surfing in the `fr` locale, but then explicitly asks for a route with `en` appended, their preference
 is persisted, and all subsequent requests will redirect to the `en` locale, making it simple to change language choice
-for the user. You may also optionally use '/?language=fr` style query string parameters to elicit the same redirection
+for the user. You may also optionally use `/?language=fr` style query string parameters to elicit the same redirection
 behavior. Route requests for languages you do not have resources for will _not_ redirect to a default resource, they
 will 404 as expected.
 
@@ -135,7 +135,7 @@ use them with a framework like this. Still, I18N contains replacements for sever
 a base class for extending to build your own. These replacements function similarly to the originals, but use the
 `ILocalizing` interface; just use normally and any derived text will pass through the localization process. Any custom
 interactions that occur using these attributes elsewhere in the framework, however, will not work as expected. For the
-most part, you should be able to substitute `System.ComponentModel.DataAnnotations` with `i18n.DataAnnotations` namespaces
+most part, you should be able to swap `System.ComponentModel.DataAnnotations` and `i18n.DataAnnotations` namespaces
 cleanly.
 
 ### Contributing
