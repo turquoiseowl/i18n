@@ -2,7 +2,7 @@
 using System.IO;
 using System.Web;
 
-namespace i18n.Routing
+namespace i18n
 {
     internal class ClonedHttpRequest : HttpRequestBase
     {

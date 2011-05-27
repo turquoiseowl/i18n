@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using i18n.Extensions;
 
 namespace i18n
 {
@@ -39,7 +40,8 @@ namespace i18n
 
             // Value is part of the explicit route and is the preferred language (from those available)
             var preferred = _session.GetLanguageFromSessionOrService(filterContext.HttpContext);
-            if (request.RawUrl.EndsWith(string.Format("/{0}", preferred)))
+            var url = _session.GetUrlFromRequest(filterContext.HttpContext.Request);
+            if (url.EndsWithAnyIgnoreCase(string.Format("/{0}", preferred), string.Format("/{0}/", preferred)))
             {
                 return;
             }
@@ -52,13 +54,12 @@ namespace i18n
             }
 
             // Value is part of the explicit route, i.e. '/about/en' but not the preferred language
-            var url = request.RawUrl;
             var languages = request.UserLanguages ?? new[] { I18N.DefaultTwoLetterISOLanguageName };
             foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
             {
                 var semiColonIndex = language.IndexOf(';');
                 var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
-                if (!url.EndsWith(token, StringComparison.OrdinalIgnoreCase))
+                if (!url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)))
                 {
                     continue;
                 }

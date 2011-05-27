@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
-	<metadata>
-		<id>I18N</id>
-		<version>1.0.0</version>
-		<authors>Daniel Crenna</authors>
-		<owners>Daniel Crenna</owners>
-		<description>
+  <metadata>
+    <id>I18N</id>
+    <version>1.0.1</version>
+    <authors>Daniel Crenna</authors>
+    <owners>Daniel Crenna</owners>
+    <description>
       Smart internationalization for .NET web apps;
       Globally recognized interface; localize like the big kids
       Localizes everything; controller calls, razor views, validation attributes, and routes.
     </description>
-		<summary>Smart internationalization for .NET web apps</summary>
-		<language>en-US</language>
-		<projectUrl>http://github.com/danielcrenna/i18n</projectUrl>
-		<licenseUrl>https://github.com/danielcrenna/i18n/blob/master/LICENSE</licenseUrl>
-		<iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
-		<tags>i18n localization globalization</tags>   
-	</metadata>
+    <summary>Smart internationalization for .NET web apps</summary>
+    <language>en-US</language>
+    <projectUrl>http://github.com/danielcrenna/i18n</projectUrl>
+    <licenseUrl>https://github.com/danielcrenna/i18n/blob/master/LICENSE</licenseUrl>
+    <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
+    <tags>i18n localization globalization</tags>
+    <dependencies>
+      <dependency id="Mono.Reflection" version="1.0.0.0" />
+      <dependency id="CommonServiceLocator" version="1.0" />
+    </dependencies>
+  </metadata>
 </package>

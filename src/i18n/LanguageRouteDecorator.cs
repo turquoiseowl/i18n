@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web;
 using System.Web.Routing;
-using i18n.Routing;
+using i18n.Extensions;
 
 namespace i18n
 {
@@ -24,13 +24,13 @@ namespace i18n
 
             if(result == null)
             {
-                var url = context.Request.RawUrl;
+                var url = _session.GetUrlFromRequest(context.Request);
                 var languages = context.Request.UserLanguages ?? new[] { I18N.DefaultTwoLetterISOLanguageName };
                 foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
                 {
                     var semiColonIndex = language.IndexOf(';');
                     var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
-                    if (!url.EndsWith(token, StringComparison.OrdinalIgnoreCase))
+                    if (!url.EndsWithAnyIgnoreCase(token, token + "/"))
                     {
                         continue;
                     }
@@ -67,7 +67,9 @@ namespace i18n
                     else
                     {
                         var language = _session.GetLanguageFromSessionOrService(context.HttpContext);
-                        if(request.RawUrl.EndsWith(string.Format("/{0}", language)))
+                        var token = string.Format("/{0}", language);
+                        var url = _session.GetUrlFromRequest(context.HttpContext.Request);
+                        if(url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)))
                         {
                             result.VirtualPath = result.VirtualPath.Equals("")
                                                      ? language

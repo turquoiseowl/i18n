@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 namespace i18n
 {
@@ -68,16 +69,31 @@ namespace i18n
 
         public virtual string GetText(HttpContextBase context, string text)
         {
+            //text = HttpUtility.HtmlEncode(text);
+
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
             if (stored != null)
             {
-                return _service.GetText(text, new[] { stored });
+                text = _service.GetText(text, new[] { stored });
+                return HttpUtility.HtmlDecode(text);
             }
 
             // Use the client's browser settings to find a match
             var languages = context.Request.UserLanguages;
-            return _service.GetText(text, languages);
+            text = _service.GetText(text, languages);
+            return HttpUtility.HtmlDecode(text);
+        }
+
+        public virtual string GetUrlFromRequest(HttpRequestBase context)
+        {
+            var url = context.RawUrl;
+            if (url.EndsWith("/") && url.Length > 1)
+            {
+                // Support trailing slashes
+                url = url.Substring(0, url.Length - 1);
+            }
+            return url;
         }
     }
 }
