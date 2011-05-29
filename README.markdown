@@ -145,7 +145,5 @@ contribute back anything new. Specifically, these would be great places to add m
 
 * Better parsing and handling of PO files for more general purposes / outside editors
 * Additional validation attributes
-* Supporting additional view engines beyond Razor (dynamic building)
-* Support for GNU gettext extraction tools (static building)
 * Support for additional storage mechanisms beyond ASP.NET Session (i.e. cookies, closures, etc.)
 * Support for medium trust environments
