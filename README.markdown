@@ -96,10 +96,16 @@ to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controlle
     }
 
 #### Building PO databases
-At application start, if you've called `I18N.RebuildDatabase()`, I18N rips through your source code, 
-finding everywhere you've used the `ILocalizing._("text")` alias, and uses this to build or update a master .PO 
-localization database. You don't have to do anything special, all PO data is stored in the `/locale` folder relative
-to your web application.
+
+To set up automatic PO database building, add the following post-build task to your project, after
+adding `i18n.PostBuild.exe` as a project reference:
+
+    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
+	
+After a successful build, this task will rip through your source code, finding everywhere you've used the `ILocalizing._("text")` alias, 
+and uses this to build a master .PO template file located at `/locale/messages.pot` relative to your web application folder. After the
+new template is constructed, any locales that exist inside the `/locale` folder are automatically merged with the template, so that
+new strings can be flagged for further translation.
 
 From here, you use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
