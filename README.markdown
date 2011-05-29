@@ -5,6 +5,7 @@
 
 ### Introduction
 
+The i18n library is designed to replace the use of .NET resources in favor of an easier, globally recognized standard for localizing web applications. Using this library simplifies localization by making it a first class citizen of views, controllers, and validation attributes.
 
 ### Features
 - Globally recognized interface; localize like the big kids
