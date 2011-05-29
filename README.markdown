@@ -111,12 +111,6 @@ From here, you use any of the widely available PO editing tools (like [POEdit](h
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
 If you change a PO file on the fly, I18N will update accordingly; you do _not_ need to redeploy your application.
 
-#### What if I don't want all of this reflection happening at boot time?
-A large web application may start up slowly due to analyzing the IL looking for localization text. You can optionally
-avoid this performance hit by passing `false` to `I18N.RebuildDatabase(bool compileViews)` command. It's up to you, then, to
-either ensure you're using precompiled Razor views, or that you've set `MvcBuildViews` to `true` in your project
-properties.
-
 #### Automatic routing
 To participate in the automatic routing features of this library, call `I18N.Register()` in your startup code;
 this will register a global filter and route decorator to provide the feature.
