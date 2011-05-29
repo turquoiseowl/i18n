@@ -99,7 +99,7 @@ namespace i18n
                 // en-US
                 var regional = TryGetTextFor(culture.IetfLanguageTag, key);
 
-                // save cycles processing beyond the default; just return the original key
+                // Save cycles processing beyond the default; just return the original key
                 if (culture.TwoLetterISOLanguageName.Equals(I18N.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return key;

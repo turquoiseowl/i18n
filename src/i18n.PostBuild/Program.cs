@@ -8,11 +8,14 @@ namespace i18n.PostBuild
         {
             if(args.Length != 1)
             {
-                Console.WriteLine("This post build task requires passing in the $(SolutionDirectory) path");
+                Console.WriteLine("This post build task requires passing in the $(ProjectDirectory) path");
                 return;
             }
+
+            var path = args[0];
+            path = path.Trim(new[] {'\"'});
             
-            new PostBuildTask().Execute(args[0]);
+            new PostBuildTask().Execute(path);
         }
     }
 }

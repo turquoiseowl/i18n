@@ -29,8 +29,7 @@ namespace i18n
         }
 
         /// <summary>
-        /// Scans source code to produce a master PO file in at the
-        /// default locale location
+        /// Scans source code to produce a master PO file in at the default locale location
         /// </summary>
         /// <param name="compileViews">Whether dynamic views are compiled for inspection at runtime</param>
         public static void BuildDatabase(bool compileViews = true)
@@ -186,8 +185,6 @@ namespace i18n
         {
             var physicalPath = HostingEnvironment.ApplicationPhysicalPath.ToLowerInvariant();
             var templates = Directory.GetFiles(physicalPath, "*.cshtml", SearchOption.AllDirectories).ToList();
-            var vbhtml = Directory.GetFiles(physicalPath, "*.vbhtml", SearchOption.AllDirectories);
-            templates.AddRange(vbhtml);
             return templates.Select(t => t.Replace(physicalPath, "~/"));
         }
     }

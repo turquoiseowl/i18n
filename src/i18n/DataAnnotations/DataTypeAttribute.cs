@@ -3,31 +3,19 @@ using System.Web;
 
 namespace i18n.DataAnnotations
 {
-    public enum DataType
-    {
-        Currency,
-        Custom,
-        Date,
-        DateTime,
-        Duration,
-        EmailAddress,
-        Html,
-        ImageUrl,
-        MultilineText,
-        Password,
-        PhoneNumber,
-        Text,
-        Time,
-        Url
-    }
-
+    /// <summary>
+    /// Specifies an additional type to associate with a data field
+    /// </summary>
     public class DataTypeAttribute : System.ComponentModel.DataAnnotations.DataTypeAttribute, ILocalizing
     {
         private readonly I18NSession _session;
 
+        ///<summary>
+        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> class by using the specified type name
+        ///</summary>
+        ///<param name="dataType"></param>
         public DataTypeAttribute(DataType dataType) : base(Convert(dataType))
         {
-           
             _session = new I18NSession();
         }
 
@@ -68,16 +56,31 @@ namespace i18n.DataAnnotations
             }
         }
 
+        ///<summary>
+        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> class by using the specified field template name
+        ///</summary>
+        ///<param name="customDataType"></param>
         public DataTypeAttribute(string customDataType) : base(customDataType)
         {
             _session = new I18NSession();   
         }
 
+        /// <summary>
+        /// Returns localized text for the given key, if available
+        /// </summary>
+        /// <param name="text">The text to localize</param>
         public virtual string _(string text)
         {
             return _session.GetText(HttpContext.Current, text);
         }
 
+        /// <summary>
+        /// Applies formatting to an error message, based on the data field where the error occurred. 
+        /// </summary>
+        /// <returns>
+        /// An instance of the formatted error message.
+        /// </returns>
+        /// <param name="name">The name to include in the formatted message.</param>
         public override string FormatErrorMessage(string name)
         {
             var formatted = base.FormatErrorMessage(name);

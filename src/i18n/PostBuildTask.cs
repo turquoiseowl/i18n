@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -17,34 +18,62 @@ namespace i18n
         public void Execute(string path)
         {
             var manifest = BuildProjectFileManifest(path);
-            var text = File.ReadAllText(manifest);
-            Trace.WriteLine(text);
 
-            // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("-LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest);
-            var info = new ProcessStartInfo("gettext\\xgettext.exe", args)
-                            {
-                                UseShellExecute = false,
-                                ErrorDialog = false,
-                                CreateNoWindow = true,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true
-                            };
+            CreateMessageTemplate(path, manifest);
 
-            RunGetText(args, info);
+            MergeTemplateWithExistingLocales(path);
 
             File.Delete(manifest);
         }
 
-        private static void RunGetText(string args, ProcessStartInfo info)
+        private static void MergeTemplateWithExistingLocales(string path)
         {
-            Trace.WriteLine(string.Format("gettext\\xgettext.exe {0}", args));
+            var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", path));
+            var template = string.Format("{0}\\locale\\messages.pot", path);
+
+            foreach (var messages in locales.Select(locale => string.Format("{0}\\messages.po", locale)))
+            {
+                if(File.Exists(messages))
+                {
+                    // http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html
+                    var args = string.Format("-U \"{0}\" \"{1}\"", messages, template);
+                    RunWithOutput("gettext\\msgmerge.exe", args);
+                }
+                else
+                {
+                    File.Copy(template, messages);
+                }
+            }
+        }
+
+        private static void CreateMessageTemplate(string path, string manifest)
+        {
+            // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
+            var args = string.Format("-LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest);
+            RunWithOutput("gettext\\xgettext.exe", args);
+        }
+
+        private static void RunWithOutput(string filename, string args)
+        {
+            var info = new ProcessStartInfo(filename, args)
+            {
+                UseShellExecute = false,
+                ErrorDialog = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            Console.WriteLine("{0} {1}", info.FileName, info.Arguments);
             var process = Process.Start(info);
             while (!process.StandardError.EndOfStream)
             {
                 var line = process.StandardError.ReadLine();
-                if (line == null) continue;
-                Trace.WriteLine(line);
+                if (line == null)
+                {
+                    continue;
+                }
+                Console.WriteLine(line);
             }
         }
 
