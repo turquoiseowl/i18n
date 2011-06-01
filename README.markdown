@@ -139,6 +139,26 @@ interactions that occur using these attributes elsewhere in the framework, howev
 most part, you should be able to swap `System.ComponentModel.DataAnnotations` and `i18n.DataAnnotations` namespaces
 cleanly.
 
+#### A reminder about folders in a web application
+
+Your `locale` folder is exposed to HTTP requests as-is, just like a typical log directory, so remember to block all requests
+to this folder by adding a `Web.config` file. 
+
+<?xml version="1.0"?>
+<configuration>    
+    <system.web>
+        <httpHandlers>
+            <add path="*" verb="*" type="System.Web.HttpNotFoundHandler"/>
+        </httpHandlers>
+    </system.web>
+    <system.webServer>
+        <handlers>
+            <remove name="BlockViewHandler"/>
+            <add name="BlockViewHandler" path="*" verb="*" preCondition="integratedMode" type="System.Web.HttpNotFoundHandler"/>
+        </handlers>
+    </system.webServer>
+</configuration>
+
 ### Contributing
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
