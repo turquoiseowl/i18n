@@ -1,6 +1,6 @@
 ﻿namespace i18n.DataAnnotations
 {
-    public class DisplayAttribute : ValidationAttribute
+    public class DisplayAttribute : LocalizingAttribute
     {
         private string _name;
         private string _prompt;

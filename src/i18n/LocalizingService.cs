@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
@@ -199,38 +200,31 @@ namespace i18n
             {
                 using (var fs = File.OpenText(path))
                 {
+                    // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
+
                     var messages = new List<I18NMessage>(0);
                     string line;
                     while ((line = fs.ReadLine()) != null)
                     {
+                        var message = new I18NMessage();
+                        var sb = new StringBuilder();
+
                         if (line.StartsWith("#"))
                         {
-                            var message = new I18NMessage();
+                            sb.Append(CleanCommentLine(line));
+                            while((line = fs.ReadLine()) != null && line.StartsWith("#"))
+                            {
+                                sb.Append(CleanCommentLine(line));
+                            }
+                            message.Comment = sb.ToString();
 
-                            // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
-                            message.Comment =
-                                line.Replace("# ", "").Replace("#. ", "").Replace("#: ", "").Replace("#, ", "").Replace(
-                                    "#| ", "");
-
-                            var msgid = quoted.Match(line = fs.ReadLine()).Value;
-                            message.MsgId = msgid.Substring(1, msgid.Length - 2);
-
-                            var msgstr = quoted.Match(line = fs.ReadLine()).Value;
-                            message.MsgStr = msgstr.Substring(1, msgstr.Length - 2);
-
+                            sb.Clear();
+                            ParseBody(fs, line, sb, message, quoted);
                             messages.Add(message);
                         }
                         else if (line.StartsWith("msgid"))
                         {
-                            var message = new I18NMessage();
-
-                            var msgid = quoted.Match(line).Value;
-                            message.MsgId = msgid.Substring(1, msgid.Length - 2);
-
-                            var msgstr = quoted.Match(line = fs.ReadLine()).Value;
-                            message.MsgStr = msgstr.Substring(1, msgstr.Length - 2);
-
-                            messages.Add(message);
+                            ParseBody(fs, line, sb, message, quoted);
                         }
                     }
 
@@ -241,6 +235,44 @@ namespace i18n
                     }
                 }
             }
+        }
+
+        private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message, Regex quoted)
+        {
+            if(!string.IsNullOrEmpty(line))
+            {
+                if(line.StartsWith("msgid"))
+                {
+                    var msgid = quoted.Match(line).Value;
+                    sb.Append(msgid.Substring(1, msgid.Length - 2));
+
+                    while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && !string.IsNullOrWhiteSpace(msgid = quoted.Match(line).Value))
+                    {
+                        sb.Append(msgid.Substring(1, msgid.Length - 2));
+                    }
+
+                    message.MsgId = sb.ToString();
+                }
+
+                sb.Clear();
+                if(!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
+                {
+                    var msgstr = quoted.Match(line).Value;
+                    sb.Append(msgstr.Substring(1, msgstr.Length - 2));
+
+                    while ((line = fs.ReadLine()) != null && !string.IsNullOrEmpty(msgstr = quoted.Match(line).Value))
+                    {
+                        sb.Append(msgstr.Substring(1, msgstr.Length - 2));
+                    }
+
+                    message.MsgStr = sb.ToString();
+                }
+            }
+        }
+
+        private static string CleanCommentLine(string line)
+        {
+            return line.Replace("# ", "").Replace("#. ", "").Replace("#: ", "").Replace("#, ", "").Replace("#| ", "");
         }
 
         private static string GetTextOrDefault(string culture, string key)

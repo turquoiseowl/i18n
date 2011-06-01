@@ -25,11 +25,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\lib\net40\</OutputPath>
+    <OutputPath>..\..\bin\lib\net40\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\lib\net40\i18n.xml</DocumentationFile>
+    <DocumentationFile>..\..\bin\lib\net40\i18n.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -59,10 +59,14 @@
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
+    <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
     <Compile Include="DataAnnotations\ValidationAttribute.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="Extensions\Extensions.cs" />
+    <Content Include="gettext\README">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="I18NMessage.cs" />
     <Compile Include="LanguageFilter.cs" />
     <Compile Include="I18N.cs" />
@@ -79,120 +83,18 @@
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\tools\gettext-0.14.4\gettext.sh">
-      <Link>gettext\gettext.sh</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\hostname.exe">
-      <Link>gettext\hostname.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libexpat.dll">
-      <Link>gettext\libexpat.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libgettextlib.dll">
-      <Link>gettext\libgettextlib.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libgettextpo.dll">
-      <Link>gettext\libgettextpo.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libgettextsrc.dll">
-      <Link>gettext\libgettextsrc.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libiconv2.dll">
-      <Link>gettext\libiconv2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\libintl3.dll">
-      <Link>gettext\libintl3.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgattrib.exe">
-      <Link>gettext\msgattrib.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgcat.exe">
-      <Link>gettext\msgcat.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgcmp.exe">
-      <Link>gettext\msgcmp.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgcomm.exe">
-      <Link>gettext\msgcomm.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgconv.exe">
-      <Link>gettext\msgconv.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgen.exe">
-      <Link>gettext\msgen.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgexec.exe">
-      <Link>gettext\msgexec.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgfilter.exe">
-      <Link>gettext\msgfilter.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgfmt.exe">
-      <Link>gettext\msgfmt.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msggrep.exe">
-      <Link>gettext\msggrep.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msginit.exe">
-      <Link>gettext\msginit.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgmerge.exe">
-      <Link>gettext\msgmerge.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msgunfmt.exe">
-      <Link>gettext\msgunfmt.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\msguniq.exe">
-      <Link>gettext\msguniq.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\ngettext.exe">
-      <Link>gettext\ngettext.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\urlget.exe">
-      <Link>gettext\urlget.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\xgettext.exe">
-      <Link>gettext\xgettext.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="i18n.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\tools\gettext-0.14.4\envsubst.exe">
-      <Link>gettext\envsubst.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\tools\gettext-0.14.4\gettext.exe">
-      <Link>gettext\gettext.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(SolutionDir)..\tools\gettext-0.14.4\*.*" "$(TargetDir)gettext\"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
