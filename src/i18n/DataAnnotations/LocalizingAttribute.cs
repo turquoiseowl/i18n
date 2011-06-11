@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using System.Web.Mvc;
 
 namespace i18n.DataAnnotations
 {
@@ -12,9 +13,9 @@ namespace i18n.DataAnnotations
             _session = new I18NSession();   
         }
 
-        public virtual string _(string text)
+        public virtual IHtmlString _(string text)
         {
-            return _session.GetText(HttpContext.Current, text);
+            return new MvcHtmlString(_session.GetText(HttpContext.Current, text));
         }
     }
 }

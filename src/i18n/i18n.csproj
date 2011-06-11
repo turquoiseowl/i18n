@@ -78,7 +78,7 @@
     <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LanguageRouteDecorator.cs" />
-    <Compile Include="LanguageSession.cs" />
+    <Compile Include="I18NSession.cs" />
     <Compile Include="RouteDecoratorBase.cs" />
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />
   </ItemGroup>

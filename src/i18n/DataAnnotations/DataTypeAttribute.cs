@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using System.Web.Mvc;
 
 namespace i18n.DataAnnotations
 {
@@ -69,9 +70,9 @@ namespace i18n.DataAnnotations
         /// Returns localized text for the given key, if available
         /// </summary>
         /// <param name="text">The text to localize</param>
-        public virtual string _(string text)
+        public virtual IHtmlString _(string text)
         {
-            return _session.GetText(HttpContext.Current, text);
+            return new MvcHtmlString(_session.GetText(HttpContext.Current, text));
         }
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace i18n.DataAnnotations
         public override string FormatErrorMessage(string name)
         {
             var formatted = base.FormatErrorMessage(name);
-            return _(formatted);
+            return _(formatted).ToHtmlString();
         }
     }
 }

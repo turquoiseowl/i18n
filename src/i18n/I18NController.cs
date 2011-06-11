@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Web;
+using System.Web.Mvc;
 
 namespace i18n
 {
@@ -13,10 +14,10 @@ namespace i18n
         {
             _session = new I18NSession();
         }
-        
-        public string _(string text)
+
+        public virtual IHtmlString _(string text)
         {
-            return _session.GetText(ControllerContext.HttpContext, text);
+            return new MvcHtmlString(_session.GetText(HttpContext, text));
         }
     }
 }

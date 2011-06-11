@@ -5,7 +5,7 @@ namespace i18n
     /// <summary>
     /// A convenience class for localization operations
     /// </summary>
-    internal class I18NSession
+    public class I18NSession
     {
         private readonly ILocalizingService _service;
         private const string SessionKey = "po:language";
@@ -68,8 +68,6 @@ namespace i18n
 
         public virtual string GetText(HttpContextBase context, string text)
         {
-            //text = HttpUtility.HtmlEncode(text);
-
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
             if (stored != null)
