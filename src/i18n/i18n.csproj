@@ -93,7 +93,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>REM copy "$(SolutionDir)..\tools\gettext-0.14.4\*.*" "$(TargetDir)gettext\"</PostBuildEvent>
+    <PostBuildEvent>copy "$(SolutionDir)..\tools\gettext-0.14.4\*.*" "$(TargetDir)gettext\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
