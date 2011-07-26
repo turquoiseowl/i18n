@@ -81,7 +81,9 @@ namespace i18n
         {
             var cs = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
             var razor = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-            var files = (new[] {cs, razor}).SelectMany(f => f).ToList();
+            var objPath = Path.Combine(path, "obj").ToLower();
+            
+            var files = (new[] {cs, razor}).SelectMany(f => f).Where(f=>!f.ToLower().StartsWith(objPath)).ToList();
             var temp = Path.GetTempFileName();
             using(var sw = File.CreateText(temp))
             {
