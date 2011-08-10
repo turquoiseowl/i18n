@@ -194,6 +194,7 @@ namespace i18n
 
         private static void LoadFromDiskAndCache(string culture, string path)
         {
+            //If the msgstr is 1 word length, e.g. msgstr \"a\", it does not worked
             var quoted = new Regex("(?:\"(?:[^\"]+.)*\")", RegexOptions.Compiled);
 
             lock (_sync)
@@ -245,7 +246,7 @@ namespace i18n
                 {
                     var msgid = quoted.Match(line).Value;
                     sb.Append(msgid.Substring(1, msgid.Length - 2));
-
+                    
                     while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && !string.IsNullOrWhiteSpace(msgid = quoted.Match(line).Value))
                     {
                         sb.Append(msgid.Substring(1, msgid.Length - 2));
@@ -257,9 +258,12 @@ namespace i18n
                 sb.Clear();
                 if(!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
                 {
-                    var msgstr = quoted.Match(line).Value;
-                    sb.Append(msgstr.Substring(1, msgstr.Length - 2));
-
+                    //var msgstr = quoted.Match(line).Value;
+                    //sb.Append(msgstr.Substring(1, msgstr.Length - 2));
+                    int firstIndex = line.IndexOf('\"');
+                    int lastIndex = line.LastIndexOf('\"');
+                    var msgstr = line.Substring(firstIndex+1, lastIndex-firstIndex-1);
+                    sb.Append(msgstr);
                     while ((line = fs.ReadLine()) != null && !string.IsNullOrEmpty(msgstr = quoted.Match(line).Value))
                     {
                         sb.Append(msgstr.Substring(1, msgstr.Length - 2));
