@@ -3,6 +3,14 @@ using System.Web.Mvc;
 
 namespace i18n
 {
+    public static class ModelStateDictionaryExtensions
+    {
+        public static void AddModelError(this ModelStateDictionary dictionary, string key, IHtmlString errorMessage)
+        {
+            dictionary.AddModelError(key, errorMessage.ToHtmlString());
+        }
+    }
+
     /// <summary>
     /// A base controller providing an alias for localizable resources
     /// </summary>
