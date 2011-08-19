@@ -73,12 +73,14 @@ namespace i18n
             if (stored != null)
             {
                 text = _service.GetText(text, new[] { stored });
+                return text;
                 return HttpUtility.HtmlDecode(text);
             }
 
             // Use the client's browser settings to find a match
             var languages = context.Request.UserLanguages;
             text = _service.GetText(text, languages);
+            return text;
             return HttpUtility.HtmlDecode(text);
         }
 
