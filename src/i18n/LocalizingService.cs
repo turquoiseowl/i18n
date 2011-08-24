@@ -123,6 +123,9 @@ namespace i18n
                 }
             }
 
+            //no match found
+            
+
             return key;
         }
 
@@ -287,6 +290,18 @@ namespace i18n
                 }
 
                 var matched = messages.SingleOrDefault(m => m.MsgId.Equals(key));
+
+                if (matched == null || string.IsNullOrWhiteSpace(matched.MsgStr))
+                {
+                    if (HttpContext.Current != null)
+                    {
+                        List<string> missingTranslations = HttpContext.Current.Items["_MissingTranslations"] as List<string> ??
+                                                   (HttpContext.Current.Items["_MissingTranslations"] = new List<string>()) as
+                                                   List<string>;
+
+                        missingTranslations.Add(key);
+                    }
+                }
 
                 if (matched == null)
                 {
