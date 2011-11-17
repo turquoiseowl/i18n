@@ -86,8 +86,8 @@ namespace i18n
             using(var sw = File.CreateText(temp))
             {
                 foreach(var file in files)
-                {
-					sw.WriteLine(".." + file.Replace(path, ""));
+                {			
+                    sw.WriteLine(file);
                 }
             }
             return temp;
