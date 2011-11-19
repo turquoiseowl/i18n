@@ -207,6 +207,11 @@ namespace i18n
                     string line;
                     while ((line = fs.ReadLine()) != null)
                     {
+                        if (line.StartsWith("#~"))
+                        {
+                            continue;
+                        }
+
                         var message = new I18NMessage();
                         var sb = new StringBuilder();
 
