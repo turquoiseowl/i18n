@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -33,7 +33,7 @@ namespace i18n
 
             foreach (var messages in locales.Select(locale => string.Format("{0}\\messages.po", locale)))
             {
-                if(File.Exists(messages))
+                if (File.Exists(messages))
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html
                     var args = string.Format("-U \"{0}\" \"{1}\"", messages, template);
@@ -49,8 +49,8 @@ namespace i18n
         private static void CreateMessageTemplate(string path, string manifest)
         {
             // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("-LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest);
-            RunWithOutput("gettext\\xgettext.exe", args);
+            var args = string.Format("-LC# -k_ -k__ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest);
+            RunWithOutput(path + "\\..\\gettext\\xgettext.exe", args); // Mark H bodge
         }
 
         private static void RunWithOutput(string filename, string args)
@@ -81,13 +81,14 @@ namespace i18n
         {
             var cs = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
             var razor = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-            var files = (new[] {cs, razor}).SelectMany(f => f).ToList();
+            var files = (new[] { cs, razor }).SelectMany(f => f).ToList();
             var temp = Path.GetTempFileName();
-            using(var sw = File.CreateText(temp))
+            using (var sw = File.CreateText(temp))
             {
-                foreach(var file in files)
-                {			
+                foreach (var file in files)
+                {
                     sw.WriteLine(file);
+                    // sw.WriteLine(".." + file.Replace(path, ""));
                 }
             }
             return temp;
