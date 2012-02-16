@@ -15,18 +15,20 @@ namespace i18n
         /// Runs GNU xgettext to extract a messages template file
         ///</summary>
         ///<param name="path"></param>
-        public void Execute(string path)
+        ///<param name="gettext"> </param>
+        ///<param name="msgmerge"> </param>
+        public void Execute(string path, string gettext = null, string msgmerge = null)
         {
             var manifest = BuildProjectFileManifest(path);
 
-            CreateMessageTemplate(path, manifest);
+            CreateMessageTemplate(path, manifest, gettext);
 
-            MergeTemplateWithExistingLocales(path);
+            MergeTemplateWithExistingLocales(path, msgmerge);
 
             File.Delete(manifest);
         }
 
-        private static void MergeTemplateWithExistingLocales(string path)
+        private static void MergeTemplateWithExistingLocales(string path, string options)
         {
             var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", path));
             var template = string.Format("{0}\\locale\\messages.pot", path);
@@ -36,7 +38,7 @@ namespace i18n
                 if(File.Exists(messages))
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html
-                    var args = string.Format("-U \"{0}\" \"{1}\"", messages, template);
+                    var args = string.Format("{2} -U \"{0}\" \"{1}\"", messages, template, options);
                     RunWithOutput("gettext\\msgmerge.exe", args);
                 }
                 else
@@ -46,10 +48,10 @@ namespace i18n
             }
         }
 
-        private static void CreateMessageTemplate(string path, string manifest)
+        private static void CreateMessageTemplate(string path, string manifest, string options)
         {
             // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("-LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest);
+            var args = string.Format("{2} -LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest, options);
             RunWithOutput("gettext\\xgettext.exe", args);
         }
 
