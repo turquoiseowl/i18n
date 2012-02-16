@@ -21,7 +21,7 @@ namespace i18n.PostBuild
             for (int i = 1; i < args.Length; i++)
             {
                 if (args[i].StartsWith("gettext:", StringComparison.InvariantCultureIgnoreCase))
-                    gettext = args[i].Substring(args[i].IndexOf("gettext:") + 8);
+                    gettext = args[i].Substring(8);
 
                 if (args[i].StartsWith("msgmerge:", StringComparison.InvariantCultureIgnoreCase))
                     msgmerge = args[i].Substring(9);
