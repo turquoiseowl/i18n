@@ -249,9 +249,11 @@ namespace i18n
             {
                 if(line.StartsWith("msgid"))
                 {
-                    var msgid = quoted.Match(line).Value;
-                    sb.Append(msgid.Substring(1, msgid.Length - 2));
-                    
+                    int firstIndex = line.IndexOf('\"');
+                    int lastIndex = line.LastIndexOf('\"');
+                    var msgid = line.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    sb.Append(msgid);
+
                     while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && !string.IsNullOrWhiteSpace(msgid = quoted.Match(line).Value))
                     {
                         sb.Append(msgid.Substring(1, msgid.Length - 2));
