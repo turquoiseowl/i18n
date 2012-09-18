@@ -12,6 +12,8 @@
     <AssemblyName>i18n</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,9 +66,6 @@
     <Compile Include="DataAnnotations\ValidationAttribute.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="Extensions\Extensions.cs" />
-    <Content Include="gettext\README">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Compile Include="I18NMessage.cs" />
     <Compile Include="LanguageFilter.cs" />
     <Compile Include="I18N.cs" />
@@ -93,8 +92,10 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(SolutionDir)..\tools\gettext-0.14.4\*.*" "$(TargetDir)gettext\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

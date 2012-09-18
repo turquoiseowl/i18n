@@ -1,8 +1,8 @@
 # i18n
 ## Smart internationalization for .NET web apps
-
+```
     PM> Package-Install I18N
-
+```
 _Note: NuGet is currently not having it when it comes to nested folders with executables, which this project requires. For now, I suggest you download the lib from this site if you're experiencing problems, and add the gettext folder as content in your web application root folder. I'm working on a better solution._
 
 ### Introduction
@@ -20,6 +20,7 @@ The i18n library is designed to replace the use of .NET resources in favor of an
 To localize text in your application, use the `_("text")` alias method wherever required. That's it.
 Here's an example of localizing text in a Razor view:
 
+```html
     <div id="content">
         <h2>@_("Welcome to my web app!")</h2>
         <h3><span>@_("Amazing slogan here")</span></h3>
@@ -31,9 +32,11 @@ Here's an example of localizing text in a Razor view:
             </a>
         </span>
     </div>
+```
 
 And here's an example in a controller:
 
+```csharp
     using i18n;
     
     namespace MyApplication
@@ -48,6 +51,7 @@ And here's an example in a controller:
             }
         }
     }
+```
 
 #### Installing a base WebViewPage for Razor
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
@@ -55,12 +59,14 @@ Depending on whether you're using the provided base classes or your own base cla
 you'll want to change the `~/Views/web.config` file to point Razor to the base class containing the alias.
 Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 
+```xml
      <system.web.webPages.razor>
         <!-- ... -->
         <pages pageBaseType="i18n.I18NWebViewPage">
           <!-- ... -->
         </pages>
       </system.web.webPages.razor>
+```
 
 #### Using base classes vs. interfaces
 The central service is `ILocalizingService`; anywhere you need localization, implement the `ILocalizing` interface.
@@ -68,6 +74,7 @@ The package comes with default base classes for convenience, including `I18NCont
 `I18NWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
 to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
 
+```csharp
     using System.Web.Mvc;
     using i18n;
 
@@ -97,14 +104,17 @@ to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controlle
             }
         }
     }
+```
 
 #### Building PO databases
 
 To set up automatic PO database building, add the following post-build task to your project, after
 adding `i18n.PostBuild.exe` as a project reference:
 
+```
     "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
-	
+```
+    
 After a successful build, this task will rip through your source code, finding everywhere you've used the `ILocalizing._("text")` alias, 
 and uses this to build a master .PO template file located at `/locale/messages.pot` relative to your web application folder. After the
 new template is constructed, any locales that exist inside the `/locale` folder are automatically merged with the template, so that
@@ -112,7 +122,7 @@ new strings can be flagged for further translation.
 
 From here, you use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
-If you change a PO file on the fly, I18N will update accordingly; you do _not_ need to redeploy your application.
+If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
 
 #### Automatic routing
 To participate in the automatic routing features of this library, call `I18N.Register()` in your startup code;
@@ -146,6 +156,7 @@ cleanly.
 Your `locale` folder is exposed to HTTP requests as-is, just like a typical log directory, so remember to block all requests
 to this folder by adding a `Web.config` file. 
 
+```xml
     <?xml version="1.0"?>
     <configuration>    
         <system.web>
@@ -160,6 +171,7 @@ to this folder by adding a `Web.config` file.
             </handlers>
         </system.webServer>
     </configuration>
+```
 
 ### Contributing
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
