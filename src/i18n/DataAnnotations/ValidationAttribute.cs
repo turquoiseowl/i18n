@@ -1,5 +1,4 @@
 ﻿using System.Web;
-using System.Web.Mvc;
 
 namespace i18n.DataAnnotations
 {
@@ -14,7 +13,7 @@ namespace i18n.DataAnnotations
 
         public virtual IHtmlString _(string text)
         {
-            return new MvcHtmlString(_session.GetText(HttpContext.Current, text));
+            return new HtmlString(_session.GetText(HttpContext.Current, text));
         }
 
         public override string FormatErrorMessage(string name)

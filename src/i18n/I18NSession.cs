@@ -7,13 +7,7 @@ namespace i18n
     /// </summary>
     public class I18NSession
     {
-        private readonly ILocalizingService _service;
         private const string SessionKey = "po:language";
-
-        public I18NSession()
-        {
-            _service = DependencyResolver.LocalizingService;
-        }
 
         public virtual void Set(HttpContextBase context, string language)
         {
@@ -43,7 +37,7 @@ namespace i18n
             if(language == null)
             {
                 var languages = context.Request.UserLanguages;
-                language = _service.GetBestAvailableLanguageFrom(languages);
+                language = DependencyResolver.LocalizingService.GetBestAvailableLanguageFrom(languages);
                 if (context.Session != null)
                 {
                     context.Session.Add(SessionKey, language);
@@ -58,12 +52,12 @@ namespace i18n
             var stored = GetLanguageFromSession(context);
             if (stored != null)
             {
-                return _service.GetText(text, new[] { stored });
+                return DependencyResolver.LocalizingService.GetText(text, new[] { stored });
             }
 
             // Use the client's browser settings to find a match
             var languages = context.Request.UserLanguages;
-            return _service.GetText(text, languages);
+            return DependencyResolver.LocalizingService.GetText(text, languages);
         }
 
         public virtual string GetText(HttpContextBase context, string text)
@@ -72,13 +66,13 @@ namespace i18n
             var stored = GetLanguageFromSession(context);
             if (stored != null)
             {
-                text = _service.GetText(text, new[] { stored });
+                text = DependencyResolver.LocalizingService.GetText(text, new[] { stored });
                 return HttpUtility.HtmlDecode(text);
             }
 
             // Use the client's browser settings to find a match
             var languages = context.Request.UserLanguages;
-            text = _service.GetText(text, languages);
+            text = DependencyResolver.LocalizingService.GetText(text, languages);
             return HttpUtility.HtmlDecode(text);
         }
 

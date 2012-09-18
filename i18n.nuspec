@@ -16,10 +16,7 @@
     <licenseUrl>https://github.com/danielcrenna/i18n/blob/master/LICENSE</licenseUrl>
     <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
     <tags>i18n localization globalization</tags>
-    <dependencies>
-      <dependency id="CommonServiceLocator" version="1.0" />
-    </dependencies>
-	  <releaseNotes>Fixed issues with gettext disallowing NuGet installation</releaseNotes>
+    <releaseNotes>Fixed issues with gettext disallowing NuGet installation</releaseNotes>
     <copyright>Copyright 2012 Daniel Crenna</copyright>
   </metadata>
 </package>

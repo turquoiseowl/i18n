@@ -16,7 +16,7 @@ namespace i18n
     /// </summary>
     public class LocalizingService : ILocalizingService
     {
-        private static readonly object _sync = new object();
+        private static readonly object Sync = new object();
 
         /// <summary>
         /// Returns the best matching language for this application's resources, based the provided languages
@@ -36,9 +36,9 @@ namespace i18n
                 }
 
                 // Save cycles processing beyond the default; this one is guaranteed
-                if (culture.TwoLetterISOLanguageName.Equals(I18N.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
+                if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
-                    return I18N.DefaultTwoLetterISOLanguageName;
+                    return DefaultSettings.DefaultTwoLetterISOLanguageName;
                 }
 
                 // Don't process the same culture code again
@@ -55,7 +55,7 @@ namespace i18n
                 }
             }
 
-            return I18N.DefaultTwoLetterISOLanguageName;
+            return DefaultSettings.DefaultTwoLetterISOLanguageName;
         }
 
         private static string GetLanguageIfAvailable(string culture)
@@ -64,7 +64,7 @@ namespace i18n
 
             var cacheKey = string.Format("po:{0}", culture);
 
-            lock (_sync)
+            lock (Sync)
             {
                 if (HttpRuntime.Cache[cacheKey] != null)
                 {
@@ -101,7 +101,7 @@ namespace i18n
                 var regional = TryGetTextFor(culture.IetfLanguageTag, key);
 
                 // Save cycles processing beyond the default; just return the original key
-                if (culture.TwoLetterISOLanguageName.Equals(I18N.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
+                if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return key;
                 }
@@ -128,7 +128,7 @@ namespace i18n
 
         private static string TryGetTextFor(string culture, string key)
         {
-            lock (_sync)
+            lock (Sync)
             {
                 if (HttpRuntime.Cache[string.Format("po:{0}", culture)] != null)
                 {
@@ -150,7 +150,7 @@ namespace i18n
 
         private static void CreateEmptyMessages(string culture)
         {
-            lock (_sync)
+            lock (Sync)
             {
                 string directory;
                 string path;
@@ -197,7 +197,7 @@ namespace i18n
             //If the msgstr is 1 word length, e.g. msgstr \"a\", it does not worked
             var quoted = new Regex("(?:\"(?:[^\"]+.)*\")", RegexOptions.Compiled);
 
-            lock (_sync)
+            lock (Sync)
             {
                 using (var fs = File.OpenText(path))
                 {
@@ -234,7 +234,7 @@ namespace i18n
                         }
                     }
 
-                    lock (_sync)
+                    lock (Sync)
                     {
                         // If the file changes we want to be able to rebuild the index without recompiling
                         HttpRuntime.Cache.Insert(string.Format("po:{0}", culture), messages, new CacheDependency(path));
@@ -288,7 +288,7 @@ namespace i18n
 
         private static string GetTextOrDefault(string culture, string key)
         {
-            lock (_sync)
+            lock (Sync)
             {
                 var messages = (List<I18NMessage>) HttpRuntime.Cache[string.Format("po:{0}", culture)];
 

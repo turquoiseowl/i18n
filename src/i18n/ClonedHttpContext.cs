@@ -3,7 +3,7 @@ using System.Web;
 
 namespace i18n
 {
-    internal class ClonedHttpContext : HttpContextBase
+    public class ClonedHttpContext : HttpContextBase
     {
         private readonly HttpContextBase _base;
         private readonly HttpRequestBase _requestBase;

@@ -4,7 +4,7 @@ using System.Web;
 
 namespace i18n
 {
-    internal class ClonedHttpRequest : HttpRequestBase
+    public class ClonedHttpRequest : HttpRequestBase
     {
         private readonly HttpRequestBase _base;
         private readonly string _url;
