@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>I18N</id>
-    <version>1.0.5</version>
+    <version>1.0.6-candidate</version>
     <authors>Daniel Crenna</authors>
     <owners>Daniel Crenna</owners>
     <summary>Smart internationalization for .NET web apps</summary>
