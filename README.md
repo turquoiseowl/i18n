@@ -1,7 +1,7 @@
 # i18n
 ## Smart internationalization for .NET web apps
 ```
-    PM> Package-Install I18N
+    PM> Install-Package I18N
 ```
 _Note: NuGet is currently not having it when it comes to nested folders with executables, which this project requires. For now, I suggest you download the lib from this site if you're experiencing problems, and add the gettext folder as content in your web application root folder. I'm working on a better solution._
 
