@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -51,8 +51,8 @@ namespace i18n
         private static void CreateMessageTemplate(string path, string manifest, string options)
         {
             // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("{2} -LC# -k_ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest, options);
-            RunWithOutput("gettext\\xgettext.exe", args);
+            var args = string.Format("{2} -LC# -k_ -k__ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest, options);
+            RunWithOutput("gettext\\xgettext.exe", args); // Mark H bodge
         }
 
         private static void RunWithOutput(string filename, string args)
@@ -88,7 +88,7 @@ namespace i18n
             using(var sw = File.CreateText(temp))
             {
                 foreach(var file in files)
-                {			
+                {
                     sw.WriteLine(file);
                 }
             }
