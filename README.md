@@ -53,6 +53,12 @@ And here's an example in a controller:
     }
 ```
 
+For use in URL-Helpers or other functions that require a plain string, you can use the `__("text")` alias:
+
+```html
+@Html.LabelFor(m => m.Name, __("First Name"))
+```
+
 #### Installing a base WebViewPage for Razor
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
 Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
