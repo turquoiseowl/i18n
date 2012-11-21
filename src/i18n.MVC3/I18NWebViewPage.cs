@@ -1,4 +1,4 @@
-﻿using System.Web;
+using System.Web;
 using System.Web.Mvc;
 
 namespace i18n
@@ -15,13 +15,19 @@ namespace i18n
         {
             _session = new I18NSession();
         }
-        
+
         public IHtmlString _(string text)
         {
             return new MvcHtmlString(_session.GetText(Context, text));
         }
+
+        public string __(string text)
+        {
+            return _session.GetText(Context, text);
+        }    
     }
 
+    
     /// <summary>
     /// A base view providing an alias for localizable resources
     /// </summary>
