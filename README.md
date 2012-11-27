@@ -181,7 +181,8 @@ to this folder by adding a `Web.config` file.
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
+* Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
 * Better parsing and handling of PO files for more general purposes / outside editors
-* Additional validation attributes
+* Additional validation attributes (though these days I think this feature should be tossed)
+* Generic handling that will work in ASP.NET Web API
 * Support for additional storage mechanisms beyond ASP.NET Session (i.e. cookies, closures, etc.)
-* Support for medium trust environments
