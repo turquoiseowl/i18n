@@ -5,4 +5,4 @@ if not exist "bin\tools\gettext-0.14.4" mkdir "bin\tools\gettext-0.14.4"
 copy LICENSE.md bin
 copy README.md bin
 copy "tools\gettext-0.14.4\*.*" "bin\tools\gettext-0.14.4"
-"src\.nuget\NuGet.exe" pack i18n.nuspec -BasePath bin
+".nuget\NuGet.exe" pack i18n.nuspec -BasePath bin

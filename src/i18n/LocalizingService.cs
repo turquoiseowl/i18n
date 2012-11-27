@@ -35,12 +35,6 @@ namespace i18n
                     return result;
                 }
 
-                // Save cycles processing beyond the default; this one is guaranteed
-                if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return DefaultSettings.DefaultTwoLetterISOLanguageName;
-                }
-
                 // Don't process the same culture code again
                 if (culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {

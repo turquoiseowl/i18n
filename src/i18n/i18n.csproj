@@ -34,12 +34,16 @@
     <DocumentationFile>..\..\bin\lib\net40\i18n.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>i18n.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="container">
+      <HintPath>..\packages\container.0.0.4\lib\net40\container.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -53,7 +57,6 @@
   <ItemGroup>
     <Compile Include="ClonedHttpRequest.cs" />
     <Compile Include="ClonedHttpContext.cs" />
-    <Compile Include="IocContainer.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
@@ -62,7 +65,6 @@
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
     <Compile Include="DataAnnotations\ValidationAttribute.cs" />
     <Compile Include="DefaultSettings.cs" />
-    <Compile Include="DependencyResolver.cs" />
     <Compile Include="I18NMessage.cs" />
     <Compile Include="ILocalizing.cs" />
     <Compile Include="ILocalizingService.cs" />
@@ -74,7 +76,7 @@
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="i18n.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

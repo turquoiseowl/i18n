@@ -14,7 +14,7 @@ namespace i18n
 
         public HtmlString()
         {
-            _formatter = DependencyResolver.HtmlStringFormatter;
+            _formatter = DefaultSettings.HtmlStringFormatter;
         }
 
         public string ToHtmlString()

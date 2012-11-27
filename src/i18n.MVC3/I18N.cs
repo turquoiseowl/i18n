@@ -13,12 +13,14 @@ namespace i18n
             get { return DefaultSettings.DefaultTwoLetterISOLanguageName; }
             set { DefaultSettings.DefaultTwoLetterISOLanguageName = value; }
         }
+
         static I18N()
         {
             DefaultTwoLetterISOLanguageName = "en";
-            DependencyResolver.Container.Register<IHtmlStringFormatter>(r => new MvcHtmlStringFormatter());
+            DefaultSettings.LocalizingService = new LocalizingService();
+            DefaultSettings.HtmlStringFormatter = new MvcHtmlStringFormatter();
         }
-        
+
         /// <summary>
         /// Registers the calling web application for automatic language
         /// URL routing based on the existing PO database

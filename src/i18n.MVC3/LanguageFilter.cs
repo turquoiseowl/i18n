@@ -18,7 +18,7 @@ namespace i18n
         public LanguageFilter()
         {
             _session = new I18NSession();
-            _service = DependencyResolver.LocalizingService;
+            _service = DefaultSettings.LocalizingService;
         }
 
         /// <summary>

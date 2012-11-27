@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>container</id>
+    <version>0.0.4</version>
+    <authors>Daniel Crenna</authors>
+    <owners>Daniel Crenna</owners>
+    <licenseUrl>https://github.com/danielcrenna/container/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>http://github.com/danielcrenna/container</projectUrl>
+    <iconUrl>http://apitize.com.s3.amazonaws.com/logo_generic.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A simple interface for function-descriptor style IoC containers. Includes an embedded Munq container by default.</description>
+    <summary>A simple interface for function-descriptor style IoC containers.</summary>
+    <language>en-US</language>
+    <tags>ioc container</tags>
+  </metadata>
+</package>
