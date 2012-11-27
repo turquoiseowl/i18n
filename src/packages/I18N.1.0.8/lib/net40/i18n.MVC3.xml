@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>i18n.MVC3</name>
+    </assembly>
+    <members>
+        <member name="T:i18n.I18N">
+            <summary>
+            The entrypoint for internationalization features in ASP.NET MVC
+            </summary>
+        </member>
+        <member name="M:i18n.I18N.Register">
+            <summary>
+            Registers the calling web application for automatic language
+            URL routing based on the existing PO database
+            </summary>
+        </member>
+        <member name="T:i18n.I18NController">
+            <summary>
+            A base controller providing an alias for localizable resources
+            </summary>
+        </member>
+        <member name="T:i18n.I18NWebViewPage`1">
+            <summary>
+            A base view providing an alias for localizable resources
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:i18n.I18NWebViewPage">
+            <summary>
+            A base view providing an alias for localizable resources
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:i18n.LanguageFilter">
+            <summary>
+            A global filter for automatically redirecting localized requests
+            to appropriate URLs, as well as setting the resulting language in
+            the HTTP response
+            </summary>
+        </member>
+        <member name="M:i18n.LanguageFilter.OnActionExecuting(System.Web.Mvc.ActionExecutingContext)">
+            <summary>
+            Called before an action method executes.
+            </summary>
+            <param name="filterContext">The filter context.</param>
+        </member>
+        <member name="M:i18n.LanguageFilter.OnActionExecuted(System.Web.Mvc.ActionExecutedContext)">
+            <summary>
+            Called after the action method executes.
+            </summary>
+            <param name="filterContext">The filter context.</param>
+        </member>
+        <member name="T:i18n.LanguageRouteDecorator">
+            <summary>
+            A route decorator that adapts existing original routes for localization
+            </summary>
+        </member>
+    </members>
+</doc>

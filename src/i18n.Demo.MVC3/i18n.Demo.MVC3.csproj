@@ -41,6 +41,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="container, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\I18N.1.0.8\lib\net40\container.dll</HintPath>
+    </Reference>
+    <Reference Include="i18n, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\I18N.1.0.8\lib\net40\i18n.dll</HintPath>
+    </Reference>
+    <Reference Include="i18n.MVC3, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\I18N.1.0.8\lib\net40\i18n.MVC3.dll</HintPath>
+    </Reference>
+    <Reference Include="i18n.PostBuild, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\I18N.1.0.8\lib\net40\i18n.PostBuild.exe</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System" />
@@ -94,7 +110,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -103,6 +118,110 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\envsubst.exe">
+      <Link>gettext\envsubst.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\gettext.exe">
+      <Link>gettext\gettext.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\hostname.exe">
+      <Link>gettext\hostname.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libexpat.dll">
+      <Link>gettext\libexpat.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libgettextlib.dll">
+      <Link>gettext\libgettextlib.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libgettextpo.dll">
+      <Link>gettext\libgettextpo.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libgettextsrc.dll">
+      <Link>gettext\libgettextsrc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libiconv2.dll">
+      <Link>gettext\libiconv2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\libintl3.dll">
+      <Link>gettext\libintl3.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgattrib.exe">
+      <Link>gettext\msgattrib.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgcat.exe">
+      <Link>gettext\msgcat.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgcmp.exe">
+      <Link>gettext\msgcmp.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgcomm.exe">
+      <Link>gettext\msgcomm.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgconv.exe">
+      <Link>gettext\msgconv.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgen.exe">
+      <Link>gettext\msgen.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgexec.exe">
+      <Link>gettext\msgexec.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgfilter.exe">
+      <Link>gettext\msgfilter.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgfmt.exe">
+      <Link>gettext\msgfmt.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msggrep.exe">
+      <Link>gettext\msggrep.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msginit.exe">
+      <Link>gettext\msginit.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgmerge.exe">
+      <Link>gettext\msgmerge.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msgunfmt.exe">
+      <Link>gettext\msgunfmt.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\msguniq.exe">
+      <Link>gettext\msguniq.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\ngettext.exe">
+      <Link>gettext\ngettext.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\urlget.exe">
+      <Link>gettext\urlget.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\xgettext.exe">
+      <Link>gettext\xgettext.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Scripts\modernizr-2.5.3.js" />
     <Content Include="Web.config" />
@@ -124,10 +243,6 @@
     <Content Include="Scripts\MicrosoftMvcValidation.js" />
     <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Account\ChangePassword.cshtml" />
-    <Content Include="Views\Account\ChangePasswordSuccess.cshtml" />
-    <Content Include="Views\Account\LogOn.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -136,16 +251,13 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Content Include="..\packages\I18N.1.0.8\tools\gettext-0.14.4\gettext.sh">
+      <Link>gettext\gettext.sh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\i18n.MVC3\i18n.MVC3.csproj">
-      <Project>{83841c25-a06e-4760-9407-92e445f16ea5}</Project>
-      <Name>i18n.MVC3</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -176,6 +288,9 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

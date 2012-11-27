@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>I18N</id>
+    <version>1.0.8</version>
+    <authors>Daniel Crenna</authors>
+    <owners>Daniel Crenna</owners>
+    <licenseUrl>https://github.com/danielcrenna/i18n/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://github.com/danielcrenna/i18n</projectUrl>
+    <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Smart internationalization for .NET web apps;
+    Globally recognized interface; localize like the big kids;
+    Localizes everything; controller calls, views, validation attributes, and routes.</description>
+    <summary>Smart internationalization for .NET web apps</summary>
+    <language>en-US</language>
+    <tags>i18n localization globalization</tags>
+    <dependencies>
+      <dependency id="container" version="0.0.4" />
+    </dependencies>
+  </metadata>
+</package>

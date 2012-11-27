@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>i18n</name>
+    </assembly>
+    <members>
+        <member name="T:i18n.DataAnnotations.DataType">
+            <summary>
+            Represents an enumeration of the data types associated with data fields and parameters
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Currency">
+            <summary>
+            Represents a currency value
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Custom">
+            <summary>
+            Represents a custom data type
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Date">
+            <summary>
+            Represents a date value
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.DateTime">
+            <summary>
+            Represents an instant of time, expressed as a date and time of day
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Duration">
+            <summary>
+            Represents a continuous time in which an object exists
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.EmailAddress">
+            <summary>
+            Represents an e-mail address
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Html">
+            <summary>
+            Represents an HTML file
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.ImageUrl">
+            <summary>
+            Represents a URL to an image
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.MultilineText">
+            <summary>
+            Represents multi-line test
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Password">
+            <summary>
+            Represents a password value
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.PhoneNumber">
+            <summary>
+            Represents a phone number value
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Text">
+            <summary>
+            Represents text that is displayed
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Time">
+            <summary>
+            Represents a time value
+            </summary>
+        </member>
+        <member name="F:i18n.DataAnnotations.DataType.Url">
+            <summary>
+            Represents a URL value
+            </summary>
+        </member>
+        <member name="T:i18n.DataAnnotations.DataTypeAttribute">
+            <summary>
+            Specifies an additional type to associate with a data field
+            </summary>
+        </member>
+        <member name="T:i18n.ILocalizing">
+            <summary>
+            Defines an alias for passing localizable text
+            </summary>
+        </member>
+        <member name="M:i18n.ILocalizing._(System.String)">
+            <summary>
+            Returns localized text for the given key, if available
+            </summary>
+            <param name="text">The text to localize</param>
+        </member>
+        <member name="M:i18n.DataAnnotations.DataTypeAttribute.#ctor(i18n.DataAnnotations.DataType)">
+            <summary>
+             Initializes a new instance of the <see cref="T:i18n.DataAnnotations.DataTypeAttribute"/> class by using the specified type name
+            </summary>
+            <param name="dataType"></param>
+        </member>
+        <member name="M:i18n.DataAnnotations.DataTypeAttribute.#ctor(System.String)">
+            <summary>
+             Initializes a new instance of the <see cref="T:i18n.DataAnnotations.DataTypeAttribute"/> class by using the specified field template name
+            </summary>
+            <param name="customDataType"></param>
+        </member>
+        <member name="M:i18n.DataAnnotations.DataTypeAttribute._(System.String)">
+            <summary>
+            Returns localized text for the given key, if available
+            </summary>
+            <param name="text">The text to localize</param>
+        </member>
+        <member name="M:i18n.DataAnnotations.DataTypeAttribute.FormatErrorMessage(System.String)">
+            <summary>
+            Applies formatting to an error message, based on the data field where the error occurred. 
+            </summary>
+            <returns>
+            An instance of the formatted error message.
+            </returns>
+            <param name="name">The name to include in the formatted message.</param>
+        </member>
+        <member name="P:i18n.DefaultSettings.DefaultTwoLetterISOLanguageName">
+            <summary>
+            The default language for all localized keys; when a PO database
+            is built, the default key file is stored at this locale location
+            </summary>
+        </member>
+        <member name="T:i18n.I18NMessage">
+            <summary>
+            A localized message residing in a PO resource file
+            </summary>
+        </member>
+        <member name="T:i18n.ILocalizingService">
+            <summary>
+            Defines a service for retrieving localized text from data source
+            </summary>
+        </member>
+        <member name="M:i18n.ILocalizingService.GetBestAvailableLanguageFrom(System.String[])">
+            <summary>
+            Returns the best matching language for this application's resources, based the provided languages
+            </summary>
+            <param name="languages">A sorted list of language preferences</param>
+        </member>
+        <member name="M:i18n.ILocalizingService.GetText(System.String,System.String[])">
+            <summary>
+            Returns localized text for a given default language key, or the default itself,
+            based on the provided languages and application resources
+            </summary>
+            <param name="key">The default language key to search for</param>
+            <param name="languages">A sorted list of language preferences</param>
+            <returns></returns>
+        </member>
+        <member name="T:i18n.LocalizingService">
+            <summary>
+            A service for retrieving localized text from PO resource files
+            </summary>
+        </member>
+        <member name="M:i18n.LocalizingService.GetBestAvailableLanguageFrom(System.String[])">
+            <summary>
+            Returns the best matching language for this application's resources, based the provided languages
+            </summary>
+            <param name="languages">A sorted list of language preferences</param>
+        </member>
+        <member name="M:i18n.LocalizingService.GetText(System.String,System.String[])">
+            <summary>
+            Returns localized text for a given default language key, or the default itself,
+            based on the provided languages and application resources
+            </summary>
+            <param name="key">The default language key to search for</param>
+            <param name="languages">A sorted list of language preferences</param>
+            <returns></returns>
+        </member>
+        <member name="T:i18n.PostBuildTask">
+            <summary>
+            A post-build task for building a localization message database using GNU xgettext
+            <see href="http://gnuwin32.sourceforge.net/packages/gettext.htm" />
+            </summary>
+        </member>
+        <member name="M:i18n.PostBuildTask.Execute(System.String,System.String,System.String)">
+            <summary>
+             Runs GNU xgettext to extract a messages template file
+            </summary>
+            <param name="path"></param>
+            <param name="gettext"> </param>
+            <param name="msgmerge"> </param>
+        </member>
+        <member name="T:i18n.I18NSession">
+            <summary>
+            A convenience class for localization operations
+            </summary>
+        </member>
+    </members>
+</doc>
