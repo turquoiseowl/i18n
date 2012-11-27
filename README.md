@@ -3,8 +3,6 @@
 ```
     PM> Install-Package I18N
 ```
-_Note: NuGet is currently not having it when it comes to nested folders with executables, which this project requires. For now, I suggest you download the lib from this site if you're experiencing problems, and add the gettext folder as content in your web application root folder. I'm working on a better solution._
-
 ### Introduction
 
 The i18n library is designed to replace the use of .NET resources in favor of an easier, globally recognized standard for localizing web applications. Using this library simplifies localization by making it a first class citizen of views, controllers, and validation attributes.
