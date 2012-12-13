@@ -299,10 +299,16 @@ namespace i18n
 
         private static CultureInfo GetCultureInfoFromLanguage(string language)
         {
+            //var semiColonIndex = language.IndexOf(';');
+            //return semiColonIndex > -1
+            //           ? new CultureInfo(language.Substring(0, semiColonIndex), true)
+            //           : new CultureInfo(language, true);
+            //Codes wouldn't work on ie10 of some languages of Windows 8 and Windows 2012
+
             var semiColonIndex = language.IndexOf(';');
-            return semiColonIndex > -1
-                       ? new CultureInfo(language.Substring(0, semiColonIndex), true)
-                       : new CultureInfo(language, true);
+            language = semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language;
+            language = System.Globalization.CultureInfo.CreateSpecificCulture(language).Name;
+            return new CultureInfo(language, true);
         }
     }
 }
