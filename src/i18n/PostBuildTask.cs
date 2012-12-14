@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -79,10 +80,23 @@ namespace i18n
             }
         }
 
+		private static string[] GetFiles(string path, string pattern) {
+			var files = new List<string>();
+
+			var directories = Directory.GetDirectories( path );
+
+			foreach ( var dir in directories.Where( x => !x.EndsWith( "\\obj" ) ) ) {
+				files.AddRange( Directory.GetFiles( dir, pattern, SearchOption.AllDirectories ) );
+			}
+
+
+			return files.ToArray();
+		}
+
         private static string BuildProjectFileManifest(string path)
         {
-            var cs = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
-            var razor = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
+			var cs = GetFiles( path, "*.cs" );
+            var razor = GetFiles(path, "*.cshtml");
             var files = (new[] {cs, razor}).SelectMany(f => f).ToList();
             var temp = Path.GetTempFileName();
             using(var sw = File.CreateText(temp))
