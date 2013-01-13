@@ -19,15 +19,17 @@ namespace i18n
 
         public static string GetLanguageFromSession(HttpContext context)
         {
-            return context.Session != null && context.Session[SessionKey] != null
-                       ? context.Session[SessionKey].ToString()
+            object val;
+            return context.Session != null && (val = context.Session[SessionKey]) != null
+                       ? val.ToString()
                        : null;
         }
 
         public static string GetLanguageFromSession(HttpContextBase context)
         {
-            return context.Session != null && context.Session[SessionKey] != null
-                       ? context.Session[SessionKey].ToString()
+            object val;
+            return context.Session != null && (val = context.Session[SessionKey]) != null
+                       ? val.ToString()
                        : null;
         }
 
