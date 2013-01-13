@@ -57,6 +57,22 @@ For use in URL-Helpers or other functions that require a plain string, you can u
 @Html.LabelFor(m => m.Name, __("First Name"))
 ```
 
+For use in HTML attributes, you can use the `_("value", "attrname")` overload:
+
+```html
+    <img @_("Our logo", "alt") src="...">...</img>
+```
+
+And the same overload can be used for Javascript embedded into your Razor view:
+
+```html
+    <script type="text/javascript">
+        $(function () {
+            alert(@_("Hello world!", ""));
+        });
+    </script>
+```
+
 #### Installing a base WebViewPage for Razor
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
 Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
