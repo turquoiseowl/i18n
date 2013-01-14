@@ -91,16 +91,16 @@ namespace i18n
             {
                 var culture = GetCultureInfoFromLanguage(language);
 
-                // en-US
-                var regional = TryGetTextFor(culture.IetfLanguageTag, key);
-
                 // Save cycles processing beyond the default; just return the original key
                 if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return key;
                 }
 
-                // en (and regional was defined)
+                // E.g. en-US
+                var regional = TryGetTextFor(culture.IetfLanguageTag, key);
+
+                // If we just tried a region-specific lookup and that failed...try a region-neutral lookup. E.g. fr-CH -> fr.
                 if(!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase) && regional == key)
                 {
                     var global = TryGetTextFor(culture.TwoLetterISOLanguageName, key);
