@@ -39,7 +39,7 @@ namespace i18n
             // Value is part of the explicit route and is the preferred language (from those available)
             var preferred = _session.GetLanguageFromSessionOrService(filterContext.HttpContext);
             var url = _session.GetUrlFromRequest(filterContext.HttpContext.Request);
-            if (url.EndsWithAnyIgnoreCase(string.Format("/{0}", preferred), string.Format("/{0}/", preferred)))
+            if (url.EndsWithAnyIgnoreCase(string.Format("/{0}", preferred), string.Format("/{0}/", preferred)) != null)
             {
                 return;
             }
@@ -57,7 +57,7 @@ namespace i18n
             {
                 var semiColonIndex = language.IndexOf(';');
                 var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
-                if (!url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)))
+                if (url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)) == null)
                 {
                     continue;
                 }
