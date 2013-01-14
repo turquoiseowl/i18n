@@ -7,7 +7,7 @@ namespace i18n
     /// </summary>
     public class I18NSession
     {
-        private const string SessionKey = "po:language";
+        protected const string SessionKey = "po:language";
 
         public virtual void Set(HttpContextBase context, string language)
         {
@@ -19,15 +19,17 @@ namespace i18n
 
         public static string GetLanguageFromSession(HttpContext context)
         {
-            return context.Session != null && context.Session[SessionKey] != null
-                       ? context.Session[SessionKey].ToString()
+            object val;
+            return context.Session != null && (val = context.Session[SessionKey]) != null
+                       ? val.ToString()
                        : null;
         }
 
         public static string GetLanguageFromSession(HttpContextBase context)
         {
-            return context.Session != null && context.Session[SessionKey] != null
-                       ? context.Session[SessionKey].ToString()
+            object val;
+            return context.Session != null && (val = context.Session[SessionKey]) != null
+                       ? val.ToString()
                        : null;
         }
 
