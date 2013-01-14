@@ -7,7 +7,7 @@ namespace i18n
     /// </summary>
     public class I18NSession
     {
-        private const string SessionKey = "po:language";
+        protected const string SessionKey = "po:language";
 
         public virtual void Set(HttpContextBase context, string language)
         {
