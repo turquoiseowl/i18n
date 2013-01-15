@@ -58,9 +58,7 @@ namespace i18n
         //
             culture = culture.ToLowerInvariant();
 
-            var cacheKey = string.Format("po:{0}", culture);
-
-            List<I18NMessage> messages = (List<I18NMessage>)HttpRuntime.Cache[cacheKey];
+            List<I18NMessage> messages = (List<I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
@@ -74,11 +72,11 @@ namespace i18n
                 }
 
                 // Address messages just loaded.
-                messages = (List<I18NMessage>)HttpRuntime.Cache[cacheKey];
+                messages = (List<I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
             }
 
             // The language is considered to be available if one or more message strings exist.
-            return ((List<I18NMessage>)HttpRuntime.Cache[cacheKey]).Count > 0 ? culture : null;
+            return messages.Count > 0 ? culture : null;
         }
 
         /// <summary>
@@ -148,7 +146,7 @@ namespace i18n
                 }
 
                 // If the file changes we want to be able to rebuild the index without recompiling
-                HttpRuntime.Cache.Insert(string.Format("po:{0}", culture), new List<I18NMessage>(0), new CacheDependency(path));
+                HttpRuntime.Cache.Insert(GetCacheKey(culture), new List<I18NMessage>(0), new CacheDependency(path));
             }
         }
 
@@ -223,7 +221,7 @@ namespace i18n
                     //lock (Sync)
                     {
                         // If the file changes we want to be able to rebuild the index without recompiling
-                        HttpRuntime.Cache.Insert(string.Format("po:{0}", culture), messages, new CacheDependency(path));
+                        HttpRuntime.Cache.Insert(GetCacheKey(culture), messages, new CacheDependency(path));
                     }
                 }
             }
@@ -276,9 +274,9 @@ namespace i18n
         {
             lock (Sync)
             {
-                var messages = (List<I18NMessage>) HttpRuntime.Cache[string.Format("po:{0}", culture)];
+                var messages = (List<I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
 
-                if (messages.Count() == 0)
+                if (messages == null || messages.Count() == 0)
                 {
                     return key;
                 }
@@ -307,7 +305,10 @@ namespace i18n
             language = System.Globalization.CultureInfo.CreateSpecificCulture(language).Name;
             return new CultureInfo(language, true);
         }
+
+        private static string GetCacheKey(string culture)
+        {
+            return string.Format("po:{0}", culture).ToLowerInvariant();
+        }
     }
 }
-
-       
