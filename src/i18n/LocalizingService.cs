@@ -174,6 +174,12 @@ namespace i18n
         {
             lock (Sync)
             {
+                // It is possible for multiple threads to race to this method. The first to
+                // enter the above lock will insert the messages into the cache.
+                // If we lost the race...no need to duplicate the work of the winning thread.
+                if (HttpRuntime.Cache[GetCacheKey(culture)] != null) {
+                    return; }
+
                 using (var fs = File.OpenText(path))
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
