@@ -126,24 +126,7 @@ namespace i18n
 
         private static string TryGetTextFor(string culture, string key)
         {
-            lock (Sync)
-            {
-                if (HttpRuntime.Cache[string.Format("po:{0}", culture)] != null)
-                {
-                    // This culture is already processed and in memory
-                    return GetTextOrDefault(culture, key);
-                }
-            }
-
-            if(LoadMessages(culture))
-            {
-                return GetTextOrDefault(culture, key);    
-            }
-            
-            // Avoid shredding the disk looking for non-existing files
-            CreateEmptyMessages(culture);
-
-            return key;
+            return GetLanguageIfAvailable(culture) != null ? GetTextOrDefault(culture, key) : key;
         }
 
         private static void CreateEmptyMessages(string culture)
