@@ -20,5 +20,26 @@ namespace i18n
             }
             return null;
         }
+
+        /// <summary>
+        /// Isolates and returns the character sequence between any first and last quote chars.
+        /// </summary>
+        /// <param name="lhs">Subject string possibly containing a quoted sequence.</param>
+        /// <param name="quotechar">Quote char, defaults to double quotes. May be a string of more than one character.</param>
+        /// <returns>
+        /// Any character sequence contained within the first and last occurence of quotechar.
+        /// Empty string if the first and last occurrence of quotechar are adjacent chars.
+        /// Null if no welformed quoted sequence found.
+        /// </returns>
+        public static string Unquote(this string lhs, string quotechar = "\"")
+        {
+            int begin = lhs.IndexOf(quotechar);
+            if (begin == -1) {
+                return null; }
+            int end = lhs.LastIndexOf(quotechar);
+            if (end <= begin) {
+                return null; }
+            return lhs.Substring(begin +1, end -begin -1);
+        }
     }
 }

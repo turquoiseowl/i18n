@@ -173,8 +173,6 @@ namespace i18n
 
         private static void LoadFromDiskAndCache(string culture, string path)
         {
-            var quoted = new Regex("(?:\"(?:[^\"]+.)*\")", RegexOptions.Compiled);
-
             lock (Sync)
             {
                 using (var fs = File.OpenText(path))
@@ -203,7 +201,7 @@ namespace i18n
                             message.Comment = sb.ToString();
 
                             sb.Clear();
-                            ParseBody(fs, line, sb, message, quoted);
+                            ParseBody(fs, line, sb, message);
                             // Only if a msgstr (translation) is provided for this entry do we add an entry to the cache.
                             // This conditions facilitates more useful operation of the GetLanguageIfAvailable method,
                             // which prior to this condition was indicating a language was available when in fact there
@@ -213,7 +211,7 @@ namespace i18n
                         }
                         else if (line.StartsWith("msgid"))
                         {
-                            ParseBody(fs, line, sb, message, quoted);
+                            ParseBody(fs, line, sb, message);
                         }
                     }
 
@@ -226,20 +224,18 @@ namespace i18n
             }
         }
 
-        private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message, Regex quoted)
+        private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message)
         {
             if(!string.IsNullOrEmpty(line))
             {
                 if(line.StartsWith("msgid"))
                 {
-                    int firstIndex = line.IndexOf('\"');
-                    int lastIndex = line.LastIndexOf('\"');
-                    var msgid = line.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    var msgid = line.Unquote();
                     sb.Append(msgid);
 
-                    while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && !string.IsNullOrWhiteSpace(msgid = quoted.Match(line).Value))
+                    while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && (msgid = line.Unquote()) != null)
                     {
-                        sb.Append(msgid.Substring(1, msgid.Length - 2));
+                        sb.Append(msgid);
                     }
 
                     message.MsgId = sb.ToString();
@@ -248,15 +244,12 @@ namespace i18n
                 sb.Clear();
                 if(!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
                 {
-                    //var msgstr = quoted.Match(line).Value;
-                    //sb.Append(msgstr.Substring(1, msgstr.Length - 2));
-                    int firstIndex = line.IndexOf('\"');
-                    int lastIndex = line.LastIndexOf('\"');
-                    var msgstr = line.Substring(firstIndex+1, lastIndex-firstIndex-1);
+                    var msgstr = line.Unquote();
                     sb.Append(msgstr);
-                    while ((line = fs.ReadLine()) != null && !string.IsNullOrEmpty(msgstr = quoted.Match(line).Value))
+
+                    while ((line = fs.ReadLine()) != null && (msgstr = line.Unquote()) != null)
                     {
-                        sb.Append(msgstr.Substring(1, msgstr.Length - 2));
+                        sb.Append(msgstr);
                     }
 
                     message.MsgStr = sb.ToString();
