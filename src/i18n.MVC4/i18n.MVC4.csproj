@@ -53,9 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\i18n.MVC3\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
     <Compile Include="..\i18n.MVC3\I18N.cs">
       <Link>I18N.cs</Link>
     </Compile>
