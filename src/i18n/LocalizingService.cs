@@ -271,24 +271,23 @@ namespace i18n
 
         private static string GetTextOrDefault(string culture, string key)
         {
-            lock (Sync)
+        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+        //
+            var messages = (List<I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
+
+            if (messages == null || messages.Count() == 0)
             {
-                var messages = (List<I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
-
-                if (messages == null || messages.Count() == 0)
-                {
-                    return key;
-                }
-
-                var matched = messages.SingleOrDefault(m => m.MsgId.Equals(key));
-
-                if (matched == null)
-                {
-                    return key;
-                }
-
-                return string.IsNullOrWhiteSpace(matched.MsgStr) ? key : matched.MsgStr;
+                return key;
             }
+
+            var matched = messages.SingleOrDefault(m => m.MsgId.Equals(key));
+
+            if (matched == null)
+            {
+                return key;
+            }
+
+            return string.IsNullOrWhiteSpace(matched.MsgStr) ? key : matched.MsgStr;
         }
 
         private static CultureInfo GetCultureInfoFromLanguage(string language)
