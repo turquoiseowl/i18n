@@ -173,7 +173,6 @@ namespace i18n
 
         private static void LoadFromDiskAndCache(string culture, string path)
         {
-            //If the msgstr is 1 word length, e.g. msgstr \"a\", it does not worked
             var quoted = new Regex("(?:\"(?:[^\"]+.)*\")", RegexOptions.Compiled);
 
             lock (Sync)
