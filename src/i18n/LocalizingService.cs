@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
@@ -238,7 +237,7 @@ namespace i18n
                         sb.Append(msgid);
                     }
 
-                    message.MsgId = sb.ToString();
+                    message.MsgId = sb.ToString().Unescape();
                 }
 
                 sb.Clear();
@@ -252,7 +251,7 @@ namespace i18n
                         sb.Append(msgstr);
                     }
 
-                    message.MsgStr = sb.ToString();
+                    message.MsgStr = sb.ToString().Unescape();
                 }
             }
         }
