@@ -23,9 +23,13 @@ namespace i18n
         /// <param name="languages">A sorted list of language preferences</param>
         public virtual string GetBestAvailableLanguageFrom(string[] languages)
         {
-            foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
+            foreach (var language in languages)
             {
                 var culture = GetCultureInfoFromLanguage(language);
+                if (culture == null)
+                {
+                    continue;
+                }
                 
                 // en-US
                 var result = GetLanguageIfAvailable(culture.IetfLanguageTag);
@@ -51,12 +55,11 @@ namespace i18n
             return DefaultSettings.DefaultTwoLetterISOLanguageName;
         }
 
+        /// <returns>null if not available.</returns>
         private static string GetLanguageIfAvailable(string culture)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            culture = culture.ToLowerInvariant();
-
             Dictionary<string, I18NMessage> messages = (Dictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
 
             // If messages not yet loaded in for the language
@@ -88,9 +91,13 @@ namespace i18n
         public virtual string GetText(string key, string[] languages)
         {
             // Prefer 'en-US', then 'en', before moving to next language choice
-            foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
+            foreach (var language in languages)
             {
                 var culture = GetCultureInfoFromLanguage(language);
+                if (culture == null)
+                {
+                    continue;
+                }
 
                 // Save cycles processing beyond the default; just return the original key
                 if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
@@ -100,30 +107,29 @@ namespace i18n
 
                 // E.g. en-US
                 var regional = TryGetTextFor(culture.IetfLanguageTag, key);
-
-                // If we just tried a region-specific lookup and that failed...try a region-neutral lookup. E.g. fr-CH -> fr.
-                if(!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase) && regional == key)
-                {
-                    var global = TryGetTextFor(culture.TwoLetterISOLanguageName, key);
-                    if(global != key)
-                    {
-                        return global;
-                    }
-                    continue;
-                }
-
-                if(regional != key)
+                if (regional != null)
                 {
                     return regional;
+                }
+
+                // Now that region-specific lookup failed...try a region-neutral lookup. E.g. fr-CH -> fr.
+                if (!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
+                {
+                    var neutral = TryGetTextFor(culture.TwoLetterISOLanguageName, key);
+                    if (neutral != null)
+                    {
+                        return neutral;
+                    }
                 }
             }
 
             return key;
         }
 
+        /// <returns>null if not found.</returns>
         private static string TryGetTextFor(string culture, string key)
         {
-            return GetLanguageIfAvailable(culture) != null ? GetTextOrDefault(culture, key) : key;
+            return GetLanguageIfAvailable(culture) != null ? LookupText(culture, key) : null;
         }
 
         private static void CreateEmptyMessages(string culture)
@@ -273,7 +279,8 @@ namespace i18n
             return line.Replace("# ", "").Replace("#. ", "").Replace("#: ", "").Replace("#, ", "").Replace("#| ", "");
         }
 
-        private static string GetTextOrDefault(string culture, string key)
+        /// <returns>null if not found.</returns>
+        private static string LookupText(string culture, string key)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
@@ -282,13 +289,14 @@ namespace i18n
 
             if (messages == null || !messages.TryGetValue(key, out message))
             {
-                return key;
+                return null;
             }
 
             return message.MsgStr;
                 // We check this for null/empty before adding to collection.
         }
 
+        /// <returns>null if not found.</returns>
         private static CultureInfo GetCultureInfoFromLanguage(string language)
         {
             //var semiColonIndex = language.IndexOf(';');
@@ -297,10 +305,16 @@ namespace i18n
             //           : new CultureInfo(language, true);
             //Codes wouldn't work on ie10 of some languages of Windows 8 and Windows 2012
 
-            var semiColonIndex = language.IndexOf(';');
-            language = semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language;
-            language = System.Globalization.CultureInfo.CreateSpecificCulture(language).Name;
-            return new CultureInfo(language, true);
+            if (string.IsNullOrWhiteSpace(language)) {
+                return null; }
+            try {
+                var semiColonIndex = language.IndexOf(';');
+                language = semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language;
+                language = System.Globalization.CultureInfo.CreateSpecificCulture(language).Name;
+                return new CultureInfo(language, true);
+            }
+            catch (Exception) {
+                return null; }
         }
 
         private static string GetCacheKey(string culture)
