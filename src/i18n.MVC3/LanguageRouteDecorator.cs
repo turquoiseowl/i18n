@@ -29,12 +29,13 @@ namespace i18n
                 {
                     var semiColonIndex = language.IndexOf(';');
                     var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
-                    if (!url.EndsWithAnyIgnoreCase(token, token + "/"))
+                    string suffix = url.EndsWithAnyIgnoreCase(token, token + "/");
+                    if (suffix == null)
                     {
                         continue;
                     }
 
-                    url = url.TrimEnd(token.Substring(1).ToCharArray());
+                    url = url.Substring(0, url.Length -suffix.Length);
                     var originalRequest = new ClonedHttpRequest(context.Request, url);
                     var originalContext = new ClonedHttpContext(context, originalRequest);
 
@@ -68,7 +69,7 @@ namespace i18n
                         var language = _session.GetLanguageFromSessionOrService(context.HttpContext);
                         var token = string.Format("/{0}", language);
                         var url = _session.GetUrlFromRequest(context.HttpContext.Request);
-                        if(url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)))
+                        if (url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)) != null)
                         {
                             result.VirtualPath = result.VirtualPath.Equals("")
                                                      ? language
