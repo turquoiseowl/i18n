@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -60,7 +60,7 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            Dictionary<string, I18NMessage> messages = (Dictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
@@ -74,7 +74,7 @@ namespace i18n
                 }
 
                 // Address messages just loaded.
-                messages = (Dictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
             }
 
             // The language is considered to be available if one or more message strings exist.
@@ -151,7 +151,7 @@ namespace i18n
                 }
 
                 // If the file changes we want to be able to rebuild the index without recompiling
-                HttpRuntime.Cache.Insert(GetCacheKey(culture), new Dictionary<string, I18NMessage>(0), new CacheDependency(path));
+                HttpRuntime.Cache.Insert(GetCacheKey(culture), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
             }
         }
 
@@ -190,7 +190,7 @@ namespace i18n
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
 
-                    var messages = new Dictionary<string, I18NMessage>(0);
+                    var messages = new ConcurrentDictionary<string, I18NMessage>();
                     string line;
                     while ((line = fs.ReadLine()) != null)
                     {
@@ -222,7 +222,7 @@ namespace i18n
                             {
                                 if (!messages.ContainsKey(message.MsgId))
                                 {
-                                    messages.Add(message.MsgId, message);
+                                    messages[message.MsgId] = message;
                                 }
                             }
                         }
@@ -284,7 +284,7 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            var messages = (Dictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
+            var messages = (ConcurrentDictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
             I18NMessage message = null;
 
             if (messages == null || !messages.TryGetValue(key, out message))
