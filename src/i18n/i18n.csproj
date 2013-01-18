@@ -70,6 +70,7 @@
     <Compile Include="ILocalizing.cs" />
     <Compile Include="ILocalizingService.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
+    <Compile Include="LanguageTag.cs" />
     <Compile Include="LocalizingService.cs" />
     <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

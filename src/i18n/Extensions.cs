@@ -7,6 +7,15 @@ namespace i18n
     internal static class Extensions
     {
         /// <summary>
+        /// String extension method to simplify testing for non-null/non-empty values.
+        /// </summary>
+        public static bool IsSet(
+            this string str)
+        {
+            return !string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
         /// Helper for testing whether a string ends with one of any out of a collection of strings,
         /// in a case-insentive way.
         /// </summary>
