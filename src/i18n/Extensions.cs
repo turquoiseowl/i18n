@@ -56,7 +56,7 @@ namespace i18n
         /// Looks up in the subject string standard C escape sequences and converts them
         /// to their actual character counterparts.
         /// </summary>
-        /// <seealso cref="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
+        /// <seealso href="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
         public static string Unescape(this string s)
         {
             StringBuilder sb = new StringBuilder();

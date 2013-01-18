@@ -24,7 +24,7 @@ namespace i18n
     ///     "zh-Hant"       [language + script]
     ///     "zh-Hant-HK"    [language + script + region]
     /// </summary>
-    /// <seealso cref="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
+    /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
     public class LanguageTag
     {
     // Decl
@@ -100,7 +100,7 @@ namespace i18n
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
         /// </param>
-        /// <seealso cref="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
+        /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public LanguageTag(string langtag)
         {
             langtag = langtag.Trim();
@@ -141,7 +141,7 @@ namespace i18n
         ///     "zh-Hant-HK"    [language + script + region]
         /// </param>
         /// <returns>Either new or pre-exisiting instance.</returns>
-        /// <seealso cref="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
+        /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public static LanguageTag GetCachedInstance(string langtag)
         {
             LanguageTag result = null;
@@ -241,7 +241,7 @@ namespace i18n
         /// F. Language Mismatch (0)
         ///     Language doesn't match.
         /// </remarks>
-        /// <seealso cref="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
+        /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public int Match(LanguageTag i_rhs, MatchGrade matchGrade = MatchGrade.LanguageMatch)
         {
         //

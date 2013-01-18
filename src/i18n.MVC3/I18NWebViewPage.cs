@@ -58,7 +58,7 @@ namespace i18n
         ///           });
         ///     </script>
         /// </example>
-        /// <seealso cref="https://github.com/danielcrenna/i18n/issues/8"/>
+        /// <seealso href="https://github.com/danielcrenna/i18n/issues/8"/>
         public IHtmlString _(string value, string attrname)
         {
             value = _session.GetText(Context, value);
