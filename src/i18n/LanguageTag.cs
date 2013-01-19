@@ -25,7 +25,7 @@ namespace i18n
     ///     "zh-Hant-HK"    [language + script + region]
     /// </summary>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
-    public class LanguageTag
+    public class LanguageTag : ILanguageTag
     {
     // Decl
         public static readonly string[,] NormalizedLangTags =
@@ -186,6 +186,15 @@ namespace i18n
                 sb.Append("-").Append(Region); }
             return sb.ToString();
         }
+    // [ILanguageTag]
+        string   ILanguageTag.GetLanguage()   { return Language; }
+        string   ILanguageTag.GetExtlang()    { return null; }
+        string   ILanguageTag.GetScript()     { return Script; }
+        string   ILanguageTag.GetRegion()     { return Region; }
+        string[] ILanguageTag.GetVariant()    { return null; }
+        string   ILanguageTag.GetExtension()  { return null; }
+        string   ILanguageTag.GetPrivateuse() { return null; }
+        float    ILanguageTag.GetQuality()    { return -1; }
     // Operations
         /// <summary>
         /// Performs 'language matching' between lang described by this (A)
