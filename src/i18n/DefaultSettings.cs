@@ -7,6 +7,7 @@ namespace i18n
         /// <summary>
         /// Enumeration of supported language matching algorithms.
         /// </summary>
+        /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public enum LanguageMatching
         {
             /// <summary>

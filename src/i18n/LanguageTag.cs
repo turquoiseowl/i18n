@@ -83,7 +83,8 @@ namespace i18n
         public string Region { get; private set; }
     // Con
         /// <summary>
-        /// Constructs a new instance based on a langugae tag string.
+        /// Constructs a new instance based on a language tag string.
+        /// If successful, then the Language property is set to a valid language subtag.
         /// </summary>
         /// <param name="langtag">
         /// Supports a subset of BCP 47 language tag spec corresponding to the Windows
@@ -120,7 +121,7 @@ namespace i18n
                 Script   = match.Groups[2].Value;
                 Region   = match.Groups[3].Value;
             }
-            Debug.Assert(ToString() == langtag);
+            //Debug.Assert(ToString() == langtag);
         }
         /// <summary>
         /// Instance factory that supports re-use of instances which by definition are read-only.

@@ -55,12 +55,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcceptLanguage.cs" />
     <Compile Include="ClonedHttpRequest.cs" />
     <Compile Include="ClonedHttpContext.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ParseHelpers.cs" />
     <Compile Include="HtmlString.cs" />
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="ILocalizing.cs" />
     <Compile Include="ILocalizingService.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
+    <Compile Include="LanguageMatching.cs" />
     <Compile Include="LanguageTag.cs" />
     <Compile Include="LocalizingService.cs" />
     <Compile Include="PostBuildTask.cs" />
