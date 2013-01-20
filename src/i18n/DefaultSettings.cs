@@ -16,8 +16,9 @@ namespace i18n
             Basic,
 
             /// <summary>
-            /// Multi-phase language matching algorithm that provides more granular matching 
+            /// Multi-pass language matching algorithm that provides more granular matching 
             /// of a client's preferred languages against available application languages.
+            /// Requires the localizing service to implement ILocalizingServiceEnhanced.
             /// </summary>
             Enhanced,
         }

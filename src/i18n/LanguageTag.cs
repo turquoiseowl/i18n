@@ -25,7 +25,7 @@ namespace i18n
     ///     "zh-Hant-HK"    [language + script + region]
     /// </summary>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
-    public class LanguageTag : ILanguageTag
+    public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>
     {
     // Decl
         public static readonly string[,] NormalizedLangTags =
@@ -70,6 +70,17 @@ namespace i18n
             // Facilitates serialization of write-access to s_cache.
     // Props
         /// <summary>
+        /// Original full language tag string passed to constructor.
+        /// </summary>
+        private string m_langtag;
+        /// <summary>
+        /// Reference to any parent language tag, or null if no parent determined.
+        /// The parent is the the language tag with one less subtag.
+        /// E.g. if all three supported subtags are set (language, script and region), the parent 
+        /// will be the language tag composed of the language and script subtags.
+        /// </summary>
+        LanguageTag m_parent;
+        /// <summary>
         /// Mandatory Language subtag, or if CON fails then null.
         /// </summary>
         public string Language { get; private set; }
@@ -104,23 +115,35 @@ namespace i18n
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public LanguageTag(string langtag)
         {
-            langtag = langtag.Trim();
+            m_langtag = langtag.Trim();
            // Normalize certain langtags:
            // «LX113» http://www.w3.org/International/articles/language-tags/#script
             for (int i = 0; i < NormalizedLangTags.GetLength(0); ++i) {
-                if (0 == string.Compare(langtag, NormalizedLangTags[i,0], true)) {
-                    langtag = NormalizedLangTags[i,1];
+                if (0 == string.Compare(m_langtag, NormalizedLangTags[i,0], true)) {
+                    m_langtag = NormalizedLangTags[i,1];
                     break;
                 }
             }
            // Parse the langtag.
-            Match match = m_regex.Match(langtag);
+            Match match = m_regex.Match(m_langtag);
             if (match.Success
                 && match.Groups.Count == 4) {
                 Language = match.Groups[1].Value;
                 Script   = match.Groups[2].Value;
                 Region   = match.Groups[3].Value;
             }
+           // Load any parent:
+           //   l-s-r -> l-s
+           //   l-r   -> l
+           //   l-s   -> l
+           //   l     -> no parent
+            if (Region.IsSet() && Script.IsSet()) {
+                m_parent = GetCachedInstance(string.Format("{0}-{1}", Language, Script)); }
+            else if (Script.IsSet() || Region.IsSet()) {
+                m_parent = GetCachedInstance(Language); }
+            else {
+                m_parent = null; }
+
             //Debug.Assert(ToString() == langtag);
         }
         /// <summary>
@@ -179,12 +202,7 @@ namespace i18n
         /// </returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder(Language);
-            if (Script.IsSet()) {
-                sb.Append("-").Append(Script); }
-            if (Region.IsSet()) {
-                sb.Append("-").Append(Region); }
-            return sb.ToString();
+            return m_langtag.IsSet() ? m_langtag : "";
         }
     // [ILanguageTag]
         string   ILanguageTag.GetLanguage()   { return Language; }
@@ -195,6 +213,13 @@ namespace i18n
         string   ILanguageTag.GetExtension()  { return null; }
         string   ILanguageTag.GetPrivateuse() { return null; }
         float    ILanguageTag.GetQuality()    { return -1; }
+        ILanguageTag ILanguageTag.GetParent() { return m_parent; }
+        int      ILanguageTag.GetMaxParents() { return 2; }
+    // [IEquatable<LanguageTag>]
+        public bool Equals(LanguageTag other)
+        {
+            return 0 == string.Compare(m_langtag, other.m_langtag, true);
+        }
     // Operations
         /// <summary>
         /// Performs 'language matching' between lang described by this (A)

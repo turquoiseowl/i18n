@@ -16,6 +16,21 @@ namespace i18n
         }
 
         /// <summary>
+        /// Efficiently returns the number of time the specified char appears in the string.
+        /// </summary>
+        public static int CountOfChar(
+            this string str,
+            char ch)
+        {
+            int n = 0;
+            foreach (char ch1 in str) {
+                if (ch1 == ch) {
+                    ++n; }
+            }
+            return n;
+        }
+
+        /// <summary>
         /// Helper for testing whether a string ends with one of any out of a collection of strings,
         /// in a case-insentive way.
         /// </summary>

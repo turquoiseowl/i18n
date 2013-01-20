@@ -72,6 +72,9 @@ namespace i18n
                 return HttpUtility.HtmlDecode(text);
             }
 
+            LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+            
+
             // Use the client's browser settings to find a match
             var languages = context.Request.UserLanguages;
             text = DefaultSettings.LocalizingService.GetText(text, languages);

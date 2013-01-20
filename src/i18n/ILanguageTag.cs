@@ -1,4 +1,6 @@
-﻿namespace i18n
+﻿using System;
+
+namespace i18n
 {
     /// <summary>
     /// Describes a language tag value, as defined in RFC 5646 (BCP 47).
@@ -59,5 +61,17 @@
         /// -1 if the instance does not implement a quality value.
         /// </returns>
         float GetQuality();
+
+        /// <summary>
+        /// Returns an object representing any logical parent of the tag.
+        /// </summary>
+        /// <returns>Parent object or null if no parent.</returns>
+        ILanguageTag GetParent();
+
+        /// <summary>
+        /// Returns the maximum number of parents possible.
+        /// This is really a static value provided by the underlying impl.
+        /// </summary>
+        int GetMaxParents();
     }
 }
