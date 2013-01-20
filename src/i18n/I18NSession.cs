@@ -50,33 +50,40 @@ namespace i18n
 
         public virtual string GetText(HttpContext context, string text)
         {
+            string[] languages;
+    
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
             if (stored != null)
             {
-                return DefaultSettings.LocalizingService.GetText(text, new[] { stored });
+                languages = new[] { stored };
+            }
+            else
+            {
+                // Use the client's browser settings to find a match
+                languages = context.Request.UserLanguages;
             }
 
-            // Use the client's browser settings to find a match
-            var languages = context.Request.UserLanguages;
-            return DefaultSettings.LocalizingService.GetText(text, languages);
+            text = DefaultSettings.LocalizingService.GetText(text, languages);
+            return HttpUtility.HtmlDecode(text);
         }
 
         public virtual string GetText(HttpContextBase context, string text)
         {
+            string[] languages;
+
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
             if (stored != null)
             {
-                text = DefaultSettings.LocalizingService.GetText(text, new[] { stored });
-                return HttpUtility.HtmlDecode(text);
+                languages = new[] { stored };
+            }
+            else
+            {
+                // Use the client's browser settings to find a match
+                languages = context.Request.UserLanguages;
             }
 
-            LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
-            
-
-            // Use the client's browser settings to find a match
-            var languages = context.Request.UserLanguages;
             text = DefaultSettings.LocalizingService.GetText(text, languages);
             return HttpUtility.HtmlDecode(text);
         }
