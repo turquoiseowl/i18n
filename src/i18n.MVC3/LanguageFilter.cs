@@ -29,6 +29,7 @@ namespace i18n
         {
             var request = filterContext.HttpContext.Request;
             var values = filterContext.RouteData.Values;
+            string str;
 
             // Value is already injected from a route declaration
             if (values.ContainsKey("language"))
@@ -45,9 +46,9 @@ namespace i18n
             }
 
             // Value is loose in the query string, i.e. '/?language=en'
-            if (request.QueryString["language"] != null)
+            if ((str = request.QueryString["language"]) != null)
             {
-                _session.Set(filterContext.HttpContext, request.QueryString["language"]);
+                _session.Set(filterContext.HttpContext, str);
                 preferred = _session.GetLanguageFromSessionOrService(filterContext.HttpContext);
             }
 
