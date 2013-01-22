@@ -34,11 +34,13 @@ namespace i18n
         /// is built, the default key file is stored at this locale location
         /// </summary>
         public static string DefaultTwoLetterISOLanguageName { get; set; }
+        public static LanguageTag DefaultTwoLetterISOLanguageTag { get; set; }
 
         static DefaultSettings()
         {
             DefaultLanguageMatchingAlgorithm = LanguageMatching.Basic;
             DefaultTwoLetterISOLanguageName = "en";
+            DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance(DefaultTwoLetterISOLanguageName);
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
             Container.Register<ILocalizingServiceEnhanced>(r => new LocalizingService());

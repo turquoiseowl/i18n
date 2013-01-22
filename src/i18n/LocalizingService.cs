@@ -149,22 +149,18 @@ namespace i18n
         /// <param name="key">The default language key to search for</param>
         /// <param name="languages">A sorted list of language preferences</param>
         /// <returns></returns>
-        public virtual string GetText(string key, LanguageItem[] languages)
+        public virtual string GetText(string key, LanguageItem[] languages, out LanguageTag o_langtag)
         {
             // Perform language matching based on UserLanguaes, AppLanguages, and presence of
             // resource under key for any particular AppLanguage.
             string text;
-            LanguageTag lt = LanguageMatching.MatchLists(languages, GetAppLanguages(), key, TryGetTextFor, out text);
+            o_langtag = LanguageMatching.MatchLists(languages, GetAppLanguages(), key, TryGetTextFor, out text);
             if (text != null) {
                 return text; }
 
             // Next try default language.
-            text = TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
-            if (text != null) {
-                return text; }
-
-            // Next fall back on returning the key.
-            return key;
+            o_langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag;
+            return TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
         }
 
     // Implementation

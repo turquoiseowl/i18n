@@ -74,7 +74,8 @@ namespace i18n
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
                     LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
-                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis);
+                    LanguageTag lt;
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis, out lt) ?? text;
                     break;
                 }
                 default:
@@ -110,7 +111,8 @@ namespace i18n
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
                     LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
-                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis);
+                    LanguageTag lt;
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis, out lt) ?? text;
                     break;
                 }
                 default:
