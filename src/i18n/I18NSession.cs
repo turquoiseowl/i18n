@@ -50,19 +50,11 @@ namespace i18n
 
         public virtual string GetText(HttpContext context, string text)
         {
-            string[] languages;
-    
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
-            if (stored != null)
-            {
-                languages = new[] { stored };
-            }
-            else
-            {
-                // Use the client's browser settings to find a match
+            string[] languages = stored != null ?
+                languages = new[] { stored }:
                 languages = context.Request.UserLanguages;
-            }
 
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
@@ -73,9 +65,21 @@ namespace i18n
                 }
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
-                    LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    // Determine UserLanguages.
+                    // This value is created afresh first time this method is called per request,
+                    // and cached for the request's remaining calls to this method.
+                    LanguageItem[] UserLanguages = context.Items["i18n.UserLanguages"] as LanguageItem[];
+                    if (UserLanguages == null)
+                    {
+                       // Construct UserLanguages list and cache it for the rest of the request.
+                        context.Items["i18n.UserLanguages"] 
+                            = UserLanguages 
+                            = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    }
+
+                    // Lookup resource.
                     LanguageTag lt;
-                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis, out lt) ?? text;
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, UserLanguages, out lt) ?? text;
                     break;
                 }
                 default:
@@ -87,19 +91,11 @@ namespace i18n
 
         public virtual string GetText(HttpContextBase context, string text)
         {
-            string[] languages;
-    
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
-            if (stored != null)
-            {
-                languages = new[] { stored };
-            }
-            else
-            {
-                // Use the client's browser settings to find a match
+            string[] languages = stored != null ?
+                languages = new[] { stored }:
                 languages = context.Request.UserLanguages;
-            }
 
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
@@ -110,9 +106,21 @@ namespace i18n
                 }
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
-                    LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    // Determine UserLanguages.
+                    // This value is created afresh first time this method is called per request,
+                    // and cached for the request's remaining calls to this method.
+                    LanguageItem[] UserLanguages = context.Items["i18n.UserLanguages"] as LanguageItem[];
+                    if (UserLanguages == null)
+                    {
+                       // Construct UserLanguages list and cache it for the rest of the request.
+                        context.Items["i18n.UserLanguages"]
+                            = UserLanguages 
+                            = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    }
+
+                    // Lookup resource.
                     LanguageTag lt;
-                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis, out lt) ?? text;
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, UserLanguages, out lt) ?? text;
                     break;
                 }
                 default:
