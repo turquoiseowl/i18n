@@ -22,38 +22,49 @@ namespace i18n
         /// </returns>
         /// <exception cref="System.ArgumentNullException">Thrown if UserLanguages or AppLanguages is null.</exception>
         /// <exception cref="System.ArgumentNullException">Thrown if UserLanguages or AppLanguages is null.</exception>
-        public static LanguageTag MatchLists(LanguageTag[] UserLanguages, LanguageTag[] AppLanguages)
+        public static LanguageTag MatchLists(
+            LanguageItem[] UserLanguages, 
+            IEnumerable<LanguageTag> AppLanguages,
+            string key,
+            Func<string, string, string> TryGetTextFor,
+            out string o_text)
         {
            // Validate arguments.
             if (UserLanguages == null) { throw new ArgumentNullException("UserLanguages"); }
             if (AppLanguages == null) { throw new ArgumentNullException("AppLanguages"); }
            //
-            int pass = 1;
-            foreach (LanguageTag langUser in UserLanguages) {
-                foreach (LanguageTag langApp in AppLanguages) {
-                    switch (pass) {
-                        case 1: {
-                            if (langUser.Match(langApp, LanguageTag.MatchGrade.ExactMatch) != 0) {
-                                return langApp; }
-                            break;
+            for (int pass = 1; pass < 4; ++pass) {
+                LanguageTag.MatchGrade matchGrade;
+                switch (pass) {
+                    case 1: matchGrade = LanguageTag.MatchGrade.ExactMatch; break;
+                    case 2: matchGrade = LanguageTag.MatchGrade.ScriptMatch; break;
+                    case 3: matchGrade = LanguageTag.MatchGrade.LanguageMatch; break;
+                    default: throw new InvalidOperationException();
+                }
+                foreach (LanguageItem langUser in UserLanguages) {
+                    LanguageTag ltUser = (LanguageTag)langUser.LanguageTag;
+                        // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
+                        // Or consider making the Match logic more abstract, e.g. requesting number of passed from
+                        // the object, and passing a pass value through to Match.
+                    foreach (LanguageTag langApp in AppLanguages) {
+                       // If languages do not match at the current grade...goto next.
+                        if (ltUser.Match(langApp, matchGrade) == 0) {
+                            continue; }
+                       // Optionally test for a resource of the given key in the matching language.
+                        if (TryGetTextFor != null) {
+                            o_text = TryGetTextFor(langApp.ToString(), key);
+                            if (o_text == null) {
+                                continue; }
                         }
-                        case 2: {
-                            if (langUser.Match(langApp, LanguageTag.MatchGrade.ScriptMatch) != 0) {
-                                return langApp; }
-                            break;
-                        }
-                        case 3: {
-                            if (langUser.Match(langApp, LanguageTag.MatchGrade.LanguageMatch) != 0) {
-                                return langApp; }
-                            break;
-                        }
+                        else {
+                            o_text = null; }
+                       // Match.
+                        return langApp;
                     }
                 }
-               // Try next phase or get out if done.
-                if (++pass == 4) {
-                    break; }
             }
            // No match at all.
+            o_text = null;
             return null;
         }
     }

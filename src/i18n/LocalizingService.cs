@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
@@ -13,9 +14,10 @@ namespace i18n
     /// <summary>
     /// A service for retrieving localized text from PO resource files
     /// </summary>
-    public class LocalizingService : ILocalizingService
+    public class LocalizingService : ILocalizingService, ILocalizingServiceEnhanced
     {
-        private static readonly object Sync = new object();
+
+    // [ILocalizingService]
 
         /// <summary>
         /// Returns the best matching language for this application's resources, based the provided languages
@@ -53,32 +55,6 @@ namespace i18n
             }
 
             return DefaultSettings.DefaultTwoLetterISOLanguageName;
-        }
-
-        /// <returns>null if not available.</returns>
-        private static string GetLanguageIfAvailable(string culture)
-        {
-        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
-        //
-            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
-
-            // If messages not yet loaded in for the language
-            if (messages == null)
-            {
-                // Attempt to load messages, and if failed (because PO file doesn't exist)
-                if (!LoadMessages(culture))
-                {
-                    // Avoid shredding the disk looking for non-existing files
-                    CreateEmptyMessages(culture);
-                    return null;
-                }
-
-                // Address messages just loaded.
-                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
-            }
-
-            // The language is considered to be available if one or more message strings exist.
-            return messages.Count > 0 ? culture : null;
         }
 
         /// <summary>
@@ -126,6 +102,141 @@ namespace i18n
             return key;
         }
 
+    // [ILocalizingServiceEnhanced]
+
+        /// <summary>
+        /// Returns the best matching language for this application's resources, based the provided languages
+        /// </summary>
+        /// <param name="languages">A sorted list of language preferences</param>
+        public virtual string GetBestAvailableLanguageFrom(LanguageItem[] languages)
+        {
+            foreach (var language in languages)
+            {
+                var culture = GetCultureInfoFromLanguage(language.ToString());
+                if (culture == null)
+                {
+                    continue;
+                }
+                
+                // en-US
+                var result = GetLanguageIfAvailable(culture.IetfLanguageTag);
+                if(result != null)
+                {
+                    return result;
+                }
+
+                // Don't process the same culture code again
+                if (culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                // en
+                result = GetLanguageIfAvailable(culture.TwoLetterISOLanguageName);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return DefaultSettings.DefaultTwoLetterISOLanguageName;
+        }
+
+        /// <summary>
+        /// Returns localized text for a given default language key, or the default itself,
+        /// based on the provided languages and application resources
+        /// </summary>
+        /// <param name="key">The default language key to search for</param>
+        /// <param name="languages">A sorted list of language preferences</param>
+        /// <returns></returns>
+        public virtual string GetText(string key, LanguageItem[] languages)
+        {
+            // Perform language matching based on UserLanguaes, AppLanguages, and presence of
+            // resource under key for any particular AppLanguage.
+            string text;
+            LanguageTag lt = LanguageMatching.MatchLists(languages, GetAppLanguages(), key, TryGetTextFor, out text);
+            if (text != null) {
+                return text; }
+
+            // Next try default language.
+            text = TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
+            if (text != null) {
+                return text; }
+
+            // Next fall back on returning the key.
+            return key;
+        }
+
+    // Implementation
+
+        private static readonly object Sync = new object();
+
+        /// <summary>
+        /// Obtains collection of language tags describing the set of languages for which one or more 
+        /// resource are possibly defined.
+        /// Note that the AppLanguages collection is unordered; this is because there is no innate 
+        /// precedence at the resource level: precedence is only relevant to UserLanguages.
+        /// </summary>
+        private ConcurrentBag<LanguageTag> GetAppLanguages()
+        {
+            ConcurrentBag<LanguageTag> AppLanguages = (ConcurrentBag<LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+            if (AppLanguages != null) {
+                return AppLanguages; }
+            lock (Sync)
+            {
+                AppLanguages = (ConcurrentBag<LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+                if (AppLanguages != null) {
+                    return AppLanguages; }
+                AppLanguages = new ConcurrentBag<LanguageTag>();
+
+               // Insert into cache.
+               // NB: we do this before actually populating the collection. This is so that any changes to the
+               // folders before we finish populating the collection will cause the cache item to be invalidated
+               // and hence reloaded on next request, and so will not be missed.
+                string directory;
+                string path;
+                GetDirectoryAndPath(null, out directory, out path);
+                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new CacheDependency(directory));
+
+               // Populate the collection.
+                List<string> dirs = new List<string>(Directory.EnumerateDirectories(directory));
+                foreach (var dir in dirs)
+                {
+                    string langtag = Path.GetFileName(dir);
+                    if (!IsPoFileNotValid(langtag)) {
+                        AppLanguages.Add(LanguageTag.GetCachedInstance(langtag)); }
+                }
+               // Done.
+                return AppLanguages;
+            }
+        }
+
+        /// <returns>null if not available.</returns>
+        private static string GetLanguageIfAvailable(string culture)
+        {
+        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+        //
+            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+
+            // If messages not yet loaded in for the language
+            if (messages == null)
+            {
+                // Attempt to load messages, and if failed (because PO file doesn't exist)
+                if (!LoadMessages(culture))
+                {
+                    // Avoid shredding the disk looking for non-existing files
+                    CreateEmptyMessages(culture);
+                    return null;
+                }
+
+                // Address messages just loaded.
+                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+            }
+
+            // The language is considered to be available if one or more message strings exist.
+            return messages.Count > 0 ? culture : null;
+        }
+
         /// <returns>null if not found.</returns>
         private static string TryGetTextFor(string culture, string key)
         {
@@ -150,8 +261,12 @@ namespace i18n
                     fs.Flush();
                 }
 
-                // If the file changes we want to be able to rebuild the index without recompiling
+                // Cache messages.
+                // NB: if the file changes we want to be able to rebuild the index without recompiling.
                 HttpRuntime.Cache.Insert(GetCacheKey(culture), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
+
+                // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
+                HttpRuntime.Cache.Remove("i18n.AppLanguages");
             }
         }
 
@@ -170,10 +285,40 @@ namespace i18n
             return true;
         }
 
+        /// <param name="culture">
+        /// Null to get path of local directory only.
+        /// </param>
+        /// <param name="directory"></param>
+        /// <param name="path"></param>
         private static void GetDirectoryAndPath(string culture, out string directory, out string path)
         {
-            directory = string.Format("{0}/locale/{1}", HostingEnvironment.ApplicationPhysicalPath, culture);
-            path = Path.Combine(directory, "messages.po");
+            if (culture == null) {
+                directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
+                path = "";
+            }
+            else {
+                directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
+                directory = Path.Combine(directory, culture);
+                path = Path.Combine(directory, "messages.po");
+            }
+        }
+
+        private static bool IsPoFileNotValid(string culture)
+        {
+            string directory;
+            string path;
+            GetDirectoryAndPath(culture, out directory, out path);
+            FileInfo fi = new FileInfo(path);
+            if (!fi.Exists
+                || fi.Length == 0) {
+                return true; }
+           // If messages not yet loaded...we don't know whether there are message or not so we can't say whether
+           // valid or not.
+            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+            if (messages == null) {
+                return false; }
+           //
+            return messages.Count == 0;
         }
 
         private static void LoadFromDiskAndCache(string culture, string path)
@@ -232,11 +377,13 @@ namespace i18n
                         }
                     }
 
-                    //lock (Sync)
-                    {
-                        // If the file changes we want to be able to rebuild the index without recompiling
-                        HttpRuntime.Cache.Insert(GetCacheKey(culture), messages, new CacheDependency(path));
-                    }
+                    // Cache messages.
+                    // NB: if the file changes we want to be able to rebuild the index without recompiling.
+                    HttpRuntime.Cache.Insert(GetCacheKey(culture), messages, new CacheDependency(path));
+
+                    // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
+                    HttpRuntime.Cache.Remove("i18n.AppLanguages");
+
                 }
             }
         }
@@ -319,7 +466,15 @@ namespace i18n
 
         private static string GetCacheKey(string culture)
         {
-            return string.Format("po:{0}", culture).ToLowerInvariant();
+            //return string.Format("po:{0}", culture).ToLowerInvariant();
+                // The above will cause a new string to be allocated.
+                // So subsituted with the following code.
+
+            // Obtain the cache key without allocating a new string (except for first time).
+            // As this method is a high-frequency method, the overhead in the (lock-free) dictionary 
+            // lookup is thought to outweigh the potentially large number of temporary string allocations
+            // and the consequently hastened garbage collections.
+            return LanguageTag.GetCachedInstance(culture).GlobalKey;
         }
     }
 }

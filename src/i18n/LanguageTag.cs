@@ -92,6 +92,11 @@ namespace i18n
         /// Optional Region subtag.
         /// </summary>
         public string Region { get; private set; }
+        /// <summary>
+        /// Unique string per language which is suitable for using as a key in global
+        /// caches such as HttpRuntime.Cache. Inited during construction.
+        /// </summary>
+        public string GlobalKey { get; private set; }
     // Con
         /// <summary>
         /// Constructs a new instance based on a language tag string.
@@ -143,6 +148,8 @@ namespace i18n
                 m_parent = GetCachedInstance(Language); }
             else {
                 m_parent = null; }
+           //
+            GlobalKey = string.Format("po:{0}", m_langtag).ToLowerInvariant();
 
             //Debug.Assert(ToString() == langtag);
         }

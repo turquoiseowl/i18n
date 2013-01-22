@@ -64,14 +64,30 @@ namespace i18n
                 languages = context.Request.UserLanguages;
             }
 
-            text = DefaultSettings.LocalizingService.GetText(text, languages);
+            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            {
+                case DefaultSettings.LanguageMatching.Basic:
+                {
+                    text = DefaultSettings.LocalizingService.GetText(text, languages);
+                    break;
+                }
+                case DefaultSettings.LanguageMatching.Enhanced:
+                {
+                    LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis);
+                    break;
+                }
+                default:
+                    throw new System.ApplicationException();
+            }
+
             return HttpUtility.HtmlDecode(text);
         }
 
         public virtual string GetText(HttpContextBase context, string text)
         {
             string[] languages;
-
+    
             // Prefer a stored value to browser-supplied preferences
             var stored = GetLanguageFromSession(context);
             if (stored != null)
@@ -84,7 +100,23 @@ namespace i18n
                 languages = context.Request.UserLanguages;
             }
 
-            text = DefaultSettings.LocalizingService.GetText(text, languages);
+            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            {
+                case DefaultSettings.LanguageMatching.Basic:
+                {
+                    text = DefaultSettings.LocalizingService.GetText(text, languages);
+                    break;
+                }
+                case DefaultSettings.LanguageMatching.Enhanced:
+                {
+                    LanguageItem[] lis = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, lis);
+                    break;
+                }
+                default:
+                    throw new System.ApplicationException();
+            }
+
             return HttpUtility.HtmlDecode(text);
         }
 

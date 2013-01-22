@@ -41,6 +41,7 @@ namespace i18n
             DefaultTwoLetterISOLanguageName = "en";
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
+            Container.Register<ILocalizingServiceEnhanced>(r => new LocalizingService());
         }
 
         internal static Container Container { get; set; }
@@ -61,6 +62,16 @@ namespace i18n
             set
             {
                 Container.Remove<ILocalizingService>();
+                Container.Register(r => value);
+            }
+        }
+
+        public static ILocalizingServiceEnhanced LocalizingServiceEnhanced
+        {
+            get { return Container.Resolve<ILocalizingServiceEnhanced>(); }
+            set
+            {
+                Container.Remove<ILocalizingServiceEnhanced>();
                 Container.Register(r => value);
             }
         }
