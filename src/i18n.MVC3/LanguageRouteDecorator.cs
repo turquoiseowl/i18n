@@ -36,6 +36,17 @@ namespace i18n
                     }
 
                     url = url.Substring(0, url.Length -suffix.Length);
+                        //BUGBUG: the above can result in a zero-length URL, which in turn
+                        // cause the ClonedHttpRequest.AppRelativeCurrentExecutionFilePath method
+                        // to throw ArgumentNull exception when called indirectly.
+                        // Fix is simple i.e. 
+/*
+                    if (url.Length == 0) {
+                        url = "/"; }
+*/
+                            // However, reluctant to alter this code as it is not well documented and
+                            // don't want to break something else.
+
                     var originalRequest = new ClonedHttpRequest(context.Request, url);
                     var originalContext = new ClonedHttpContext(context, originalRequest);
 
@@ -84,6 +95,25 @@ namespace i18n
                     if (baseUrl != null)
                     {
                         var relativeUrl = new Uri(baseUrl, values["language"].ToString()).PathAndQuery.Substring(1);
+                            //BUGBUG: the above is erroneous as the Uri constructor does not simply append: it
+                            // assumes the first, baseUri argument has no local path component which is not
+                            // a safe assumption. E.g. /a/b + c = /a/c. I.e. the action get dropped.
+                            // A fix would probebly go something like this:
+/*
+                        // Append language to relative url.
+                        // E.g. account/signup?xyz -> account/signup/de?xyz
+                        // NB: originally the Uri class was used here to combine the paths. This was a bug
+                        // as the Uri constructor baseUri param assumes a Uri without a path, which is not
+                        // a safe assumption here.
+                        string relativeUrl = baseUrl.LocalPath;
+                        if (!relativeUrl.EndsWith("/")) {
+                            relativeUrl += "/"; }
+                        relativeUrl += values["language"] + baseUrl.Query;
+                        relativeUrl = relativeUrl.Substring(1);
+ */
+                            // However, reluctant to alter this code as it is not well documented and
+                            // don't want to break something else.
+
                         result.VirtualPath = relativeUrl;
                     }
                 }
