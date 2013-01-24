@@ -221,7 +221,7 @@ namespace i18n
         }
 
         /// <summary>
-        /// Lookup up whether any messages exist for the passed langtag, and if so attempts
+        /// Lookup whether any messages exist for the passed langtag, and if so attempts
         /// to lookup the message for the passed key, or if the key is null returns indication
         /// of whether any messages exist for the langtag.
         /// </summary>
