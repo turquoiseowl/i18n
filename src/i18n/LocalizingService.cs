@@ -128,8 +128,8 @@ namespace i18n
         private static readonly object Sync = new object();
 
         /// <summary>
-        /// Obtains collection of language tags describing the set of languages for which one or more 
-        /// resource are possibly defined.
+        /// Obtains collection of language tags describing the set of Po-valid languages, that
+        /// is the languages for which one or more resource are defined.
         /// Note that the AppLanguages collection is unordered; this is because there is no innate 
         /// precedence at the resource level: precedence is only relevant to UserLanguages.
         /// </summary>
@@ -159,7 +159,8 @@ namespace i18n
                 foreach (var dir in dirs)
                 {
                     string langtag = Path.GetFileName(dir);
-                    if (!IsLanguageNotValid(langtag)) {
+                    //if (!IsLanguageNotValid(langtag)) {
+                    if (IsLanguageValid(langtag)) {
                         AppLanguages.Add(LanguageTag.GetCachedInstance(langtag)); }
                 }
                // Done.
@@ -198,29 +199,6 @@ namespace i18n
         }
 
         /// <summary>
-        /// This method determines whether a PO file is invalid without actually loading it
-        /// if it is not already loaded. Thus, returns true if the file does not exists, or it
-        /// has already been loaded and contained no message.
-        /// </summary>
-        private static bool IsLanguageNotValid(string langtag)
-        {
-            string directory;
-            string path;
-            GetDirectoryAndPath(langtag, out directory, out path);
-            FileInfo fi = new FileInfo(path);
-            if (!fi.Exists
-                || fi.Length == 0) {
-                return true; }
-           // If messages not yet loaded...we don't know whether there are message or not so we can't say whether
-           // valid or not.
-            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
-            if (messages == null) {
-                return false; }
-           //
-            return messages.Count == 0;
-        }
-
-        /// <summary>
         /// Lookup whether any messages exist for the passed langtag, and if so attempts
         /// to lookup the message for the passed key, or if the key is null returns indication
         /// of whether any messages exist for the langtag.
@@ -229,7 +207,7 @@ namespace i18n
         /// Language tag of the subject langtag.
         /// </param>
         /// <param name="key">
-        /// Key o message to lookup, or null if we test for any message loaded for the langtag.
+        /// Key (msgid) of the message to lookup, or null to test for any message loaded for the langtag.
         /// </param>
         /// <returns>
         /// On success, returns the translated message, or if key is null returns an empty string ("")
@@ -241,7 +219,7 @@ namespace i18n
             if (!IsLanguageValid(langtag)) {
                 return null; }
 
-            //              
+            // If testing for any message loaded for the langtag...return positive.
             if (key == null) {
                 return ""; }   
 
@@ -377,9 +355,9 @@ namespace i18n
 
         private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message)
         {
-            if(!string.IsNullOrEmpty(line))
+            if (!string.IsNullOrEmpty(line))
             {
-                if(line.StartsWith("msgid"))
+                if (line.StartsWith("msgid"))
                 {
                     var msgid = line.Unquote();
                     sb.Append(msgid);
@@ -393,7 +371,7 @@ namespace i18n
                 }
 
                 sb.Clear();
-                if(!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
+                if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
                 {
                     var msgstr = line.Unquote();
                     sb.Append(msgstr);
@@ -433,12 +411,10 @@ namespace i18n
         /// <returns>null if not found.</returns>
         private static CultureInfo GetCultureInfoFromLanguage(string language)
         {
-            //var semiColonIndex = language.IndexOf(';');
-            //return semiColonIndex > -1
-            //           ? new CultureInfo(language.Substring(0, semiColonIndex), true)
-            //           : new CultureInfo(language, true);
-            //Codes wouldn't work on ie10 of some languages of Windows 8 and Windows 2012
-
+        // TODO: replace usage of CultureInfo with the LanguageTag class.
+        // This method and the use of CultureInfo is now surpassed by the LanguageTag class,
+        // thus making this method of handling language tags redundant.
+        //
             if (string.IsNullOrWhiteSpace(language)) {
                 return null; }
             try {
