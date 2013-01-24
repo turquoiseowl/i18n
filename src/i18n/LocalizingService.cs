@@ -34,10 +34,9 @@ namespace i18n
                 }
                 
                 // en-US
-                var result = GetLanguageIfAvailable(culture.IetfLanguageTag);
-                if(result != null)
+                if (IsLanguageValid(culture.IetfLanguageTag))
                 {
-                    return result;
+                    return culture.IetfLanguageTag;
                 }
 
                 // Don't process the same culture code again
@@ -47,10 +46,9 @@ namespace i18n
                 }
 
                 // en
-                result = GetLanguageIfAvailable(culture.TwoLetterISOLanguageName);
-                if (result != null)
+                if (IsLanguageValid(culture.TwoLetterISOLanguageName))
                 {
-                    return result;
+                    return culture.TwoLetterISOLanguageName;
                 }
             }
 
@@ -103,44 +101,6 @@ namespace i18n
         }
 
     // [ILocalizingServiceEnhanced]
-
-        /// <summary>
-        /// Returns the best matching language for this application's resources, based the provided languages
-        /// </summary>
-        /// <param name="languages">A sorted list of language preferences</param>
-        public virtual string GetBestAvailableLanguageFrom(LanguageItem[] languages)
-        {
-            foreach (var language in languages)
-            {
-                var culture = GetCultureInfoFromLanguage(language.ToString());
-                if (culture == null)
-                {
-                    continue;
-                }
-                
-                // en-US
-                var result = GetLanguageIfAvailable(culture.IetfLanguageTag);
-                if(result != null)
-                {
-                    return result;
-                }
-
-                // Don't process the same culture code again
-                if (culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                // en
-                result = GetLanguageIfAvailable(culture.TwoLetterISOLanguageName);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return DefaultSettings.DefaultTwoLetterISOLanguageName;
-        }
 
         /// <summary>
         /// Returns localized text for a given default language key, or the default itself,
@@ -199,7 +159,7 @@ namespace i18n
                 foreach (var dir in dirs)
                 {
                     string langtag = Path.GetFileName(dir);
-                    if (!IsPoFileNotValid(langtag)) {
+                    if (!IsLanguageNotValid(langtag)) {
                         AppLanguages.Add(LanguageTag.GetCachedInstance(langtag)); }
                 }
                // Done.
@@ -207,45 +167,94 @@ namespace i18n
             }
         }
 
-        /// <returns>null if not available.</returns>
-        private static string GetLanguageIfAvailable(string culture)
+        /// <summary>
+        /// Assesses whether a language is PO-valid, that is whether or not one or more
+        /// localized messages exists for the language.
+        /// </summary>
+        /// <returns>true if one or more localized messages exist for the language; otherwise false.</returns>
+        private static bool IsLanguageValid(string langtag)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
             {
                 // Attempt to load messages, and if failed (because PO file doesn't exist)
-                if (!LoadMessages(culture))
+                if (!LoadMessages(langtag))
                 {
                     // Avoid shredding the disk looking for non-existing files
-                    CreateEmptyMessages(culture);
-                    return null;
+                    CreateEmptyMessages(langtag);
+                    return false;
                 }
 
                 // Address messages just loaded.
-                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
+                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
             }
 
             // The language is considered to be available if one or more message strings exist.
-            return messages.Count > 0 ? culture : null;
+            return messages.Count > 0;
         }
 
-        /// <returns>null if not found.</returns>
-        private static string TryGetTextFor(string culture, string key)
+        /// <summary>
+        /// This method determines whether a PO file is invalid without actually loading it
+        /// if it is not already loaded. Thus, returns true if the file does not exists, or it
+        /// has already been loaded and contained no message.
+        /// </summary>
+        private static bool IsLanguageNotValid(string langtag)
         {
-            return GetLanguageIfAvailable(culture) != null ? LookupText(culture, key) : null;
+            string directory;
+            string path;
+            GetDirectoryAndPath(langtag, out directory, out path);
+            FileInfo fi = new FileInfo(path);
+            if (!fi.Exists
+                || fi.Length == 0) {
+                return true; }
+           // If messages not yet loaded...we don't know whether there are message or not so we can't say whether
+           // valid or not.
+            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
+            if (messages == null) {
+                return false; }
+           //
+            return messages.Count == 0;
         }
 
-        private static void CreateEmptyMessages(string culture)
+        /// <summary>
+        /// Lookup up whether any messages exist for the passed langtag, and if so attempts
+        /// to lookup the message for the passed key, or if the key is null returns indication
+        /// of whether any messages exist for the langtag.
+        /// </summary>
+        /// <param name="langtag">
+        /// Language tag of the subject langtag.
+        /// </param>
+        /// <param name="key">
+        /// Key o message to lookup, or null if we test for any message loaded for the langtag.
+        /// </param>
+        /// <returns>
+        /// On success, returns the translated message, or if key is null returns an empty string ("")
+        /// to indciate that one or more messages exist for the langtag.
+        /// On failure, returns null.
+        /// </returns>
+        private static string TryGetTextFor(string langtag, string key)
+        {
+            if (!IsLanguageValid(langtag)) {
+                return null; }
+
+            //              
+            if (key == null) {
+                return ""; }   
+
+            return LookupText(langtag, key);
+        }
+
+        private static void CreateEmptyMessages(string langtag)
         {
             lock (Sync)
             {
                 string directory;
                 string path;
-                GetDirectoryAndPath(culture, out directory, out path);
+                GetDirectoryAndPath(langtag, out directory, out path);
 
                 if (!Directory.Exists(directory))
                 {
@@ -259,72 +268,54 @@ namespace i18n
 
                 // Cache messages.
                 // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                HttpRuntime.Cache.Insert(GetCacheKey(culture), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
+                HttpRuntime.Cache.Insert(GetCacheKey(langtag), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
 
                 // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
                 HttpRuntime.Cache.Remove("i18n.AppLanguages");
             }
         }
 
-        private static bool LoadMessages(string culture)
+        private static bool LoadMessages(string langtag)
         {
             string directory;
             string path;
-            GetDirectoryAndPath(culture, out directory, out path);
+            GetDirectoryAndPath(langtag, out directory, out path);
 
             if (!File.Exists(path))
             {
                 return false;
             }
 
-            LoadFromDiskAndCache(culture, path);
+            LoadFromDiskAndCache(langtag, path);
             return true;
         }
 
-        /// <param name="culture">
+        /// <param name="langtag">
         /// Null to get path of local directory only.
         /// </param>
         /// <param name="directory"></param>
         /// <param name="path"></param>
-        private static void GetDirectoryAndPath(string culture, out string directory, out string path)
+        private static void GetDirectoryAndPath(string langtag, out string directory, out string path)
         {
-            if (culture == null) {
+            if (langtag == null) {
                 directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
                 path = "";
             }
             else {
                 directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
-                directory = Path.Combine(directory, culture);
+                directory = Path.Combine(directory, langtag);
                 path = Path.Combine(directory, "messages.po");
             }
         }
 
-        private static bool IsPoFileNotValid(string culture)
-        {
-            string directory;
-            string path;
-            GetDirectoryAndPath(culture, out directory, out path);
-            FileInfo fi = new FileInfo(path);
-            if (!fi.Exists
-                || fi.Length == 0) {
-                return true; }
-           // If messages not yet loaded...we don't know whether there are message or not so we can't say whether
-           // valid or not.
-            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
-            if (messages == null) {
-                return false; }
-           //
-            return messages.Count == 0;
-        }
-
-        private static void LoadFromDiskAndCache(string culture, string path)
+        private static void LoadFromDiskAndCache(string langtag, string path)
         {
             lock (Sync)
             {
                 // It is possible for multiple threads to race to this method. The first to
                 // enter the above lock will insert the messages into the cache.
                 // If we lost the race...no need to duplicate the work of the winning thread.
-                if (HttpRuntime.Cache[GetCacheKey(culture)] != null) {
+                if (HttpRuntime.Cache[GetCacheKey(langtag)] != null) {
                     return; }
 
                 using (var fs = File.OpenText(path))
@@ -356,7 +347,7 @@ namespace i18n
                             ParseBody(fs, line, sb, message);
 
                             // Only if a msgstr (translation) is provided for this entry do we add an entry to the cache.
-                            // This conditions facilitates more useful operation of the GetLanguageIfAvailable method,
+                            // This conditions facilitates more useful operation of the IsLanguageValid method,
                             // which prior to this condition was indicating a language was available when in fact there
                             // were zero translation in the PO file (it having been autogenerated during gettext merge).
                             if (!string.IsNullOrWhiteSpace(message.MsgStr))
@@ -375,7 +366,7 @@ namespace i18n
 
                     // Cache messages.
                     // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                    HttpRuntime.Cache.Insert(GetCacheKey(culture), messages, new CacheDependency(path));
+                    HttpRuntime.Cache.Insert(GetCacheKey(langtag), messages, new CacheDependency(path));
 
                     // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
                     HttpRuntime.Cache.Remove("i18n.AppLanguages");
@@ -423,11 +414,11 @@ namespace i18n
         }
 
         /// <returns>null if not found.</returns>
-        private static string LookupText(string culture, string key)
+        private static string LookupText(string langtag, string key)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            var messages = (ConcurrentDictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
+            var messages = (ConcurrentDictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(langtag)];
             I18NMessage message = null;
 
             if (messages == null || !messages.TryGetValue(key, out message))
@@ -460,9 +451,9 @@ namespace i18n
                 return null; }
         }
 
-        private static string GetCacheKey(string culture)
+        private static string GetCacheKey(string langtag)
         {
-            //return string.Format("po:{0}", culture).ToLowerInvariant();
+            //return string.Format("po:{0}", langtag).ToLowerInvariant();
                 // The above will cause a new string to be allocated.
                 // So subsituted with the following code.
 
@@ -470,7 +461,7 @@ namespace i18n
             // As this method is a high-frequency method, the overhead in the (lock-free) dictionary 
             // lookup is thought to outweigh the potentially large number of temporary string allocations
             // and the consequently hastened garbage collections.
-            return LanguageTag.GetCachedInstance(culture).GlobalKey;
+            return LanguageTag.GetCachedInstance(langtag).GlobalKey;
         }
     }
 }
