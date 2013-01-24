@@ -12,8 +12,28 @@ namespace i18n
         /// in which an arbitrary resource is available (AppLanguages), returns the AppLanguage which
         /// the user is most likely able to understand.
         /// </summary>
-        /// <param name="UserLanguages">A list of user-preferred languages (in order of preference).</param>
-        /// <param name="AppLanguages">The list of languages in which an arbitrary resource is available.</param>
+        /// <param name="UserLanguages">
+        /// A list of user-preferred languages (in order of preference).
+        /// </param>
+        /// <param name="AppLanguages">
+        /// The list of languages in which an arbitrary resource is available.
+        /// </param>
+        /// <param name="key">
+        /// Optionally specifies the key or a message to be looked up in order to validate
+        /// a language selection. Only is the language passes the validation will it be selected.
+        /// Set in conjunction with TryGetTextFor.
+        /// May be null (while TryGetTextFor is non-null) which specifies that one or more messages 
+        /// must exists for a language for it to be considered valid (PO-valid).
+        /// </param>
+        /// <param name="TryGetTextFor">
+        /// Optional delegate to be called in order to validate a language for selection.
+        /// See LocalizingService.TryGetTextFor for more details.
+        /// </param>
+        /// <param name="o_text">
+        /// When language validation is enabled (TryGetTextFor is non-null) outputs the translated
+        /// text that was returned by TryGetTextFor when teh language was validated.
+        /// If key == null then this will be set to "".
+        /// </param>
         /// <returns>
         /// LanguageTag instance selected from AppLanguages with the best match, or null if the is no match
         /// at all (or UserLanguages and/or AppLanguages is empty).
@@ -29,6 +49,8 @@ namespace i18n
             Func<string, string, string> TryGetTextFor,
             out string o_text)
         {
+        // This method called many times per request. Every effort taken to avoid it making any heap allocations.
+        //
            // Validate arguments.
             if (UserLanguages == null) { throw new ArgumentNullException("UserLanguages"); }
             if (AppLanguages == null) { throw new ArgumentNullException("AppLanguages"); }
