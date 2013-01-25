@@ -102,25 +102,36 @@ namespace i18n
 
     // [ILocalizingServiceEnhanced]
 
-        /// <summary>
-        /// Returns localized text for a given default language key, or the default itself,
-        /// based on the provided languages and application resources
-        /// </summary>
-        /// <param name="key">The default language key to search for</param>
-        /// <param name="languages">A sorted list of language preferences</param>
-        /// <returns></returns>
-        public virtual string GetText(string key, LanguageItem[] languages, out LanguageTag o_langtag)
+        public virtual string GetText(string key, LanguageItem[] languages, out LanguageTag o_langtag, int maxPasses = -1)
         {
+            // Validate arguments.
+            if (maxPasses > (int)LanguageTag.MatchGrade._MaxMatch +1) { 
+                maxPasses = (int)LanguageTag.MatchGrade._MaxMatch +1; }
+            // Init.
+            bool fallbackOnDefault = maxPasses == (int)LanguageTag.MatchGrade._MaxMatch +1;
+            string text;
             // Perform language matching based on UserLanguaes, AppLanguages, and presence of
             // resource under key for any particular AppLanguage.
-            string text;
-            o_langtag = LanguageMatching.MatchLists(languages, GetAppLanguages(), key, TryGetTextFor, out text);
+            o_langtag = LanguageMatching.MatchLists(
+                languages, 
+                GetAppLanguages(), 
+                key, 
+                TryGetTextFor, 
+                out text, 
+                Math.Min(maxPasses, (int)LanguageTag.MatchGrade._MaxMatch));
             if (text != null) {
                 return text; }
 
-            // Next try default language.
-            o_langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag;
-            return TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
+            // Optionally try default language.
+            if (fallbackOnDefault)
+            {
+                text = TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
+                o_langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag;
+                if (text != null) {
+                    return text; }
+            }
+
+            return null;
         }
 
     // Implementation
@@ -133,17 +144,17 @@ namespace i18n
         /// Note that the AppLanguages collection is unordered; this is because there is no innate 
         /// precedence at the resource level: precedence is only relevant to UserLanguages.
         /// </summary>
-        private ConcurrentBag<LanguageTag> GetAppLanguages()
+        private ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
-            ConcurrentBag<LanguageTag> AppLanguages = (ConcurrentBag<LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+            ConcurrentDictionary<string, LanguageTag> AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
             if (AppLanguages != null) {
                 return AppLanguages; }
             lock (Sync)
             {
-                AppLanguages = (ConcurrentBag<LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+                AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
                 if (AppLanguages != null) {
                     return AppLanguages; }
-                AppLanguages = new ConcurrentBag<LanguageTag>();
+                AppLanguages = new ConcurrentDictionary<string, LanguageTag>();
 
                // Insert into cache.
                // NB: we do this before actually populating the collection. This is so that any changes to the
@@ -152,16 +163,15 @@ namespace i18n
                 string directory;
                 string path;
                 GetDirectoryAndPath(null, out directory, out path);
-                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new CacheDependency(directory));
+                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new FsCacheDependency(directory));
 
                // Populate the collection.
                 List<string> dirs = new List<string>(Directory.EnumerateDirectories(directory));
                 foreach (var dir in dirs)
                 {
                     string langtag = Path.GetFileName(dir);
-                    //if (!IsLanguageNotValid(langtag)) {
                     if (IsLanguageValid(langtag)) {
-                        AppLanguages.Add(LanguageTag.GetCachedInstance(langtag)); }
+                        AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); }
                 }
                // Done.
                 return AppLanguages;
@@ -247,9 +257,6 @@ namespace i18n
                 // Cache messages.
                 // NB: if the file changes we want to be able to rebuild the index without recompiling.
                 HttpRuntime.Cache.Insert(GetCacheKey(langtag), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
-
-                // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
-                HttpRuntime.Cache.Remove("i18n.AppLanguages");
             }
         }
 
@@ -345,10 +352,6 @@ namespace i18n
                     // Cache messages.
                     // NB: if the file changes we want to be able to rebuild the index without recompiling.
                     HttpRuntime.Cache.Insert(GetCacheKey(langtag), messages, new CacheDependency(path));
-
-                    // Reset any cached AppLanguages collection which is dependent on the set of loaded messages.
-                    HttpRuntime.Cache.Remove("i18n.AppLanguages");
-
                 }
             }
         }

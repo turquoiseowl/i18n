@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Routing;
@@ -19,107 +20,180 @@ namespace i18n
 
         public override RouteData GetRouteData(HttpContextBase context)
         {
-            var result = _route.GetRouteData(context);
-
-            if(result == null)
+            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                var url = _session.GetUrlFromRequest(context.Request);
-                var languages = context.Request.UserLanguages ?? new[] { I18N.DefaultTwoLetterISOLanguageName };
-                foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
+                case DefaultSettings.LanguageMatching.Basic:
                 {
-                    var semiColonIndex = language.IndexOf(';');
-                    var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
-                    string suffix = url.EndsWithAnyIgnoreCase(token, token + "/");
-                    if (suffix == null)
+                    var result = _route.GetRouteData(context);
+
+                    if(result == null)
                     {
-                        continue;
+                        var url = _session.GetUrlFromRequest(context.Request);
+                        var languages = context.Request.UserLanguages ?? new[] { I18N.DefaultTwoLetterISOLanguageName };
+                        foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
+                        {
+                            var semiColonIndex = language.IndexOf(';');
+                            var token = string.Format("/{0}", semiColonIndex > -1 ? language.Substring(0, semiColonIndex) : language);
+                            string suffix = url.EndsWithAnyIgnoreCase(token, token + "/");
+                            if (suffix == null)
+                            {
+                                continue;
+                            }
+
+                            url = url.Substring(0, url.Length -suffix.Length);
+                                //BUGBUG: the above can result in a zero-length URL, which in turn
+                                // cause the ClonedHttpRequest.AppRelativeCurrentExecutionFilePath method
+                                // to throw ArgumentNull exception when called indirectly.
+                                // Fix is simple i.e. 
+        /*
+                            if (url.Length == 0) {
+                                url = "/"; }
+        */
+                                    // However, reluctant to alter this code as it is not well documented and
+                                    // don't want to break something else.
+
+                            var originalRequest = new ClonedHttpRequest(context.Request, url);
+                            var originalContext = new ClonedHttpContext(context, originalRequest);
+                                // TODO: possibly the above can be replaced by the following:
+                                //      context.RewritePath(url);
+                                // The rewrite back the original value afterwards.
+                                // Or is there a reason not to do that?
+
+                            result = _route.GetRouteData(originalContext);
+                            if (result != null)
+                            {
+                                // Found the original non-decorated route
+                                return result;
+                            }
+                        }
                     }
 
-                    url = url.Substring(0, url.Length -suffix.Length);
-                        //BUGBUG: the above can result in a zero-length URL, which in turn
-                        // cause the ClonedHttpRequest.AppRelativeCurrentExecutionFilePath method
-                        // to throw ArgumentNull exception when called indirectly.
-                        // Fix is simple i.e. 
-/*
-                    if (url.Length == 0) {
-                        url = "/"; }
-*/
-                            // However, reluctant to alter this code as it is not well documented and
-                            // don't want to break something else.
-
-                    var originalRequest = new ClonedHttpRequest(context.Request, url);
-                    var originalContext = new ClonedHttpContext(context, originalRequest);
-
-                    result = _route.GetRouteData(originalContext);
-                    if (result != null)
-                    {
-                        // Found the original non-decorated route
-                        return result;
-                    }
+                    return result;
                 }
+                case DefaultSettings.LanguageMatching.Enhanced:
+                {
+                // MVC calls us here when it attempts to match the incoming request URL to
+                // this particular registered route. Thus, we get here for each route until 
+                // we report back a match with the route.
+                // Our purpose is to check for any langtag embedded in the URL and remove it
+                // for the purposes of doing a match:
+                // 1. First examine URL for langtag prefix. If found and that matches an AppLanguage (directly
+                //    or indirectly through language-matching), strip the langtag from the URL
+                //    and try a match with the resulting URL. If found, add back the langtag
+                //    and return the routedata for the match.
+                // 2. Failing that, try a match with the URL as is.
+                // 3. Failing that, return 'no match'.
+                // 
+                    RouteData routedata;
+                    // 1.
+                    string urlOrg = context.Request.Url.AbsolutePath;
+                    string urlPatched;
+                    LanguageTag urlLangTag = LanguageTag.UrlExtractLangTag(urlOrg, out urlPatched);
+                    if (urlLangTag.IsValid())
+                    {
+                        // If language matches an AppLanguage
+                        LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(urlLangTag.ToString());
+                        if (appLangTag != null)
+                        {
+                            // Attempt to match the patched URL.
+                            context.RewritePath(urlPatched);
+                            routedata = _route.GetRouteData(context);
+                            //urlOrg = string.Format("/{0}{1}", appLangTag.ToString(), urlPatched == "/" ? "" : urlPatched);
+                            // Restore url to what it was before for subsequent tests.
+                            context.RewritePath(urlOrg);
+                            // If we have a match...store details of the language in the route, and success.
+                            if (routedata != null) {
+                                routedata.DataTokens["i18n.langtag_url"] = urlLangTag;
+                                    // langtag found in and stripped from the url.
+                                routedata.DataTokens["i18n.langtag_app"] = appLangTag;
+                                    // Relative of langtag_url for which we know resource are available (AppLanguage).
+                                    // May be equal to langtag_url or a relative.
+                                return routedata;
+                            }
+                        }
+                    }
+                    // 2.
+                    routedata = _route.GetRouteData(context);
+                    if (routedata != null) {
+                        return routedata; }
+                    // 3.
+                    return null;
+                }
+                default:
+                    throw new System.ApplicationException();
             }
-
-            return result;
         }
 
         public override VirtualPathData GetVirtualPath(RequestContext context, RouteValueDictionary values)
         {
-            var result = _route.GetVirtualPath(context, values);
-
-            if (result != null && result.VirtualPath != null)
+            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                var request = context.HttpContext.Request;
-                if (!values.ContainsKey("language"))
+                case DefaultSettings.LanguageMatching.Basic:
                 {
-                    if (request.QueryString["language"] != null)
+                    var result = _route.GetVirtualPath(context, values);
+
+                    if (result != null && result.VirtualPath != null)
                     {
-                        result.VirtualPath = string.Format("{0}/{1}", result.VirtualPath, request.QueryString["language"]);
-                    }
-                    else
-                    {
-                        var language = _session.GetLanguageFromSessionOrService(context.HttpContext);
-                        var token = string.Format("/{0}", language);
-                        var url = _session.GetUrlFromRequest(context.HttpContext.Request);
-                        if (url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)) != null)
+                        var request = context.HttpContext.Request;
+                        if (!values.ContainsKey("language"))
                         {
-                            result.VirtualPath = result.VirtualPath.Equals("")
-                                                     ? language
-                                                     : string.Format("{0}/{1}", result.VirtualPath, language);
+                            if (request.QueryString["language"] != null)
+                            {
+                                result.VirtualPath = string.Format("{0}/{1}", result.VirtualPath, request.QueryString["language"]);
+                            }
+                            else
+                            {
+                                var language = _session.GetLanguageFromSessionOrService(context.HttpContext);
+                                var token = string.Format("/{0}", language);
+                                var url = _session.GetUrlFromRequest(context.HttpContext.Request);
+                                if (url.EndsWithAnyIgnoreCase(token, string.Format("{0}/", token)) != null)
+                                {
+                                    result.VirtualPath = result.VirtualPath.Equals("")
+                                                             ? language
+                                                             : string.Format("{0}/{1}", result.VirtualPath, language);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Use pre-injected route value
+                            var baseUrl = context.HttpContext.Request.Url;
+                            if (baseUrl != null)
+                            {
+                                var relativeUrl = new Uri(baseUrl, values["language"].ToString()).PathAndQuery.Substring(1);
+                                    //BUGBUG: the above is erroneous as the Uri constructor does not simply append: it
+                                    // assumes the first, baseUri argument has no local path component which is not
+                                    // a safe assumption. E.g. /a/b + c = /a/c. I.e. the action get dropped.
+                                    // A fix would probebly go something like this:
+        /*
+                                // Append language to relative url.
+                                // E.g. account/signup?xyz -> account/signup/de?xyz
+                                // NB: originally the Uri class was used here to combine the paths. This was a bug
+                                // as the Uri constructor baseUri param assumes a Uri without a path, which is not
+                                // a safe assumption here.
+                                string relativeUrl = baseUrl.LocalPath;
+                                if (!relativeUrl.EndsWith("/")) {
+                                    relativeUrl += "/"; }
+                                relativeUrl += values["language"] + baseUrl.Query;
+                                relativeUrl = relativeUrl.Substring(1);
+         */
+                                    // However, reluctant to alter this code as it is not well documented and
+                                    // don't want to break something else.
+
+                                result.VirtualPath = relativeUrl;
+                            }
                         }
                     }
+
+                    return result;
                 }
-                else
+                case DefaultSettings.LanguageMatching.Enhanced:
                 {
-                    // Use pre-injected route value
-                    var baseUrl = context.HttpContext.Request.Url;
-                    if (baseUrl != null)
-                    {
-                        var relativeUrl = new Uri(baseUrl, values["language"].ToString()).PathAndQuery.Substring(1);
-                            //BUGBUG: the above is erroneous as the Uri constructor does not simply append: it
-                            // assumes the first, baseUri argument has no local path component which is not
-                            // a safe assumption. E.g. /a/b + c = /a/c. I.e. the action get dropped.
-                            // A fix would probebly go something like this:
-/*
-                        // Append language to relative url.
-                        // E.g. account/signup?xyz -> account/signup/de?xyz
-                        // NB: originally the Uri class was used here to combine the paths. This was a bug
-                        // as the Uri constructor baseUri param assumes a Uri without a path, which is not
-                        // a safe assumption here.
-                        string relativeUrl = baseUrl.LocalPath;
-                        if (!relativeUrl.EndsWith("/")) {
-                            relativeUrl += "/"; }
-                        relativeUrl += values["language"] + baseUrl.Query;
-                        relativeUrl = relativeUrl.Substring(1);
- */
-                            // However, reluctant to alter this code as it is not well documented and
-                            // don't want to break something else.
-
-                        result.VirtualPath = relativeUrl;
-                    }
+                    return _route.GetVirtualPath(context, values);
                 }
+                default:
+                    throw new System.ApplicationException();
             }
-
-            return result;
         }
     }
 }

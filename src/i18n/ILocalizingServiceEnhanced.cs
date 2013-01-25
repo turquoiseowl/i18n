@@ -21,6 +21,14 @@
         /// <param name="o_langtag">
         /// On success, outputs a description of the language from which the resource was selected.
         /// </param>
+        /// <param name="maxPasses">
+        /// 0 - allow exact match only
+        /// 1 - allow exact match or default-region match only
+        /// 2 - allow exact match or default-region match or script match only
+        /// 3 - allow exact match or default-region match or script match or language match only
+        /// 4 - allow exact match or default-region match or script or language match only, or failing return the default language.
+        /// -1 to set to most tolerant (i.e. 4).
+        /// </param>
         /// <returns>
         /// When key is set to non-null, returns either the sucessully-looked up localized string, or 
         /// null if the lookup failed.
@@ -28,6 +36,10 @@
         /// (PO-valid meaning that one or more messages/resources are defined for that language),
         /// or null if no match was made.
         /// </returns>
-        string GetText(string key, LanguageItem[] languages, out LanguageTag o_langtag);
+        string GetText(
+            string key, 
+            LanguageItem[] languages, 
+            out LanguageTag o_langtag,
+            int maxPasses = -1);
     }
 }

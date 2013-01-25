@@ -57,12 +57,15 @@
   <ItemGroup>
     <Compile Include="ClonedHttpRequest.cs" />
     <Compile Include="ClonedHttpContext.cs" />
+    <Compile Include="DebugHelpers.cs" />
+    <Compile Include="FsCacheDependency.cs" />
     <Compile Include="ILocalizingServiceEnhanced.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="ILanguageTag.cs" />
+    <Compile Include="LanguageHelpers.cs" />
     <Compile Include="LanguageItem.cs" />
     <Compile Include="ParseHelpers.cs" />
     <Compile Include="HtmlString.cs" />

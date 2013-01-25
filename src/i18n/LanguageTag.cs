@@ -37,19 +37,32 @@ namespace i18n
         {
             /// <summary>
             /// Only consider a match where language and script and region parts match.
+            /// E.g. fr matches fr
+            /// E.g. zh-Hans-HK matches zh-Hans-HK
             /// </summary>
-            ExactMatch,
+            ExactMatch = 0,
+            /// <summary>
+            /// Only consider a match where language and script parts match, one region is set and the other region 
+            /// is not set.
+            /// E.g. fr matches fr-BE
+            /// E.g. zh-Hans-HK matches zh-Hans
+            /// </summary>
+            DefaultRegion = 1,
             /// <summary>
             /// Only consider a match where language and script parts match. Region part need not match.
+            /// E.g. fr-CA matches fr-BE
+            /// E.g. zh-Hant-HK matches zh-Hant-TW
             /// </summary>
-            ScriptMatch,
+            ScriptMatch = 2,
             /// <summary>
             /// Only consider a match where language matches. Script and region parts need not match.
+            /// E.g. zh-Hans-HK matches zh
             /// </summary>
-            LanguageMatch,
+            LanguageMatch = 3,
+            _MaxMatch = LanguageMatch,
         }
     // Data
-        static readonly Regex m_regex = new Regex(
+        static readonly Regex m_regex_parseLangtag = new Regex(
             @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?$", 
             RegexOptions.CultureInvariant);
             // ([a-zA-Z]{2})
@@ -62,6 +75,16 @@ namespace i18n
             //      Matches region.
             //      NB: The inner group is wrapped in an outer non-capturing group that
             //      prefixed the former with the '-' which is thus not captured.
+        static readonly Regex m_regex_parseUrl = new System.Text.RegularExpressions.Regex(
+            @"^/([a-zA-Z]{2}(?:-[a-zA-Z]{4})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?)(?:$|/)", 
+            System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+                // ^/
+                // (                                # begin 1st and only capture group
+                // [a-zA-Z]{2}                      # 2-letter country code
+                // (?:-[a-zA-Z]{4})?                # optional script code - not a capture group itself
+                // (?:-(?:[a-zA-Z]{2}|[0-9]{3}))?   # optional region code (2-letter or 3-digit) - not a capture group itself
+                // )                                # end 1st and only capture group
+                // (?:$|/)                          # match end of string or fwd-slash char - not a capture group itself
         private static ConcurrentDictionary<string, LanguageTag> s_cache = new ConcurrentDictionary<string, LanguageTag>();
             // Facilitates fast and efficient re-use of languag tag instances.
             // Key = langtag string.
@@ -97,6 +120,12 @@ namespace i18n
         /// caches such as HttpRuntime.Cache. Inited during construction.
         /// </summary>
         public string GlobalKey { get; private set; }
+        /// <summary>
+        /// Returns indication of whether the instance was initialized to a valid language tag.
+        /// Valid in the sense that it confirms to a support pattern of characters,
+        /// NOT whether the value itself refers to valid language.
+        /// </summary>
+        //public bool IsValid { get { return Language != null; } }
     // Con
         /// <summary>
         /// Constructs a new instance based on a language tag string.
@@ -130,7 +159,7 @@ namespace i18n
                 }
             }
            // Parse the langtag.
-            Match match = m_regex.Match(m_langtag);
+            Match match = m_regex_parseLangtag.Match(m_langtag);
             if (match.Success
                 && match.Groups.Count == 4) {
                 Language = match.Groups[1].Value;
@@ -185,7 +214,12 @@ namespace i18n
                // Check again for instance incase another thd just created it.
                 if (s_cache.TryGetValue(langtag, out result)) {
                     return result; }
-               // Created new instance.
+               // If cache is over a certain size...clear it.
+               // NB: this prevents the cache from filling with invalid langtag values,
+               // possibly due to DOS attack.
+                if (s_cache.Count > 10000) {
+                    s_cache.Clear(); }
+               // Create and cache new instance.
                 s_cache[langtag] = result = new LanguageTag(langtag);
                 return result;
             }
@@ -307,22 +341,24 @@ namespace i18n
                 if (S[0] && !R[0] && R[1] != R[2]) {
                     return score; }
                 --score;
-               // C.
-                if (S[0] && !R[0] && R[1] == R[2]) {
-                    return score; }
-                --score;
-                if (matchGrade != MatchGrade.ScriptMatch) {
-                   // D.
-                    if (!S[0] && S[1] != S[2]) {
+                if (matchGrade != MatchGrade.DefaultRegion) {
+                   // C.
+                    if (S[0] && !R[0] && R[1] == R[2]) {
                         return score; }
                     --score;
-                   // E.
-                    if (!S[0] && S[1] == S[2]) {
-                        return score; }
+                    if (matchGrade != MatchGrade.ScriptMatch) {
+                       // D.
+                        if (!S[0] && S[1] != S[2]) {
+                            return score; }
+                        --score;
+                       // E.
+                        if (!S[0] && S[1] == S[2]) {
+                            return score; }
+                    }
+                    //--score;
+                    //DebugHelpers.WriteLine("LanguageTag.Match -- fallen through: {0}, {1}", ToString(), i_rhs.ToString());
+                    //Debug.Assert(false);
                 }
-                //--score;
-                //DebugHelpers.WriteLine("LanguageTag.Match -- fallen through: {0}, {1}", ToString(), i_rhs.ToString());
-                //Debug.Assert(false);
             }
            // F.
             return 0;
@@ -347,102 +383,145 @@ namespace i18n
             }
             return matchScore;
         }
-    // Test
+        /// <summary>
+        /// Helper for detecting a URL prefixed with a langtag part, and if found outputs
+        /// both the langtag and the URL with the prefix removed.
+        /// E.g. for URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
+        /// <remarks>
+        /// This method does not check for the validity of the returned langtag other than
+        /// it matching the pattern of a langtag as supported by this LanguageTag class.
+        /// </remarks>
+        /// </summary>
+        /// <param name="url">URL to be inspected for a valid langtag prefix forming the first path part of the URL.</param>
+        /// <param name="urlPatched">On success, set to the URL with the prefix path part removed.</param>
+        /// <returns>On success a LanguageTag instance, otherwise null.</returns>
+        public static LanguageTag UrlExtractLangTag(string url, out string urlPatched)
+        {
+           // Parse the url.
+            System.Text.RegularExpressions.Match match = m_regex_parseUrl.Match(url);
+           // If successful
+            if (match.Success
+                && match.Groups.Count == 2) {
+               // Extract the langtag value.
+                string langtag = match.Groups[1].Value;
+               // Patch the url.
+                urlPatched = url.Substring(langtag.Length +1);
+                if (urlPatched.Length == 0) {
+                    urlPatched = "/"; }
+               // Success.
+                return GetCachedInstance(langtag);
+            }
+           // No match.
+            urlPatched = null;
+            return null;
+        }
+    // Trace
         [Conditional("DEBUG")]
-        public static void TraceMatch(string i_langtag_lhs, string i_langtag_rhs)
+        public static void Trace_Match(string i_langtag_lhs, string i_langtag_rhs)
         {
             LanguageTag lhs = new LanguageTag(i_langtag_lhs);
             LanguageTag rhs = new LanguageTag(i_langtag_rhs);
             int score = lhs.Match(rhs);
-            //DebugHelpers.WriteLine("LanguageTag.TraceMatch -- Match({0}, {1}) = {2}", i_langtag_lhs, i_langtag_rhs, score.ToString());
+            DebugHelpers.WriteLine("LanguageTag.Trace_Match -- Match({0}, {1}) = {2}", i_langtag_lhs, i_langtag_rhs, score.ToString());
         }
         [Conditional("DEBUG")]
-        public static void Test()
+        public static void Trace()
         {
-            LanguageTag.TraceMatch("zh", "zh");
-            LanguageTag.TraceMatch("zh", "zh-HK");
-            LanguageTag.TraceMatch("zh", "zh-Hant");
-            LanguageTag.TraceMatch("zh", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-HK", "zh");
-            LanguageTag.TraceMatch("zh-HK", "zh-HK");
-            LanguageTag.TraceMatch("zh-HK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Hant", "zh");
-            LanguageTag.TraceMatch("zh-Hant", "zh-HK");
-            LanguageTag.TraceMatch("zh-Hant", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Hant-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Hant-HK", "zh");
-            LanguageTag.TraceMatch("zh-Hant-HK", "zh-HK");
-            LanguageTag.TraceMatch("zh-Hant-HK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Hant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh", "zh");
+            LanguageTag.Trace_Match("zh", "zh-HK");
+            LanguageTag.Trace_Match("zh", "zh-Hant");
+            LanguageTag.Trace_Match("zh", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-HK", "zh");
+            LanguageTag.Trace_Match("zh-HK", "zh-HK");
+            LanguageTag.Trace_Match("zh-HK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Hant", "zh");
+            LanguageTag.Trace_Match("zh-Hant", "zh-HK");
+            LanguageTag.Trace_Match("zh-Hant", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Hant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Hant-HK", "zh");
+            LanguageTag.Trace_Match("zh-Hant-HK", "zh-HK");
+            LanguageTag.Trace_Match("zh-Hant-HK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Hant-HK", "zh-Hant-HK");
 
-            LanguageTag.TraceMatch("dh", "zh");
-            LanguageTag.TraceMatch("dh", "zh-HK");
-            LanguageTag.TraceMatch("dh", "zh-Hant");
-            LanguageTag.TraceMatch("dh", "zh-Hant-HK");
-            LanguageTag.TraceMatch("dh-HK", "zh");
-            LanguageTag.TraceMatch("dh-HK", "zh-HK");
-            LanguageTag.TraceMatch("dh-HK", "zh-Hant");
-            LanguageTag.TraceMatch("dh-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("dh-Hant", "zh");
-            LanguageTag.TraceMatch("dh-Hant", "zh-HK");
-            LanguageTag.TraceMatch("dh-Hant", "zh-Hant");
-            LanguageTag.TraceMatch("dh-Hant-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("dh-Hant-HK", "zh");
-            LanguageTag.TraceMatch("dh-Hant-HK", "zh-HK");
-            LanguageTag.TraceMatch("dh-Hant-HK", "zh-Hant");
-            LanguageTag.TraceMatch("dh-Hant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("dh", "zh");
+            LanguageTag.Trace_Match("dh", "zh-HK");
+            LanguageTag.Trace_Match("dh", "zh-Hant");
+            LanguageTag.Trace_Match("dh", "zh-Hant-HK");
+            LanguageTag.Trace_Match("dh-HK", "zh");
+            LanguageTag.Trace_Match("dh-HK", "zh-HK");
+            LanguageTag.Trace_Match("dh-HK", "zh-Hant");
+            LanguageTag.Trace_Match("dh-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("dh-Hant", "zh");
+            LanguageTag.Trace_Match("dh-Hant", "zh-HK");
+            LanguageTag.Trace_Match("dh-Hant", "zh-Hant");
+            LanguageTag.Trace_Match("dh-Hant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("dh-Hant-HK", "zh");
+            LanguageTag.Trace_Match("dh-Hant-HK", "zh-HK");
+            LanguageTag.Trace_Match("dh-Hant-HK", "zh-Hant");
+            LanguageTag.Trace_Match("dh-Hant-HK", "zh-Hant-HK");
 
-            LanguageTag.TraceMatch("zh", "zh");
-            LanguageTag.TraceMatch("zh", "zh-HK");
-            LanguageTag.TraceMatch("zh", "zh-Hant");
-            LanguageTag.TraceMatch("zh", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-IK", "zh");
-            LanguageTag.TraceMatch("zh-IK", "zh-HK");
-            LanguageTag.TraceMatch("zh-IK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-IK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Hant", "zh");
-            LanguageTag.TraceMatch("zh-Hant", "zh-HK");
-            LanguageTag.TraceMatch("zh-Hant", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Hant-IK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Hant-IK", "zh");
-            LanguageTag.TraceMatch("zh-Hant-IK", "zh-HK");
-            LanguageTag.TraceMatch("zh-Hant-IK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Hant-IK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh", "zh");
+            LanguageTag.Trace_Match("zh", "zh-HK");
+            LanguageTag.Trace_Match("zh", "zh-Hant");
+            LanguageTag.Trace_Match("zh", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-IK", "zh");
+            LanguageTag.Trace_Match("zh-IK", "zh-HK");
+            LanguageTag.Trace_Match("zh-IK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-IK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Hant", "zh");
+            LanguageTag.Trace_Match("zh-Hant", "zh-HK");
+            LanguageTag.Trace_Match("zh-Hant", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Hant-IK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Hant-IK", "zh");
+            LanguageTag.Trace_Match("zh-Hant-IK", "zh-HK");
+            LanguageTag.Trace_Match("zh-Hant-IK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Hant-IK", "zh-Hant-HK");
 
-            LanguageTag.TraceMatch("zh", "zh");
-            LanguageTag.TraceMatch("zh", "zh-HK");
-            LanguageTag.TraceMatch("zh", "zh-Hant");
-            LanguageTag.TraceMatch("zh", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-HK", "zh");
-            LanguageTag.TraceMatch("zh-HK", "zh-HK");
-            LanguageTag.TraceMatch("zh-HK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Iant", "zh");
-            LanguageTag.TraceMatch("zh-Iant", "zh-HK");
-            LanguageTag.TraceMatch("zh-Iant", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-HK");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh", "zh");
+            LanguageTag.Trace_Match("zh", "zh-HK");
+            LanguageTag.Trace_Match("zh", "zh-Hant");
+            LanguageTag.Trace_Match("zh", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-HK", "zh");
+            LanguageTag.Trace_Match("zh-HK", "zh-HK");
+            LanguageTag.Trace_Match("zh-HK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Iant", "zh");
+            LanguageTag.Trace_Match("zh-Iant", "zh-HK");
+            LanguageTag.Trace_Match("zh-Iant", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-HK");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant-HK");
 
-            LanguageTag.TraceMatch("zh", "zh");
-            LanguageTag.TraceMatch("zh", "zh-HK");
-            LanguageTag.TraceMatch("zh", "zh-Hant");
-            LanguageTag.TraceMatch("zh", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-IK", "zh");
-            LanguageTag.TraceMatch("zh-IK", "zh-HK");
-            LanguageTag.TraceMatch("zh-IK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-IK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Iant", "zh");
-            LanguageTag.TraceMatch("zh-Iant", "zh-HK");
-            LanguageTag.TraceMatch("zh-Iant", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant-HK");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-HK");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant");
-            LanguageTag.TraceMatch("zh-Iant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh", "zh");
+            LanguageTag.Trace_Match("zh", "zh-HK");
+            LanguageTag.Trace_Match("zh", "zh-Hant");
+            LanguageTag.Trace_Match("zh", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-IK", "zh");
+            LanguageTag.Trace_Match("zh-IK", "zh-HK");
+            LanguageTag.Trace_Match("zh-IK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-IK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Iant", "zh");
+            LanguageTag.Trace_Match("zh-Iant", "zh-HK");
+            LanguageTag.Trace_Match("zh-Iant", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-HK");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant");
+            LanguageTag.Trace_Match("zh-Iant-HK", "zh-Hant-HK");
         }
     }
+
+
+    public static partial class LanguageTagExtensions
+    {
+        public static bool IsValid(
+            this LanguageTag lt)
+        {
+            return lt != null && lt.Language != null;
+        }
+    }
+
 }

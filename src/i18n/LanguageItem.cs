@@ -78,22 +78,28 @@ namespace i18n
         /// <param name="headerval">
         /// HTTP Accept-Language header value.
         /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html.
+        /// May be empty string for zero languages in which case explicitLanguage MUST be non-null.
         /// </param>
         /// <param name="explicitLanguage">
         /// Optional language to be put at front of array with quality value of 2.
         /// Null if no such language to be prepended.
         /// </param>
+        /// <returns>
+        /// Array of languages items.
+        /// </returns>
         public static LanguageItem[] ParseHttpLanguageHeader(string headerval, LanguageTag explicitLanguage = null)
         {
         // This method is designed to be as efficient as possible (avoiding string allocations where possible).
         //
             if (null == headerval) {
                 throw new ArgumentNullException("headerval"); }
+            if (!headerval.IsSet() && explicitLanguage == null) {
+                throw new ArgumentNullException("explicitLanguage"); }
             int begin, end, pos1;
             int len = headerval.Length;
             int ordinal = 0;
            // Init array with enough elements for each language entry in the header.
-            var LanguageItems = new LanguageItem[headerval.CountOfChar(',') + 1 + (explicitLanguage != null ? 1 : 0)];
+            var LanguageItems = new LanguageItem[(len > 0 ? headerval.CountOfChar(',') + 1 : 0) + (explicitLanguage != null ? 1 : 0)];
            // Add any 
             if (explicitLanguage != null) {
                 LanguageItems[ordinal] = new LanguageItem(explicitLanguage, 2, ordinal);
