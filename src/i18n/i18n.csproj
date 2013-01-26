@@ -59,6 +59,7 @@
     <Compile Include="ClonedHttpContext.cs" />
     <Compile Include="DebugHelpers.cs" />
     <Compile Include="FsCacheDependency.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ILocalizingServiceEnhanced.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />

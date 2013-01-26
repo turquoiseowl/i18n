@@ -143,7 +143,7 @@ namespace i18n
                         && appLangTag.IsValid()
                         && urlLangTag.Equals(appLangTag))
                     {
-                        I18NSession.EstablishPrincipalAppLanguageForRequest(filterContext.HttpContext, appLangTag);
+                        filterContext.HttpContext.SetPrincipalAppLanguageForRequest(appLangTag);
                         break;
                     }
 
@@ -153,7 +153,7 @@ namespace i18n
                         appLangTag = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
                     // 4.
                     if (appLangTag == null) {
-                        appLangTag = LanguageHelpers.GetMatchingAppLanguage(I18NSession.GetRequestUserLanguages(filterContext.HttpContext)); }
+                        appLangTag = LanguageHelpers.GetMatchingAppLanguage(filterContext.HttpContext.GetRequestUserLanguages()); }
                     // If we have got a PAL (from either the cookie or UserLanguages)...redirect to new URL based on it.
                     if (appLangTag != null)
                     {

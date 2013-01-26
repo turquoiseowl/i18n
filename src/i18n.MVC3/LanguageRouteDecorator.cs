@@ -201,7 +201,7 @@ namespace i18n
                     if (result != null && result.VirtualPath != null)
                     {
                        // If PAL was established for this request
-                        LanguageTag pal = I18NSession.GetPrincipalAppLanguageForRequest(context.HttpContext);
+                        LanguageTag pal = context.HttpContext.GetPrincipalAppLanguageForRequest();
                         if (pal.IsValid()) {
                            // Prepend the virtual path with the PAL langtag.
                            // E.g. "account/signup" -> "fr-CH/account/signup"

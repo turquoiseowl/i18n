@@ -85,7 +85,7 @@ namespace i18n
         /// Null if no such language to be prepended.
         /// </param>
         /// <returns>
-        /// Array of languages items.
+        /// Array of languages items sorted in order or language preference.
         /// </returns>
         public static LanguageItem[] ParseHttpLanguageHeader(string headerval, LanguageTag explicitLanguage = null)
         {
