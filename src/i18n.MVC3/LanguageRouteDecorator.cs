@@ -73,7 +73,7 @@ namespace i18n
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
                 // MVC calls us here when it attempts to match the incoming request URL to
-                // this particular registered route. Thus, we get here for each route until 
+                // this particular registered route. Thus, we get here for each registered route until 
                 // we report back a match with the route.
                 // Our purpose is to check for any langtag embedded in the URL and remove it
                 // for the purposes of doing a match:
@@ -189,7 +189,29 @@ namespace i18n
                 }
                 case DefaultSettings.LanguageMatching.Enhanced:
                 {
-                    return _route.GetVirtualPath(context, values);
+                // Here we do the reverse of what is done in GetRouteData.
+                // That is, if this route matches the route values passed and a virtual path (URL path) is 
+                // generated for the route, this will be a language neutral URL. Therefore, if the current
+                // request has a Principal Application Language (PAL) set, it is approp. to insert that
+                // langtag into the URL.
+                //
+                    VirtualPathData result = _route.GetVirtualPath(context, values);
+                   // If route values match this route
+                    if (result != null && result.VirtualPath != null)
+                    {
+                       // If PAL was established for this request
+                        LanguageTag pal = I18NSession.GetPrincipalAppLanguageForRequest(context.HttpContext);
+                        if (pal.IsValid()) {
+                           // Prepend the virtual path with the PAL langtag.
+                           // E.g. "account/signup" -> "fr-CH/account/signup"
+                           // E.g. ""               -> "fr-CH"
+                            result.VirtualPath = string.Format("{0}{1}{2}",
+                                pal.ToString(),
+                                result.VirtualPath.IsSet() ? "/" : "",
+                                result.VirtualPath.IsSet() ? result.VirtualPath : "");
+                        }
+                    }
+                    return result;
                 }
                 default:
                     throw new System.ApplicationException();

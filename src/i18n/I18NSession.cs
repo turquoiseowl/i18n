@@ -67,6 +67,10 @@ namespace i18n
         {
             context.Items["i18n.PAL"] = pal;
         }
+        public static LanguageTag GetPrincipalAppLanguageForRequest(HttpContextBase context)
+        {
+            return (LanguageTag)context.Items["i18n.PAL"];
+        }
 
     // Overrideables
 
