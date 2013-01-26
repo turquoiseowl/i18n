@@ -6,10 +6,10 @@ namespace i18n
     /// A convenience class for localization operations
     /// </summary>
     public class I18NSession
-        // TODO: This class requires some work and I suggest is possible redundant.
+        // TODO: This class requires some work and I suggest is possibly redundant.
         // For instance, the Set and GetLanguageFromSession methods should be balanced
         // with respect to each other, yet one is virtual and the other is static.
-        // It would make more sense for the GetLanguageFromSession methods to also be virtual
+        // It would make more sense for the GetLanguageFromSession method also to be virtual
         // yet that would require a session param to be passed to GetText (when we are in Basic mode).
         // Enhanced mode does would not need this class at all if GetText was moved to be an extension
         // method of HttpContext (see HttpContextExtensions).
