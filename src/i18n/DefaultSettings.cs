@@ -16,14 +16,18 @@ namespace i18n
             Basic,
 
             /// <summary>
-            /// Multi-pass language matching algorithm that provides more granular matching 
-            /// of a client's preferred languages against available application languages.
-            /// Requires the localizing service to implement ILocalizingServiceEnhanced.
-            /// Also, multi-facet language selection algorithm based on langtag in URL path prefix
-            /// (e.g. example.com/fr-CA/account/signup), then cookies ("i18n.langtag"),
-            /// then user agent Accept-Language setting (language-matched against list of AppLanguages),
-            /// and finally the default App language.
+            /// Enhanced language matching and selection algorithm.
             /// </summary>
+            /// <remarks>
+            /// · Multi-pass language matching algorithm that provides more granular matching 
+            ///   of a client's preferred languages against available application languages.
+            ///   Requires the localizing service to implement ILocalizingServiceEnhanced.
+            /// · Multi-facet language selection algorithm based, in order or priority, on:
+            ///      · a language tag in URL path prefix (e.g. example.com/fr-CA/account/signup),
+            ///      · cookies ("i18n.langtag"),
+            ///      · user agent Accept-Language setting (language-matched against list of AppLanguages),
+            ///      · and finally the default app language (DefaultSettings.DefaultTwoLetterISOLanguageTag).
+            /// </remarks>
             Enhanced,
         }
 
