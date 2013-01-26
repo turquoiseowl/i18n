@@ -18,16 +18,16 @@ namespace i18n
 
     // Static helpers
 
-        public static string GetLanguageFromSession(HttpContext context)
+        public static string GetLanguageFromSession(HttpContextBase context)
         {
             object val;
             return context.Session != null && (val = context.Session[SessionKey]) != null
                        ? val.ToString()
                        : null;
         }
-        public static string GetLanguageFromSession(HttpContextBase context)
+        public static string GetLanguageFromSession(HttpContext context)
         {
-            return GetLanguageFromSession(context.ApplicationInstance.Context);
+            return GetLanguageFromSession(context.GetHttpContextBase());
         }
 
     // Overrideables
@@ -66,7 +66,7 @@ namespace i18n
             return url;
         }
 
-        public virtual string GetText(HttpContext context, string text)
+        public virtual string GetText(HttpContextBase context, string text)
         {
             switch (DefaultSettings.TheMode)
             {
@@ -94,9 +94,9 @@ namespace i18n
 
             return HttpUtility.HtmlDecode(text);
         }
-        public virtual string GetText(HttpContextBase context, string text)
+        public virtual string GetText(HttpContext context, string text)
         {
-            return GetText(context.ApplicationInstance.Context, text);
+            return GetText(context.GetHttpContextBase(), text);
         }
     }
 }

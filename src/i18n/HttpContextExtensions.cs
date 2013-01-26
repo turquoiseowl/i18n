@@ -9,18 +9,37 @@ namespace i18n
     public static class HttpContextExtensions
     {
         /// <summary>
+        /// Returns an HttpContextBase for the current HttpContext.
+        /// This method is optimised such that the HttpContextBase instance returned is only created
+        /// once per request.
+        /// </summary>
+        public static HttpContextBase GetHttpContextBase(this HttpContext context)
+        {
+            // This value is created afresh first time this method is called per request,
+            // and cached for the request's remaining calls to this method.
+            HttpContextBase hcb = context.Items["i18n.HttpContextBase"] as HttpContextBase;
+            if (hcb == null)
+            {
+                context.Items["i18n.HttpContextBase"] 
+                    = hcb 
+                    = new HttpContextWrapper(context);
+            }
+            return hcb;
+        }
+
+        /// <summary>
         /// Helper for caching a per-request value that identifies the principal language
         /// under which the current request is to be handled.
         /// </summary>
         /// <param name="context">Context of the request.</param>
         /// <param name="pal">Selected AppLanguage.</param>
-        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, LanguageTag pal)
+        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, LanguageTag pal)
         {
             context.Items["i18n.PAL"] = pal;
         }
-        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, LanguageTag pal)
+        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, LanguageTag pal)
         {
-            context.ApplicationInstance.Context.SetPrincipalAppLanguageForRequest(pal);
+            context.GetHttpContextBase().SetPrincipalAppLanguageForRequest(pal);
         }
 
         /// <summary>
@@ -30,13 +49,13 @@ namespace i18n
         /// </summary>
         /// <param name="context">Context of the request.</param>
         /// <returns>The Principal AppLanguage Language for the reuest, or null if none previously set.</returns>
-        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
+        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
         {
             return (LanguageTag)context.Items["i18n.PAL"];
         }
-        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
+        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
         {
-            return context.ApplicationInstance.Context.GetPrincipalAppLanguageForRequest();
+            return context.GetHttpContextBase().GetPrincipalAppLanguageForRequest();
         }
 
         /// <summary>
@@ -48,7 +67,7 @@ namespace i18n
         /// <returns>
         /// Array of languages items sorted in order or language preference.
         /// </returns>
-        public static LanguageItem[] GetRequestUserLanguages(this HttpContext context)
+        public static LanguageItem[] GetRequestUserLanguages(this HttpContextBase context)
         {
             // Determine UserLanguages.
             // This value is created afresh first time this method is called per request,
@@ -63,9 +82,9 @@ namespace i18n
             }
             return UserLanguages;
         }
-        public static LanguageItem[] GetRequestUserLanguages(this HttpContextBase context)
+        public static LanguageItem[] GetRequestUserLanguages(this HttpContext context)
         {
-            return context.ApplicationInstance.Context.GetRequestUserLanguages();
+            return context.GetHttpContextBase().GetRequestUserLanguages();
         }
     }
 }
