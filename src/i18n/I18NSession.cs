@@ -27,10 +27,7 @@ namespace i18n
         }
         public static string GetLanguageFromSession(HttpContextBase context)
         {
-            object val;
-            return context.Session != null && (val = context.Session[SessionKey]) != null
-                       ? val.ToString()
-                       : null;
+            return GetLanguageFromSession(context.ApplicationInstance.Context);
         }
 
     // Overrideables
@@ -99,31 +96,7 @@ namespace i18n
         }
         public virtual string GetText(HttpContextBase context, string text)
         {
-            switch (DefaultSettings.TheMode)
-            {
-                case DefaultSettings.Mode.Basic:
-                {
-                    // Prefer a stored value to browser-supplied preferences
-                    var stored = GetLanguageFromSession(context);
-                    string[] languages = stored != null ?
-                        languages = new[] { stored }:
-                        languages = context.Request.UserLanguages;
-                    
-                    text = DefaultSettings.LocalizingService.GetText(text, languages);
-                    break;
-                }
-                case DefaultSettings.Mode.Enhanced:
-                {
-                    // Lookup resource.
-                    LanguageTag lt;
-                    text = DefaultSettings.LocalizingServiceEnhanced.GetText(text, context.GetRequestUserLanguages(), out lt) ?? text;
-                    break;
-                }
-                default:
-                    throw new System.ApplicationException();
-            }
-
-            return HttpUtility.HtmlDecode(text);
+            return GetText(context.ApplicationInstance.Context, text);
         }
     }
 }

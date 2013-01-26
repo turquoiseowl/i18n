@@ -14,9 +14,13 @@ namespace i18n
         /// </summary>
         /// <param name="context">Context of the request.</param>
         /// <param name="pal">Selected AppLanguage.</param>
-        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, LanguageTag pal)
+        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, LanguageTag pal)
         {
             context.Items["i18n.PAL"] = pal;
+        }
+        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, LanguageTag pal)
+        {
+            context.ApplicationInstance.Context.SetPrincipalAppLanguageForRequest(pal);
         }
 
         /// <summary>
@@ -26,34 +30,13 @@ namespace i18n
         /// </summary>
         /// <param name="context">Context of the request.</param>
         /// <returns>The Principal AppLanguage Language for the reuest, or null if none previously set.</returns>
-        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
+        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
         {
             return (LanguageTag)context.Items["i18n.PAL"];
         }
-
-        /// <summary>
-        /// Returns an ordered collection of languages supported by the user-agent.
-        /// See LanguageItem.ParseHttpLanguageHeader for more details.
-        /// This method is optimised such that the collection is built only once per request.
-        /// </summary>
-        /// <param name="context">Context of the current request.</param>
-        /// <returns>
-        /// Array of languages items sorted in order or language preference.
-        /// </returns>
-        public static LanguageItem[] GetRequestUserLanguages(this HttpContextBase context)
+        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
         {
-            // Determine UserLanguages.
-            // This value is created afresh first time this method is called per request,
-            // and cached for the request's remaining calls to this method.
-            LanguageItem[] UserLanguages = context.Items["i18n.UserLanguages"] as LanguageItem[];
-            if (UserLanguages == null)
-            {
-                // Construct UserLanguages list and cache it for the rest of the request.
-                context.Items["i18n.UserLanguages"] 
-                    = UserLanguages 
-                    = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
-            }
-            return UserLanguages;
+            return context.ApplicationInstance.Context.GetPrincipalAppLanguageForRequest();
         }
 
         /// <summary>
@@ -79,6 +62,10 @@ namespace i18n
                     = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
             }
             return UserLanguages;
+        }
+        public static LanguageItem[] GetRequestUserLanguages(this HttpContextBase context)
+        {
+            return context.ApplicationInstance.Context.GetRequestUserLanguages();
         }
     }
 }
