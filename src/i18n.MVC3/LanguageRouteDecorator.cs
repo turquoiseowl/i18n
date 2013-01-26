@@ -20,7 +20,7 @@ namespace i18n
 
         public override RouteData GetRouteData(HttpContextBase context)
         {
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {
@@ -82,7 +82,8 @@ namespace i18n
                 //    and try a match with the resulting URL. If found, add back the langtag
                 //    and return the routedata for the match.
                 // 2. Failing that, try a match with the URL as is.
-                // 3. Failing that, return 'no match'.
+                // 3. Failing that, return 'no match'. This will mean that if a language is in the URL but
+                //    it is not supported, we 404.
                 // 
                     RouteData routedata;
                     // 1.
@@ -126,7 +127,7 @@ namespace i18n
 
         public override VirtualPathData GetVirtualPath(RequestContext context, RouteValueDictionary values)
         {
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {

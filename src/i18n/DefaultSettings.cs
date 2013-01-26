@@ -5,13 +5,13 @@ namespace i18n
     public class DefaultSettings
     {
         /// <summary>
-        /// Enumeration of supported language matching algorithms.
+        /// Modes of operation supported by i18n.
         /// </summary>
         /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public enum Mode
         {
             /// <summary>
-            /// Original language matching algorithm.
+            /// Original language matching and selection algorithm.
             /// </summary>
             Basic,
 
@@ -19,6 +19,10 @@ namespace i18n
             /// Multi-pass language matching algorithm that provides more granular matching 
             /// of a client's preferred languages against available application languages.
             /// Requires the localizing service to implement ILocalizingServiceEnhanced.
+            /// Also, multi-facet language selection algorithm based on langtag in URL path prefix
+            /// (e.g. example.com/fr-CA/account/signup), then cookies ("i18n.langtag"),
+            /// then user agent Accept-Language setting (language-matched against list of AppLanguages),
+            /// and finally the default App language.
             /// </summary>
             Enhanced,
         }
@@ -27,7 +31,7 @@ namespace i18n
         /// The language matching algorithm to be used.
         /// Defaults to LanguageMatching.Basic but may be changed by app.
         /// </summary>
-        public static Mode DefaultLanguageMatchingAlgorithm { get; set; }
+        public static Mode TheMode { get; set; }
 
         /// <summary>
         /// The default language for all localized keys; when a PO database
@@ -38,7 +42,7 @@ namespace i18n
 
         static DefaultSettings()
         {
-            DefaultLanguageMatchingAlgorithm = Mode.Basic;
+            TheMode = Mode.Basic;
             DefaultTwoLetterISOLanguageName = "en";
             DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance(DefaultTwoLetterISOLanguageName);
             Container = new Container();

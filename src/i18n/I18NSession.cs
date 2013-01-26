@@ -116,7 +116,7 @@ namespace i18n
                 languages = new[] { stored }:
                 languages = context.Request.UserLanguages;
 
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {
@@ -144,7 +144,7 @@ namespace i18n
                 languages = new[] { stored }:
                 languages = context.Request.UserLanguages;
 
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {

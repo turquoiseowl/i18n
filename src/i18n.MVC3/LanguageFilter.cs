@@ -29,7 +29,7 @@ namespace i18n
         /// <param name="filterContext">The filter context.</param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {
@@ -197,7 +197,7 @@ namespace i18n
         /// <param name="filterContext">The filter context.</param>
         public void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
+            switch (DefaultSettings.TheMode)
             {
                 case DefaultSettings.Mode.Basic:
                 {
