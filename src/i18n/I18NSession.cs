@@ -118,12 +118,12 @@ namespace i18n
 
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     text = DefaultSettings.LocalizingService.GetText(text, languages);
                     break;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                     // Lookup resource.
                     LanguageTag lt;
@@ -146,12 +146,12 @@ namespace i18n
 
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     text = DefaultSettings.LocalizingService.GetText(text, languages);
                     break;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                     // Lookup resource.
                     LanguageTag lt;

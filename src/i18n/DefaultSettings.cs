@@ -8,7 +8,7 @@ namespace i18n
         /// Enumeration of supported language matching algorithms.
         /// </summary>
         /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
-        public enum LanguageMatching
+        public enum Mode
         {
             /// <summary>
             /// Original language matching algorithm.
@@ -27,7 +27,7 @@ namespace i18n
         /// The language matching algorithm to be used.
         /// Defaults to LanguageMatching.Basic but may be changed by app.
         /// </summary>
-        public static LanguageMatching DefaultLanguageMatchingAlgorithm { get; set; }
+        public static Mode DefaultLanguageMatchingAlgorithm { get; set; }
 
         /// <summary>
         /// The default language for all localized keys; when a PO database
@@ -38,7 +38,7 @@ namespace i18n
 
         static DefaultSettings()
         {
-            DefaultLanguageMatchingAlgorithm = LanguageMatching.Basic;
+            DefaultLanguageMatchingAlgorithm = Mode.Basic;
             DefaultTwoLetterISOLanguageName = "en";
             DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance(DefaultTwoLetterISOLanguageName);
             Container = new Container();

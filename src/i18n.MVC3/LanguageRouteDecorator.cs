@@ -22,7 +22,7 @@ namespace i18n
         {
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     var result = _route.GetRouteData(context);
 
@@ -70,7 +70,7 @@ namespace i18n
 
                     return result;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                 // MVC calls us here when it attempts to match the incoming request URL to
                 // this particular registered route. Thus, we get here for each registered route until 
@@ -128,7 +128,7 @@ namespace i18n
         {
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     var result = _route.GetVirtualPath(context, values);
 
@@ -187,7 +187,7 @@ namespace i18n
 
                     return result;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                 // Here we do the reverse of what is done in GetRouteData.
                 // That is, if this route matches the route values passed and a virtual path (URL path) is 

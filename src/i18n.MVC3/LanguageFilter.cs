@@ -31,7 +31,7 @@ namespace i18n
         {
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     var request = filterContext.HttpContext.Request;
                     var values = filterContext.RouteData.Values;
@@ -77,7 +77,7 @@ namespace i18n
                     RedirectWithLanguage(filterContext, values, preferred);
                     break;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                 // We get here with conceivably with route datatokens relating to language tags found in 
                 // the URL set by LanguageRouteDecorator.
@@ -199,7 +199,7 @@ namespace i18n
         {
             switch (DefaultSettings.DefaultLanguageMatchingAlgorithm)
             {
-                case DefaultSettings.LanguageMatching.Basic:
+                case DefaultSettings.Mode.Basic:
                 {
                     var language = I18NSession.GetLanguageFromSession(filterContext.HttpContext)
                                    ?? _service.GetBestAvailableLanguageFrom(filterContext.HttpContext.Request.UserLanguages)
@@ -208,7 +208,7 @@ namespace i18n
                     filterContext.HttpContext.Response.AppendHeader(ContentLanguageHeader, language);
                     break;
                 }
-                case DefaultSettings.LanguageMatching.Enhanced:
+                case DefaultSettings.Mode.Enhanced:
                 {
                     //TODO:
                     break;
