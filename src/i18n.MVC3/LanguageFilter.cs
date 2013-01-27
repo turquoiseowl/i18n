@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,7 +12,7 @@ namespace i18n
     /// to appropriate URLs, as well as setting the resulting language in
     /// the HTTP response
     /// </summary>
-    public class LanguageFilter : IActionFilter 
+    public class LanguageFilter : IActionFilter, IResultFilter
     {
         private const string ContentLanguageHeader = "Content-Language";
         private readonly I18NSession _session;
@@ -211,7 +212,32 @@ namespace i18n
                 }
                 case DefaultSettings.Mode.Enhanced:
                 {
-                    //TODO:
+                    break;
+                }
+                default:
+                    throw new System.ApplicationException();
+            }
+        }
+
+        public void OnResultExecuting(ResultExecutingContext filterContext)
+        {
+        }
+        public void OnResultExecuted(ResultExecutedContext filterContext)
+        {
+        // This method called AFTER any view is generated.
+        //
+            switch (DefaultSettings.TheMode)
+            {
+                case DefaultSettings.Mode.Basic:
+                {
+                    break;
+                }
+                case DefaultSettings.Mode.Enhanced:
+                {
+                   // Add a Content-Language HTTP header to the response.
+                   // NB: this is dependent on per-language counts incremented by the
+                   // GetText calls made during view generation etc..
+                    filterContext.HttpContext.SetContentLanguageHeader();
                     break;
                 }
                 default:

@@ -67,10 +67,12 @@ namespace i18n
            //
             for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
                 LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
-                foreach (LanguageItem langUser in UserLanguages) {
-                    LanguageTag ltUser = (LanguageTag)langUser.LanguageTag;
+                for (int i = 0; i < UserLanguages.Length; ++i) {
+                    LanguageTag ltUser = (LanguageTag)UserLanguages[i].LanguageTag;
+                    if (ltUser == null) {
+                        continue; }
                         // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
-                        // Or consider making the Match logic more abstract, e.g. requesting number of passed from
+                        // Or consider making the Match logic more abstract, e.g. requesting number of passes from
                         // the object, and passing a pass value through to Match.
                     foreach (KeyValuePair<string, LanguageTag> langApp in AppLanguages) {
                        // If languages do not match at the current grade...goto next.
@@ -85,6 +87,12 @@ namespace i18n
                         else {
                             o_text = null; }
                        // Match.
+                        ++UserLanguages[i].UseCount;
+
+                        if (UserLanguages.Length > 2) {
+                            int a = 10;
+                        }
+
                         return langApp.Value;
                     }
                 }

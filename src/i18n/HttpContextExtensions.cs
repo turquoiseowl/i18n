@@ -45,14 +45,8 @@ namespace i18n
         {
         // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
         //
-            // Construct (or reconstruct) UserLanguages list (with PAL foremost) and cache it for 
-            // the rest of the request.
-            context.Items["i18n.UserLanguages"] = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"], pal);
-
-            if (updateThreadCulture && pal.GetCultureInfo() != null) {
-                var thd = Thread.CurrentThread;
-                thd.CurrentCulture = thd.CurrentUICulture = pal.GetCultureInfo();
-            }
+            LanguageItem[] UserLanguages = GetRequestUserLanguages(context);
+            UserLanguages[0] = new LanguageItem(pal, LanguageItem.PalQualitySetting, 0);
         }
         public static void SetPrincipalAppLanguageForRequest(this HttpContext context, ILanguageTag pal)
         {
@@ -63,14 +57,22 @@ namespace i18n
         /// Returns any cached per-request value that identifies the principal language
         /// under which the current request is to be handled. That is, the value of any
         /// most-recent call to SetPrincipalAppLanguageForRequest.
+        /// If SetPrincipalAppLanguageForRequest has not yet been called for the request,
+        /// returns the default app language.
         /// </summary>
         /// <param name="context">Context of the request.</param>
-        /// <returns>The Principal AppLanguage Language for the request, or null if none previously set.</returns>
+        /// <returns>
+        /// The Principal AppLanguage Language for the request, or the default app language
+        /// if none previously set.
+        /// </returns>
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
         {
         // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
         //
-            return GetRequestUserLanguages(context)[0].LanguageTag;
+            ILanguageTag langtag = GetRequestUserLanguages(context)[0].LanguageTag;
+            if (langtag == null) {
+                langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag; }
+            return langtag;
         }
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
         {
@@ -105,5 +107,41 @@ namespace i18n
         {
             return context.GetHttpContextBase().GetRequestUserLanguages();
         }
+
+        /// <summary>
+        /// Add a Content-Language HTTP header to the response, based on any languages
+        /// that have provided resources during the request.
+        /// </summary>
+        /// <param name="context">Context of the current request.</param>
+        /// <returns>
+        /// true if header added; false if no languages provided content during the request and
+        /// so no header was added.
+        /// </returns>
+        public static bool SetContentLanguageHeader(this HttpContextBase context)
+        {
+           // Enumerate the possible user languages for the request. For any that have provided
+           // a resource, add them to the header value.
+            StringBuilder sb = new StringBuilder();
+            LanguageItem[] langitems = context.GetRequestUserLanguages();
+            foreach (LanguageItem langUser in langitems)
+            {
+                if (langUser.LanguageTag == null) {
+                    continue; }
+                if (langUser.UseCount > 0) {
+                    if (sb.Length > 0) {
+                        sb.Append(","); }
+                    sb.Append(langUser.LanguageTag.ToString());
+                }
+            }
+            if (sb.Length == 0) {
+                return false; }
+            context.Response.AppendHeader("Content-Language", sb.ToString());
+            return true;
+        }
+        public static bool SetContentLanguageHeader(this HttpContext context)
+        {
+            return context.GetHttpContextBase().SetContentLanguageHeader();
+        }
+
     }
 }

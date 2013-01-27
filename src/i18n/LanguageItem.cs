@@ -20,10 +20,9 @@ namespace i18n
         public const int PalQualitySetting = 2;
     // Data
         /// <summary>
-        /// Describes a language.
+        /// Describes a language. May be null if this represents a null (unset) value.
         /// </summary>
         public ILanguageTag LanguageTag;
-
         /// <returns>
         /// A real number ranging from 0 to 2 describing the quality of the language tag relative
         /// to another for which an equivalent quality value is availble (0 = lowest quality; 2 = highest quality).
@@ -32,12 +31,16 @@ namespace i18n
         /// when set is stored at the head of an array LanguageItem instances.
         /// </returns>
         public float Quality;
-
         /// <summary>
         /// Zero-based index of the item in the source language list.
         /// Used in comparison when Quality is equal.
         /// </summary>
         public int Ordinal;
+        /// <summary>
+        /// May be used to count the number of messages in the language that have been translated.
+        /// Initialized to zero. Excluded from comparisons.
+        /// </summary>
+        public int UseCount;
     // Con
         public LanguageItem(
             ILanguageTag i_LanguageTag,
@@ -47,6 +50,7 @@ namespace i18n
             LanguageTag = i_LanguageTag;
             Quality = i_Quality;
             Ordinal = i_Ordinal;
+            UseCount = 0;
         }
     // [IComparable<LanguageItem>]
         /// <summary>
@@ -60,55 +64,62 @@ namespace i18n
         {
             return Quality != other.Quality ? (Quality > other.Quality ? -1 : 1):
                    Ordinal != other.Ordinal ? (Ordinal < other.Ordinal ? -1 : 1):
-                   0;
+                   string.Compare(
+                              LanguageTag != null ?       LanguageTag.ToString() : "", 
+                        other.LanguageTag != null ? other.LanguageTag.ToString() : "", 
+                        true);
         }
     // [Object]
         public override string ToString()
         {
-            return string.Format("{0};q={1} ({2})", LanguageTag, Quality, Ordinal);
+            return string.Format("{0};q={1} ordinal = {2}, usecount = {3})", LanguageTag != null ? LanguageTag.ToString() : "", Quality, Ordinal, UseCount);
         }
     // Static helpers
         /// <summary>
         /// Parses an HTTP Accept-Language or Content-Language header value, returning
-        /// a representative ordered array of LanguageItem, sorted in order or language
-        /// preference.
+        /// a representative ordered array of LanguageItem instances, sorted in order of
+        /// language preference.
         /// E.g. "de;q=0.5, en;q=1, fr-FR;q=0,ga;q=0.5".
         /// Notably, is able to re-order elements based on quality.
         /// </summary>
         /// <remarks>
+        /// The first element position in the returned array is reserved for an item that
+        /// describes the Principal Application Language (PAL) for the request. If/when the PAL
+        /// is not set, that element will be a null item (LanguageItem.LanguageTag == null).
+        /// 
         /// This method is designed to be as efficient as possible, typically requiring
         /// only a single heap alloc, for the returned array object itself.
         /// </remarks>
         /// <param name="headerval">
         /// HTTP Accept-Language header value.
         /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html.
-        /// May be empty string for zero languages in which case explicitLanguage MUST be non-null.
+        /// May be empty string for zero languages in which case pal MUST be non-null.
         /// </param>
-        /// <param name="explicitLanguage">
-        /// Optional language to be put at front of array with quality value of 2 (LanguageItem.PalQualitySetting).
-        /// Null if no such language to be prepended.
+        /// <param name="pal">
+        /// Optional language to store at the first element position in the array, which is reserved
+        /// for the Principal Application Language (PAL). Any such LanguageItem stored that has a quality 
+        /// value of 2 (LanguageItem.PalQualitySetting). Null if no such language to be stored there and the
+        /// item to be set as null (LanguageItem.LanguageTag == null).
         /// </param>
         /// <returns>
-        /// Array of languages items sorted in order or language preference.
+        /// Array of languages items (with possibly null LanguageTag members) sorted in order or language preference.
         /// </returns>
-        public static LanguageItem[] ParseHttpLanguageHeader(string headerval, ILanguageTag explicitLanguage = null)
+        public static LanguageItem[] ParseHttpLanguageHeader(string headerval, ILanguageTag pal = null)
         {
         // This method is designed to be as efficient as possible (avoiding string allocations where possible).
         //
             if (null == headerval) {
                 throw new ArgumentNullException("headerval"); }
-            if (!headerval.IsSet() && explicitLanguage == null) {
-                throw new ArgumentNullException("explicitLanguage"); }
+            if (!headerval.IsSet() && pal == null) {
+                throw new ArgumentNullException("pal"); }
             int begin, end, pos1;
             int len = headerval.Length;
             int ordinal = 0;
            // Init array with enough elements for each language entry in the header.
-            var LanguageItems = new LanguageItem[(len > 0 ? headerval.CountOfChar(',') + 1 : 0) + (explicitLanguage != null ? 1 : 0)];
-           // Add any 
-            if (explicitLanguage != null) {
-                LanguageItems[ordinal] = new LanguageItem(explicitLanguage, PalQualitySetting, ordinal);
-                ++ordinal;
-            }
+            var LanguageItems = new LanguageItem[(len > 0 ? headerval.CountOfChar(',') + 1 : 0) + 1];
+           // First element position is reserved for any PAL.
+            LanguageItems[ordinal] = new LanguageItem(pal, PalQualitySetting, ordinal);
+            ++ordinal;
            // For each language component of the header (delimited by comma)
             for (begin = 0; begin < len; begin = end +1) {
                 end = headerval.IndexOf(',', begin);
@@ -145,7 +156,7 @@ namespace i18n
                 if (!lt.Language.IsSet()) {
                     continue; }
                // Ignore the langtag if already added.
-                if (explicitLanguage.IsValid() && explicitLanguage.Equals(lt)) {
+                if (pal.IsValid() && pal.Equals(lt)) {
                     continue; }
                // Store a new representative item.
                // NB: LanguageItem is a value type so no alloc done here.

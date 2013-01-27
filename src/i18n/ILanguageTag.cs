@@ -12,7 +12,7 @@ namespace i18n
         /// <summary>
         /// Returns the full language tag.
         /// </summary>
-        /// <returns>A string describing the full language tag.</returns>
+        /// <returns>A string describing the full language tag or "" if null or error instance.</returns>
         string ToString();
 
         /// <summary>
