@@ -40,17 +40,13 @@ namespace i18n
                                 continue;
                             }
 
+                            // Truncate the language token from the url.
+                            // NB: this can result in a zero-length URL, which if left as that
+                            // will cause the ClonedHttpRequest.AppRelativeCurrentExecutionFilePath method
+                            // to throw ArgumentNull exception when called indirectly. Thus, "" -> "/".
                             url = url.Substring(0, url.Length -suffix.Length);
-                                //BUGBUG: the above can result in a zero-length URL, which in turn
-                                // cause the ClonedHttpRequest.AppRelativeCurrentExecutionFilePath method
-                                // to throw ArgumentNull exception when called indirectly.
-                                // Fix is simple i.e. 
-        /*
                             if (url.Length == 0) {
                                 url = "/"; }
-        */
-                                    // However, reluctant to alter this code as it is not well documented and
-                                    // don't want to break something else.
 
                             var originalRequest = new ClonedHttpRequest(context.Request, url);
                             var originalContext = new ClonedHttpContext(context, originalRequest);
