@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +12,11 @@ namespace i18n
     {
         /// <summary>
         /// Returns an HttpContextBase for the current HttpContext.
+        /// Facilitates efficient consolidation of methods that require support for both 
+        /// HttpContext/HttpContextBase typed params.
         /// This method is optimised such that the HttpContextBase instance returned is only created
         /// once per request.
+        /// NB: this may involve a per-appdomain lock when reading from the items dictionary.
         /// </summary>
         public static HttpContextBase GetHttpContextBase(this HttpContext context)
         {
@@ -33,11 +38,23 @@ namespace i18n
         /// </summary>
         /// <param name="context">Context of the request.</param>
         /// <param name="pal">Selected AppLanguage.</param>
-        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, LanguageTag pal)
+        /// <param name="updateThreadCulture">
+        /// Indicates whether to also update the thread CurrentCulture/CurrentUICulture settings.
+        /// </param>
+        public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, ILanguageTag pal, bool updateThreadCulture = true)
         {
-            context.Items["i18n.PAL"] = pal;
+        // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
+        //
+            // Construct (or reconstruct) UserLanguages list (with PAL foremost) and cache it for 
+            // the rest of the request.
+            context.Items["i18n.UserLanguages"] = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"], pal);
+
+            if (updateThreadCulture && pal.GetCultureInfo() != null) {
+                var thd = Thread.CurrentThread;
+                thd.CurrentCulture = thd.CurrentUICulture = pal.GetCultureInfo();
+            }
         }
-        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, LanguageTag pal)
+        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, ILanguageTag pal)
         {
             context.GetHttpContextBase().SetPrincipalAppLanguageForRequest(pal);
         }
@@ -48,12 +65,14 @@ namespace i18n
         /// most-recent call to SetPrincipalAppLanguageForRequest.
         /// </summary>
         /// <param name="context">Context of the request.</param>
-        /// <returns>The Principal AppLanguage Language for the reuest, or null if none previously set.</returns>
-        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
+        /// <returns>The Principal AppLanguage Language for the request, or null if none previously set.</returns>
+        public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
         {
-            return (LanguageTag)context.Items["i18n.PAL"];
+        // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
+        //
+            return GetRequestUserLanguages(context)[0].LanguageTag;
         }
-        public static LanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
+        public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
         {
             return context.GetHttpContextBase().GetPrincipalAppLanguageForRequest();
         }

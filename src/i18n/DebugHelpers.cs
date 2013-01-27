@@ -4,7 +4,7 @@ using System.Text;
 
 namespace i18n
 {
-    public class DebugHelpers
+    internal class DebugHelpers
     {
         [Conditional("DEBUG")]
         public static void WriteLine(string message)

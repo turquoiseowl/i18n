@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -121,11 +122,14 @@ namespace i18n
         /// </summary>
         public string GlobalKey { get; private set; }
         /// <summary>
-        /// Returns indication of whether the instance was initialized to a valid language tag.
-        /// Valid in the sense that it confirms to a support pattern of characters,
-        /// NOT whether the value itself refers to valid language.
+        /// Corresponding CultureInfo instance, or null if the langtag is unsupported on this system.
         /// </summary>
-        //public bool IsValid { get { return Language != null; } }
+        public CultureInfo CultureInfo { get; private set; }
+        /// <summary>
+        /// If the system supports a cultureinfo object for the language, this is the native name of 
+        /// the language suitable for user display, otherwise it is the language tag string.
+        /// </summary>
+        public string NativeNameTitleCase { get; private set; }
     // Con
         /// <summary>
         /// Constructs a new instance based on a language tag string.
@@ -179,7 +183,13 @@ namespace i18n
                 m_parent = null; }
            //
             GlobalKey = string.Format("po:{0}", m_langtag).ToLowerInvariant();
-
+           //
+            try {
+                CultureInfo = new CultureInfo(langtag);
+            }
+            catch(System.ArgumentException) {}
+           //
+            NativeNameTitleCase = CultureInfo != null ? CultureInfo.TextInfo.ToTitleCase(CultureInfo.NativeName) : "m_langtag";
             //Debug.Assert(ToString() == langtag);
         }
         /// <summary>
@@ -200,10 +210,12 @@ namespace i18n
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
         /// </param>
-        /// <returns>Either new or pre-exisiting instance.</returns>
+        /// <returns>Either new or pre-exisiting instance, or null if langtag is invalid.</returns>
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public static LanguageTag GetCachedInstance(string langtag)
         {
+            if (!langtag.IsSet()) {
+                return null; }
             LanguageTag result = null;
            // Get any extant instance, no need to lock as just reading.
             if (s_cache.TryGetValue(langtag, out result)) {
@@ -220,7 +232,10 @@ namespace i18n
                 if (s_cache.Count > 10000) {
                     s_cache.Clear(); }
                // Create and cache new instance.
-                s_cache[langtag] = result = new LanguageTag(langtag);
+                result = new LanguageTag(langtag);
+                if (!result.IsValid()) {
+                    return null; }
+                s_cache[langtag] = result;
                 return result;
             }
         }
@@ -253,9 +268,15 @@ namespace i18n
         string[] ILanguageTag.GetVariant()    { return null; }
         string   ILanguageTag.GetExtension()  { return null; }
         string   ILanguageTag.GetPrivateuse() { return null; }
-        float    ILanguageTag.GetQuality()    { return -1; }
         ILanguageTag ILanguageTag.GetParent() { return m_parent; }
         int      ILanguageTag.GetMaxParents() { return 2; }
+        CultureInfo ILanguageTag.GetCultureInfo()      { return CultureInfo; }
+        string   ILanguageTag.GetNativeNameTitleCase() { return NativeNameTitleCase; }
+    // [IEquatable<ILanguageTag>]
+        public bool Equals(ILanguageTag other)
+        {
+            return 0 == string.Compare(m_langtag, other.ToString(), true);
+        }
     // [IEquatable<LanguageTag>]
         public bool Equals(LanguageTag other)
         {
@@ -386,14 +407,19 @@ namespace i18n
         /// <summary>
         /// Helper for detecting a URL prefixed with a langtag part, and if found outputs
         /// both the langtag and the URL with the prefix removed.
-        /// E.g. for URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
+        /// </summary>
+        /// <example>
+        /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
+        /// </example>
         /// <remarks>
         /// This method does not check for the validity of the returned langtag other than
         /// it matching the pattern of a langtag as supported by this LanguageTag class.
         /// </remarks>
-        /// </summary>
         /// <param name="url">URL to be inspected for a valid langtag prefix forming the first path part of the URL.</param>
-        /// <param name="urlPatched">On success, set to the URL with the prefix path part removed.</param>
+        /// <param name="urlPatched">
+        /// On success, set to the URL with the prefix path part removed.
+        /// On failure, set to value of url param.
+        /// </param>
         /// <returns>On success a LanguageTag instance, otherwise null.</returns>
         public static LanguageTag UrlExtractLangTag(string url, out string urlPatched)
         {
@@ -412,8 +438,33 @@ namespace i18n
                 return GetCachedInstance(langtag);
             }
            // No match.
-            urlPatched = null;
+            urlPatched = url;
             return null;
+        }
+        /// <summary>
+        /// Patches in the langtag into the passed url, replacing any extant langtag in the url if necessary.
+        /// </summary>
+        /// <example>
+        /// "en" + "example.com/account/signup"         -> "example.com/en/account/signup"
+        /// "en" + "example.com/zh-Hans/account/signup" -> "example.com/en/account/signup"
+        /// </example>
+        /// <param name="url">
+        /// URL to be patched.
+        /// </param>
+        /// <param name="langtag">
+        /// Optional langtag to be patched into the URL, or null if any langtag 
+        /// to be removed from the URL.
+        /// </param>
+        /// <returns>UriBuilder containing the modified version of url.</returns>
+        public static UriBuilder UrlSetLangTag(string url, LanguageTag langtag)
+        {
+            UriBuilder ub = new UriBuilder(url);
+            string urlPatched;
+            UrlExtractLangTag(ub.Path, out urlPatched);
+            ub.Path = urlPatched;
+            if (langtag.IsValid()) {
+                ub.PrependPath(langtag.ToString()); }
+            return ub;
         }
     // Trace
         [Conditional("DEBUG")]
@@ -518,9 +569,9 @@ namespace i18n
     public static partial class LanguageTagExtensions
     {
         public static bool IsValid(
-            this LanguageTag lt)
+            this ILanguageTag lt)
         {
-            return lt != null && lt.Language != null;
+            return lt != null && lt.GetLanguage() != null;
         }
     }
 

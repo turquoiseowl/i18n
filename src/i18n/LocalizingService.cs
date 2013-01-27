@@ -74,6 +74,10 @@ namespace i18n
                 }
 
                 // Save cycles processing beyond the default; just return the original key
+                // TODO: this is probably now made redundant by the equivalent check in TryGetTextFor;
+                // however that check is done AFTER the PO lookup which is probably better for this
+                // case anyway, as it allows the default PO file to override the key when the key is not
+                // intended to also be the default message.
                 if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return key;
@@ -101,6 +105,41 @@ namespace i18n
         }
 
     // [ILocalizingServiceEnhanced]
+
+        public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
+        {
+            ConcurrentDictionary<string, LanguageTag> AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+            if (AppLanguages != null) {
+                return AppLanguages; }
+            lock (Sync)
+            {
+                AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+                if (AppLanguages != null) {
+                    return AppLanguages; }
+                AppLanguages = new ConcurrentDictionary<string, LanguageTag>();
+
+               // Insert into cache.
+               // NB: we do this before actually populating the collection. This is so that any changes to the
+               // folders before we finish populating the collection will cause the cache item to be invalidated
+               // and hence reloaded on next request, and so will not be missed.
+                string directory;
+                string path;
+                GetDirectoryAndPath(null, out directory, out path);
+                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new FsCacheDependency(directory));
+
+               // Populate the collection.
+                List<string> dirs = new List<string>(Directory.EnumerateDirectories(directory));
+                foreach (var dir in dirs)
+                {
+                    string langtag = Path.GetFileName(dir);
+                    if (IsLanguageValid(langtag)) {
+                        AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); }
+                }
+
+               // Done.
+                return AppLanguages;
+            }
+        }
 
         public virtual string GetText(string key, LanguageItem[] languages, out LanguageTag o_langtag, int maxPasses = -1)
         {
@@ -137,46 +176,6 @@ namespace i18n
     // Implementation
 
         private static readonly object Sync = new object();
-
-        /// <summary>
-        /// Obtains collection of language tags describing the set of Po-valid languages, that
-        /// is the languages for which one or more resource are defined.
-        /// Note that the AppLanguages collection is unordered; this is because there is no innate 
-        /// precedence at the resource level: precedence is only relevant to UserLanguages.
-        /// </summary>
-        private ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
-        {
-            ConcurrentDictionary<string, LanguageTag> AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
-            if (AppLanguages != null) {
-                return AppLanguages; }
-            lock (Sync)
-            {
-                AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
-                if (AppLanguages != null) {
-                    return AppLanguages; }
-                AppLanguages = new ConcurrentDictionary<string, LanguageTag>();
-
-               // Insert into cache.
-               // NB: we do this before actually populating the collection. This is so that any changes to the
-               // folders before we finish populating the collection will cause the cache item to be invalidated
-               // and hence reloaded on next request, and so will not be missed.
-                string directory;
-                string path;
-                GetDirectoryAndPath(null, out directory, out path);
-                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new FsCacheDependency(directory));
-
-               // Populate the collection.
-                List<string> dirs = new List<string>(Directory.EnumerateDirectories(directory));
-                foreach (var dir in dirs)
-                {
-                    string langtag = Path.GetFileName(dir);
-                    if (IsLanguageValid(langtag)) {
-                        AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); }
-                }
-               // Done.
-                return AppLanguages;
-            }
-        }
 
         /// <summary>
         /// Assesses whether a language is PO-valid, that is whether or not one or more
@@ -226,14 +225,27 @@ namespace i18n
         /// </returns>
         private static string TryGetTextFor(string langtag, string key)
         {
+            // If no messages loaded for language...fail.
             if (!IsLanguageValid(langtag)) {
                 return null; }
 
-            // If testing for any message loaded for the langtag...return positive.
+            // If not testing for a specific message, that is just testing whether any messages 
+            // are present...return positive.
             if (key == null) {
                 return ""; }   
 
-            return LookupText(langtag, key);
+            // Lookup specific message text in the language PO and if found...return that.
+            string text = LookupText(langtag, key);
+            if (text != null) {
+                return text; }
+
+            // If the language is the default language, by definition the text always exists
+            // and as there isn't a translation defined for the key, we return the key itself.
+            if (string.Compare(langtag, DefaultSettings.DefaultTwoLetterISOLanguageName, true) == 0) {
+                return key; }
+
+            // Lookup failed.
+            return null;
         }
 
         private static void CreateEmptyMessages(string langtag)

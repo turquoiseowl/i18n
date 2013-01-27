@@ -1,11 +1,21 @@
 ﻿namespace i18n
 {
+    using System.Collections.Concurrent;
+
     /// <summary>
     /// Defines a service for retrieving localized text from a data source using the
     /// DefaultSettings.LanguageMatching.Enhanced algorithm.
     /// </summary>
     public interface ILocalizingServiceEnhanced
     {
+        /// <summary>
+        /// Obtains collection of language tags describing the set of Po-valid languages, that
+        /// is the languages for which one or more resource are defined.
+        /// Note that the AppLanguages collection is unordered; this is because there is no innate 
+        /// precedence at the resource level: precedence is only relevant to UserLanguages.
+        /// </summary>
+        ConcurrentDictionary<string, LanguageTag> GetAppLanguages();
+
         /// <summary>
         /// Looks up and returns localized text for a resource id using the
         /// DefaultSettings.LanguageMatching.Enhanced algorithm.

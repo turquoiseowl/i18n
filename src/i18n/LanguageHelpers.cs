@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,21 @@ namespace i18n
 {
     public static class LanguageHelpers
     {
+        /// <summary>
+        /// Obtains collection of language tags describing the set of Po-valid languages, that
+        /// is the languages for which one or more resource are defined.
+        /// Note that the AppLanguages collection is unordered; this is because there is no innate 
+        /// precedence at the resource level: precedence is only relevant to UserLanguages.
+        /// </summary>
+        /// <remarks>Requires i18n to be in Enhanced mode.</remarks>
+        public static ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
+        {
+            if (DefaultSettings.LocalizingServiceEnhanced == null) {
+                throw new System.InvalidOperationException("Expected Enhanced mode."); }
+
+            return DefaultSettings.LocalizingServiceEnhanced.GetAppLanguages();
+        }
+
         /// <summary>
         /// Attempts to match the passed language with an AppLanguage.
         /// </summary>
@@ -22,6 +38,7 @@ namespace i18n
         /// <returns>
         /// A language tag identifying an AppLanguage that will be the same as, or related langtag.
         /// </returns>
+        /// <remarks>Requires i18n to be in Enhanced mode.</remarks>
         public static LanguageTag GetMatchingAppLanguage(string langtag, int maxPasses = -1)
         {
             return GetMatchingAppLanguage(LanguageItem.ParseHttpLanguageHeader(langtag), maxPasses);

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace i18n
 {
-    public static class ParseHelpers
+    internal static class ParseHelpers
     {
         /// <summary>
         /// Efficient (allocation-free) parsing of numerical strings with support for substrings

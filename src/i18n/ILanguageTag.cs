@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace i18n
 {
@@ -6,8 +7,14 @@ namespace i18n
     /// Describes a language tag value, as defined in RFC 5646 (BCP 47).
     /// </summary>
     /// <seealso href="http://tools.ietf.org/html/rfc5646#section-2.1"/>
-    public interface ILanguageTag
+    public interface ILanguageTag : IEquatable<ILanguageTag>
     {
+        /// <summary>
+        /// Returns the full language tag.
+        /// </summary>
+        /// <returns>A string describing the full language tag.</returns>
+        string ToString();
+
         /// <summary>
         /// Returns the mandatory 2 character language subtag.
         /// </summary>
@@ -51,18 +58,6 @@ namespace i18n
         string GetPrivateuse();
 
         /// <summary>
-        /// Convenience method allowing the implementation of this interface optionally to associate
-        /// a quality value to the language tag value. Intended for use when working with lists of language tags
-        /// such as HTTP Accept-Language and Content-Language headers.
-        /// </summary>
-        /// <returns>
-        /// A real number ranging from 0 to 1 describing the quality of the language tag relative
-        /// to another for which an equivalent quality value is availble (0 = lowest quality; 1 = highest quality);
-        /// -1 if the instance does not implement a quality value.
-        /// </returns>
-        float GetQuality();
-
-        /// <summary>
         /// Returns an object representing any logical parent of the tag.
         /// </summary>
         /// <returns>Parent object or null if no parent.</returns>
@@ -73,5 +68,16 @@ namespace i18n
         /// This is really a static value provided by the underlying impl.
         /// </summary>
         int GetMaxParents();
+
+        /// <summary>
+        /// Corresponding CultureInfo instance, or null if the langtag is unsupported on this system.
+        /// </summary>
+        CultureInfo GetCultureInfo();
+
+        /// <summary>
+        /// If the system supports a cultureinfo object for the language, this is the native name of 
+        /// the language suitable for user display, otherwise it is the language tag string.
+        /// </summary>
+        string GetNativeNameTitleCase();
     }
 }
