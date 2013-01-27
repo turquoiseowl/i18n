@@ -72,6 +72,7 @@ namespace i18n
                         // This is an explicit language request, override preferences
                         _session.Set(filterContext.HttpContext, token.Substring(1));
                         preferred = _session.GetLanguageFromSessionOrService(filterContext.HttpContext);
+                        break;
                     }
             
                     RedirectWithLanguage(filterContext, values, preferred);
