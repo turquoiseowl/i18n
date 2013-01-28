@@ -88,11 +88,6 @@ namespace i18n
                             o_text = null; }
                        // Match.
                         ++UserLanguages[i].UseCount;
-
-                        if (UserLanguages.Length > 2) {
-                            int a = 10;
-                        }
-
                         return langApp.Value;
                     }
                 }

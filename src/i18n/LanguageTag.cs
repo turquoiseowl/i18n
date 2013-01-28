@@ -389,7 +389,6 @@ namespace i18n
         /// to this langtag. I.e. the written AppLanguage that a user understanding this langtag
         /// will most-likely understand.
         /// </summary>
-        /// <param name="i_langtag">Language tag to match.</param>
         /// <returns>Selected CultureInfoEx instance from the AppLanguages collection or null if there was no match.</returns>
         public int Match(LanguageTag[] AppLanguages, MatchGrade matchGrade = MatchGrade.LanguageMatch)
         {
