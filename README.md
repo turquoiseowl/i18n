@@ -214,6 +214,7 @@ include the following in your Application_Start() method:
 ```
 
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
+It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
 
 #### Validation attributes
 
