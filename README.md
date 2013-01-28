@@ -185,7 +185,7 @@ The PAL is determined by the first of the following conditions that is met:
 Where a *loose* match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
 
-Language matching is the performed when a list of one or more user-preferred languages is matched against
+Language matching is performed when a list of one or more user-preferred languages is matched against
 a list of one or more application laguages, the goal being to choose one of the application languages
 which the user is most likely to understand.
 
