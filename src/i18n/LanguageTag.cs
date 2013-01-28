@@ -407,9 +407,6 @@ namespace i18n
         /// Helper for detecting a URL prefixed with a langtag part, and if found outputs
         /// both the langtag and the URL with the prefix removed.
         /// </summary>
-        /// <example>
-        /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
-        /// </example>
         /// <remarks>
         /// This method does not check for the validity of the returned langtag other than
         /// it matching the pattern of a langtag as supported by this LanguageTag class.
@@ -420,6 +417,11 @@ namespace i18n
         /// On failure, set to value of url param.
         /// </param>
         /// <returns>On success a LanguageTag instance, otherwise null.</returns>
+        /// <remarks>
+        /// <example>
+        /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
+        /// </example>
+        /// </remarks>
         public static LanguageTag UrlExtractLangTag(string url, out string urlPatched)
         {
            // Parse the url.
@@ -443,10 +445,6 @@ namespace i18n
         /// <summary>
         /// Patches in the langtag into the passed url, replacing any extant langtag in the url if necessary.
         /// </summary>
-        /// <example>
-        /// "en" + "example.com/account/signup"         -> "example.com/en/account/signup"
-        /// "en" + "example.com/zh-Hans/account/signup" -> "example.com/en/account/signup"
-        /// </example>
         /// <param name="url">
         /// URL to be patched.
         /// </param>
@@ -455,6 +453,10 @@ namespace i18n
         /// to be removed from the URL.
         /// </param>
         /// <returns>UriBuilder containing the modified version of url.</returns>
+        /// <remarks>
+        /// <para>"example.com/account/signup"         , "en" -> "example.com/en/account/signup"</para>
+        /// <para>"example.com/zh-Hans/account/signup" , "en" -> "example.com/en/account/signup"</para>
+        /// </remarks>
         public static UriBuilder UrlSetLangTag(string url, LanguageTag langtag)
         {
             UriBuilder ub = new UriBuilder(url);

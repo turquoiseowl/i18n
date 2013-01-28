@@ -32,12 +32,6 @@ namespace i18n
         /// used within double quotes. Thus, &lt;img alt="@_("logo")"&gt; doesn't get picked up.
         /// Using this overload of the _() helper avoids the problem by encoding the quotes within
         /// the method.
-        /// </remarks>
-        /// <param name="value">String which is to be wrapped in double quotes and also translatable
-        /// (and picked up by xgettext and so exported to the POT file).</param>
-        /// <param name="attrname">Optional name of an HTML attribute when producing markup for an HTML attribute e.g. alt.
-        /// Null or empty string if just the quoted value string to be output.</param>
-        /// <returns>Raw html markup string of the form "value" or attrname="value".</returns>
         /// <example>
         /// The following Razor HTML syntax:
         ///       &lt;img @_("Our logo", "alt") src="..."&gt;...&lt;/img&gt;
@@ -58,6 +52,12 @@ namespace i18n
         ///           });
         ///     &lt;/script&gt;
         /// </example>
+        /// </remarks>
+        /// <param name="value">String which is to be wrapped in double quotes and also translatable
+        /// (and picked up by xgettext and so exported to the POT file).</param>
+        /// <param name="attrname">Optional name of an HTML attribute when producing markup for an HTML attribute e.g. alt.
+        /// Null or empty string if just the quoted value string to be output.</param>
+        /// <returns>Raw html markup string of the form "value" or attrname="value".</returns>
         /// <seealso href="https://github.com/danielcrenna/i18n/issues/8"/>
         public IHtmlString _(string value, string attrname)
         {
