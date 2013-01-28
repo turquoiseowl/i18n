@@ -182,25 +182,25 @@ The PAL is determined by the first of the following conditions that is met:
 
 5. The default application language is selected.
 
-Where a 'loose' match is made above, the URL is updated with the matched application language tag
+Where a *loose* match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
 
 Language matching is the performed when a list of one or more user-preferred languages is matched against
-<<<<<<< HEAD
 a list of one or more application laguages, the goal being to choose one of the application languages
 which the user is most likely to understand.
 
-The algorithm for this implemented by i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
-Script and Region elements of language tags into account. Matching is performed once per-request to determine 
-=======
-a list of one or more application laguages, the goal being to choose the application language
-the user is most likely to understand.
+The algorithm for this in i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
+Script and Region subtags into account. Matching is performed once per-request to determine 
+the principal language, and also once per GetText call. The multi-pass approach ensures a thorough attempt is made at matching a user's list of preferred 
+languages (from their Accept-Language HTTP header). E.g. in the context of the following request:
 
-The algorithm for this implemented by i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
-Script and Region subtags of language tags into account. Matching is performed once per-request to determine 
->>>>>>> master
-the principal language, and also once per GetText call providing graceful fallback
-e.g. from fr-CA to fr to default, or zh-Hans-HK to zh-Hans to zh.
+```
+User Languages: fr-CH, fr-CA  
+Application Languages: fr-CA, fr, en
+```
+
+*fr-CA* will be matched first, and if no resource exists for that language, *fr* is tried, and failing
+that, the default language *en* is fallen back on.
 
 In recognition of the potential bottleneck of the GetText call (which typically is called many times per-request),
 the matching algorithm is efficient for managed code (lock-free and essentially heap-allocation free).
@@ -212,6 +212,8 @@ include the following in your Application_Start() method:
     i18n.DefaultSettings.TheMode = i18n.DefaultSettings.Mode.Enhanced;
     i18n.I18N.Register();
 ```
+
+Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
 
 #### Validation attributes
 
