@@ -162,19 +162,19 @@ for the user. You may also optionally use `/?language=fr` style query string par
 behavior. Route requests for languages you do not have resources for will _not_ redirect to a default resource, they
 will 404 as expected.
 
-##### <a id="EM"></a>Enhanced mode
+#### <a id="EM"></a>Enhanced mode
 
 i18n now supports an Enhanced mode or operation. This introduces an alternative to the original language selection,
 routing, and matching algorithm.
 
-First of allo, the set of languages is established for which one or more translated messages exist.
+First of all, the set of languages is established for which one or more translated messages exist.
 Then, for each request, one of these languages is selected as the Principal Application Language (PAL) for the request.
 
 The PAL is determined by the first of the following conditions that is met:
 
-1. The path component of the URL is prefixed with a language tag that matches exactly one of the application languages. E.g. "example.com/fr/account/signup".
+1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
 
-2. The path component of the URL is prefixed with a language tag that matches loosely one of the application languages.
+2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages.
 
 3. The request contains a cookie called "i18n.langtag" with a language tag that matches (exactly or loosely) one of the application languages.
 
@@ -182,16 +182,20 @@ The PAL is determined by the first of the following conditions that is met:
 
 5. The default application language is selected.
 
-Where a 'loose' match is made above, the URL is updated with the application language tag which was matched
+Where a 'loose' match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
 
-The language matching algorithm is multi-facted and multi-pass and takes the Language, Script and Region elements
-of language tags into account when matching a user language to an application language. This matching is performed
-once per-request to determine the principal language, and also once per GetText call providing graceful fallback
+Language matching is the performed when a list of one or more user-preferred languages is matched against
+a list of one or more application laguages, the goal being to choose one of the application languages
+which the user is most likely to understand.
+
+The algorithm for this implemented by i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
+Script and Region elements of language tags into account. Matching is performed once per-request to determine 
+the principal language, and also once per GetText call providing graceful fallback
 e.g. from fr-CA to fr to default, or zh-Hans-HK to zh-Hans to zh.
 
-In recognition of the potential bottleneck of the GetText call which is called multiple times per-request,
-the matching algorithm is lock-free and essentially heap-allocation free.
+In recognition of the potential bottleneck of the GetText call (which typically is called many times per-request),
+the matching algorithm is efficient for managed code (lock-free and essentially heap-allocation free).
 
 To enable Enhanced mode in your project (the default mode being the original, Basic mode),
 include the following in your Application_Start() method:
