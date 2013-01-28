@@ -186,11 +186,19 @@ Where a 'loose' match is made above, the URL is updated with the matched applica
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
 
 Language matching is the performed when a list of one or more user-preferred languages is matched against
+<<<<<<< HEAD
 a list of one or more application laguages, the goal being to choose one of the application languages
 which the user is most likely to understand.
 
 The algorithm for this implemented by i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
 Script and Region elements of language tags into account. Matching is performed once per-request to determine 
+=======
+a list of one or more application laguages, the goal being to choose the application language
+the user is most likely to understand.
+
+The algorithm for this implemented by i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
+Script and Region subtags of language tags into account. Matching is performed once per-request to determine 
+>>>>>>> master
 the principal language, and also once per GetText call providing graceful fallback
 e.g. from fr-CA to fr to default, or zh-Hans-HK to zh-Hans to zh.
 
