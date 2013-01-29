@@ -40,7 +40,15 @@ namespace i18n
             {
                 for (var i = 0; i < routes.Count; i++)
                 {
-                    routes[i] = new LanguageRouteDecorator(routes[i]);
+                    RouteBase route = routes[i];
+                    if (!route.NoLocalize())
+                    {
+                        //DebugHelpers.WriteLine("I18N.ApplyDecoratorToRoutes -- decorating route: {0}", route.ToString());
+                        routes[i] = new LanguageRouteDecorator(route);
+                    }
+                    else {
+                        //                                                                                                                                                                                                                      DebugHelpers.WriteLine("I18N.ApplyDecoratorToRoutes -- skipping route: {0}", route.ToString());
+                    }
                 }
             }
         }

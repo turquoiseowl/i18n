@@ -162,6 +162,17 @@ for the user. You may also optionally use `/?language=fr` style query string par
 behavior. Route requests for languages you do not have resources for will _not_ redirect to a default resource, they
 will 404 as expected.
 
+To specifically exclude a route from this automatic behaviour, add a datatoken to it called 'nolocalize', for example:
+
+```csharp
+    routes.MapRoute(
+        name: "SiteMapRoute",
+        url: "sitemap.xml",
+        defaults: new { controller = "SiteMap", action = "SiteMapXml" }
+    ).DataTokens["nolocalize"] = 1;
+
+```
+
 #### <a id="EM"></a>Enhanced mode
 
 i18n now supports an Enhanced mode or operation. This introduces an alternative to the original language selection,

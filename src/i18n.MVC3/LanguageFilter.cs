@@ -38,6 +38,10 @@ namespace i18n
                     var values = filterContext.RouteData.Values;
                     string str;
 
+                    // If current route is NOT to be localized....nothing to do.
+                    if (filterContext.RouteData.Route.NoLocalize()) {
+                        break; }
+
                     // Value is already injected from a route declaration
                     if (values.ContainsKey("language"))
                     {
@@ -110,6 +114,10 @@ namespace i18n
                 //
                     // Only interested in normal, external actions.
                     if (filterContext.IsChildAction) {
+                        break; }
+
+                    // If current route is NOT to be localized....nothing to do.
+                    if (filterContext.RouteData.Route.NoLocalize()) {
                         break; }
 
                     // Init.
