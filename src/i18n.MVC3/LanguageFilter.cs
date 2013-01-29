@@ -133,9 +133,7 @@ namespace i18n
                             appLangTag,
                             urlOrg.Substring(pos + langTagPrefix.Length));
                        // Redirect user agent to new URL.
-                       // NB: a non-permanent (302 Found) redirect is approp. because the URL may in future become
-                       // valid, when further language resources are added.
-                        var result = new RedirectResult(urlNew, false);
+                        var result = new RedirectResult(urlNew, DefaultSettings.PermanentRedirects);
                         result.ExecuteResult(filterContext);
                         break;
                     }
@@ -163,9 +161,7 @@ namespace i18n
                         UriBuilder urlNew = new UriBuilder(urlOrg);
                         urlNew.PrependPath(appLangTag.ToString());
                         // Redirect user agent to new URL.
-                        // NB: a non-permanent (302 Found) redirect is approp. because the URL may in future become
-                        // valid, when further language resources are added.
-                        var result = new RedirectResult(urlNew.ToString(), false);
+                        var result = new RedirectResult(urlNew.ToString(), DefaultSettings.PermanentRedirects);
                         result.ExecuteResult(filterContext);
                         break;
                     }
@@ -189,7 +185,7 @@ namespace i18n
             var helper = new UrlHelper(filterContext.RequestContext);
             var url = helper.RouteUrl(values);
 
-            var result = new RedirectResult(url);
+            var result = new RedirectResult(url, DefaultSettings.PermanentRedirects);
             result.ExecuteResult(filterContext);
         }
 

@@ -44,11 +44,19 @@ namespace i18n
         public static string DefaultTwoLetterISOLanguageName { get; set; }
         public static LanguageTag DefaultTwoLetterISOLanguageTag { get; set; }
 
+        /// <summary>
+        /// Specifies the type of HTTP redirect to be issued by automatic language routing:
+        /// true for 301 (permanent) redirects; false for 302 (temporary) ones.
+        /// Defaults to false.
+        /// </summary>
+        public static bool PermanentRedirects { get; set; }
+
         static DefaultSettings()
         {
             TheMode = Mode.Basic;
             DefaultTwoLetterISOLanguageName = "en";
             DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance(DefaultTwoLetterISOLanguageName);
+            PermanentRedirects = false;
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
             Container.Register<ILocalizingServiceEnhanced>(r => new LocalizingService());
