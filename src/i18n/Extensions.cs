@@ -7,6 +7,30 @@ namespace i18n
     internal static class Extensions
     {
         /// <summary>
+        /// String extension method to simplify testing for non-null/non-empty values.
+        /// </summary>
+        public static bool IsSet(
+            this string str)
+        {
+            return !string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        /// Efficiently returns the number of time the specified char appears in the string.
+        /// </summary>
+        public static int CountOfChar(
+            this string str,
+            char ch)
+        {
+            int n = 0;
+            foreach (char ch1 in str) {
+                if (ch1 == ch) {
+                    ++n; }
+            }
+            return n;
+        }
+
+        /// <summary>
         /// Helper for testing whether a string ends with one of any out of a collection of strings,
         /// in a case-insentive way.
         /// </summary>
@@ -47,7 +71,7 @@ namespace i18n
         /// Looks up in the subject string standard C escape sequences and converts them
         /// to their actual character counterparts.
         /// </summary>
-        /// <seealso cref="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
+        /// <seealso href="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
         public static string Unescape(this string s)
         {
             StringBuilder sb = new StringBuilder();
@@ -115,6 +139,14 @@ namespace i18n
             }
 
             return sb.ToString();
+        }
+
+        public static void PrependPath(this UriBuilder uriBuilder, string folder)
+        {
+            string s1 = uriBuilder.Path;
+            uriBuilder.Path = "/" + folder;
+            if (s1.IsSet() && s1 != "/") {
+                uriBuilder.Path += s1; }
         }
     }
 }
