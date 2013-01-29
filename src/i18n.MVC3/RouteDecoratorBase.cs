@@ -38,10 +38,9 @@ namespace i18n
         private static string GetAreaToken(RouteBase r)
         {
             var route = r as Route;
-            if (route != null && route.DataTokens != null && route.DataTokens.ContainsKey("area"))
-            {
-                return (route.DataTokens["area"] as string);
-            }
+            object result;
+            if (route != null && route.DataTokens != null && route.DataTokens.TryGetValue("area", out result)) {
+                return result as string; }
             return null;
         }
     }

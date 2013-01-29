@@ -23,6 +23,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\lib\net40\i18n.XML</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\bin\lib\net40\i18n.xml</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -57,10 +64,18 @@
   <ItemGroup>
     <Compile Include="ClonedHttpRequest.cs" />
     <Compile Include="ClonedHttpContext.cs" />
+    <Compile Include="DebugHelpers.cs" />
+    <Compile Include="FsCacheDependency.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="ILocalizingServiceEnhanced.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ILanguageTag.cs" />
+    <Compile Include="LanguageHelpers.cs" />
+    <Compile Include="LanguageItem.cs" />
+    <Compile Include="ParseHelpers.cs" />
     <Compile Include="HtmlString.cs" />
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
@@ -70,6 +85,8 @@
     <Compile Include="ILocalizing.cs" />
     <Compile Include="ILocalizingService.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
+    <Compile Include="LanguageMatching.cs" />
+    <Compile Include="LanguageTag.cs" />
     <Compile Include="LocalizingService.cs" />
     <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

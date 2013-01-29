@@ -22,6 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\lib\net40\i18n.MVC3.XML</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\bin\lib\net40\i18n.MVC3.xml</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="container, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

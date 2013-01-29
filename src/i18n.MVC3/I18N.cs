@@ -18,6 +18,8 @@ namespace i18n
         {
             DefaultTwoLetterISOLanguageName = "en";
             DefaultSettings.LocalizingService = new LocalizingService();
+                // BUGBUG: the above two lines are redundant: already done by DefaultSettings static constructor.
+
             DefaultSettings.HtmlStringFormatter = new MvcHtmlStringFormatter();
         }
 

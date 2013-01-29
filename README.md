@@ -145,11 +145,12 @@ to provide locale-specific text and place them in your `/locale` folder relative
 If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
 
 #### Automatic routing
+
 To participate in the automatic routing features of this library, call `I18N.Register()` in your startup code;
 this will register a global filter and route decorator to provide the feature.
 
 I18N comes with the ability to build on top of your existing routes to automatically redirect language choice to
-an appropriate URL suffix. When a regular route is accessed, I18N will inspect the browser's `Accept-Language` header
+an appropriate URL suffix. In Basic mode (i18n now supports an [Enhanced mode](#EM)), when a regular route is accessed, I18N will inspect the browser's `Accept-Language` header
 to find the most appropriate choice of language from those you've prepared from PO files; for example, if the user's
 most preferred language is `fr-CA` followed by `en-US`, and your application has PO files for `en-US` and `fr`, I18N 
 will select `fr` as the best language choice. At this point, the regular route is then redirected to the language
@@ -160,6 +161,60 @@ is persisted, and all subsequent requests will redirect to the `en` locale, maki
 for the user. You may also optionally use `/?language=fr` style query string parameters to elicit the same redirection
 behavior. Route requests for languages you do not have resources for will _not_ redirect to a default resource, they
 will 404 as expected.
+
+#### <a id="EM"></a>Enhanced mode
+
+i18n now supports an Enhanced mode or operation. This introduces an alternative to the original language selection,
+routing, and matching algorithm.
+
+First of all, the set of languages is established for which one or more translated messages exist.
+Then, for each request, one of these languages is selected as the Principal Application Language (PAL) for the request.
+
+The PAL is determined by the first of the following conditions that is met:
+
+1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
+
+2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages.
+
+3. The request contains a cookie called "i18n.langtag" with a language tag that matches (exactly or loosely) one of the application languages.
+
+4. The request contains an Accept-Language header with a language that matches (exactly or loosely) one of the application languages.
+
+5. The default application language is selected.
+
+Where a *loose* match is made above, the URL is updated with the matched application language tag
+and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
+
+Language matching is performed when a list of one or more user-preferred languages is matched against
+a list of one or more application laguages, the goal being to choose one of the application languages
+which the user is most likely to understand.
+
+The algorithm for this in i18n Enhanced mode is multi-facted and multi-pass and takes the Language, 
+Script and Region subtags into account. Matching is performed once per-request to determine 
+the principal language, and also once per GetText call. The multi-pass approach ensures a thorough attempt is made at matching a user's list of preferred 
+languages (from their Accept-Language HTTP header). E.g. in the context of the following request:
+
+```
+User Languages: fr-CH, fr-CA  
+Application Languages: fr-CA, fr, en
+```
+
+*fr-CA* will be matched first, and if no resource exists for that language, *fr* is tried, and failing
+that, the default language *en* is fallen back on.
+
+In recognition of the potential bottleneck of the GetText call (which typically is called many times per-request),
+the matching algorithm is efficient for managed code (lock-free and essentially heap-allocation free).
+
+To enable Enhanced mode in your project (the default mode being the original, Basic mode),
+include the following in your Application_Start() method:
+
+```csharp
+    i18n.DefaultSettings.TheMode = i18n.DefaultSettings.Mode.Enhanced;
+    i18n.I18N.Register();
+```
+
+Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
+It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
 
 #### Validation attributes
 
