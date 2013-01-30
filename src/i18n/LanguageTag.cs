@@ -418,9 +418,9 @@ namespace i18n
         /// </param>
         /// <returns>On success a LanguageTag instance, otherwise null.</returns>
         /// <remarks>
-        /// <example>
+        /// <para>
         /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
-        /// </example>
+        /// </para>
         /// </remarks>
         public static LanguageTag UrlExtractLangTag(string url, out string urlPatched)
         {

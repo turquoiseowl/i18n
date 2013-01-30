@@ -85,7 +85,7 @@ namespace i18n
                     // 1.
                     string urlOrg = context.Request.Url.AbsolutePath;
                     string urlPatched;
-                    LanguageTag urlLangTag = LanguageTag.UrlExtractLangTag(urlOrg, out urlPatched);
+                    ILanguageTag urlLangTag = LanguageTag.UrlExtractLangTag(urlOrg, out urlPatched);
                     if (urlLangTag.IsValid())
                     {
                         // If language matches an AppLanguage

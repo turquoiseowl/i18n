@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="ClonedHttpRequest.cs" />
     <Compile Include="ClonedHttpContext.cs" />
+    <Compile Include="IUrlLocalizer.cs" />
     <Compile Include="DebugHelpers.cs" />
     <Compile Include="FsCacheDependency.cs" />
     <Compile Include="HttpContextExtensions.cs" />
