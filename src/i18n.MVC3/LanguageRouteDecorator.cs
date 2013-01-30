@@ -193,10 +193,14 @@ namespace i18n
                 // langtag into the URL.
                 //
                     VirtualPathData result = _route.GetVirtualPath(context, values);
-                   // If route values match this route
-                    if (result != null && result.VirtualPath != null)
+                   // If route values match this route, and this route is NOT excluded from localization
+                    if (result != null 
+                        && result.VirtualPath != null
+                        && !this.NoLocalize())
                     {
-                       // If PAL was established for this request
+                       // Get PAL was established for this request.
+                       // NB: if the PAL has not been set (for instance because the route was excluded
+                       // from localization) then we get the default language here.
                         ILanguageTag pal = context.HttpContext.GetPrincipalAppLanguageForRequest();
                         if (pal.IsValid()) {
                            // Prepend the virtual path with the PAL langtag.
