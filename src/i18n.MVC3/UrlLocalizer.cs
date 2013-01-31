@@ -7,7 +7,9 @@ namespace i18n
 {
     public class UrlLocalizer : IUrlLocalizer
     {
-    #region IUrlLocalizer
+
+    #region [IUrlLocalizer]
+
         public string ExtractLangTagFromUrl(string url, out string urlPatched)
         {
             return LanguageTag.UrlExtractLangTag(url, out urlPatched);
@@ -23,6 +25,8 @@ namespace i18n
             // E.g. ""               -> "fr-CH"
             return virtualPath.IsSet() ? string.Format("{0}/{1}", langtag, virtualPath) : langtag;
         }
+
     #endregion
+
     }
 }

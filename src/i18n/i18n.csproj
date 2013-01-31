@@ -62,8 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClonedHttpRequest.cs" />
-    <Compile Include="ClonedHttpContext.cs" />
     <Compile Include="IUrlLocalizer.cs" />
     <Compile Include="DebugHelpers.cs" />
     <Compile Include="FsCacheDependency.cs" />
@@ -84,7 +82,6 @@
     <Compile Include="DefaultSettings.cs" />
     <Compile Include="I18NMessage.cs" />
     <Compile Include="ILocalizing.cs" />
-    <Compile Include="ILocalizingService.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
     <Compile Include="LanguageMatching.cs" />
     <Compile Include="LanguageTag.cs" />

@@ -137,6 +137,7 @@ namespace i18n
             Tests_double();
             Tests_float();
         }
+        [Conditional("DEBUG")]
         public static void Tests_double()
         {
             double n;
@@ -212,6 +213,7 @@ namespace i18n
             f = TryParseDecimal("12.3-4-" , 0, -1, out n); Debug.Assert(f == true  && n == 12.3d);
 
         }
+        [Conditional("DEBUG")]
         public static void Tests_float()
         {
             float n;

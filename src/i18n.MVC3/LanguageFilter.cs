@@ -14,16 +14,6 @@ namespace i18n
     /// </summary>
     public class LanguageFilter : IActionFilter, IResultFilter
     {
-        protected static void RedirectWithLanguage(ControllerContext filterContext, LanguageTag langtag)
-        {
-            // Construct new URL.
-            string urlNew = RouteLocalization.UrlLocalizer.SetLangTagInUrl(
-                filterContext.HttpContext.Request.Url.ToString(), 
-                langtag.ToString());
-            // Redirect user agent to new URL.
-            var result = new RedirectResult(urlNew.ToString(), DefaultSettings.PermanentRedirects);
-            result.ExecuteResult(filterContext);
-        }
 
     #region [IActionFilter]
 
@@ -130,5 +120,15 @@ namespace i18n
 
     #endregion
 
+        protected static void RedirectWithLanguage(ControllerContext filterContext, LanguageTag langtag)
+        {
+            // Construct new URL.
+            string urlNew = RouteLocalization.UrlLocalizer.SetLangTagInUrl(
+                filterContext.HttpContext.Request.Url.ToString(), 
+                langtag.ToString());
+            // Redirect user agent to new URL.
+            var result = new RedirectResult(urlNew.ToString(), DefaultSettings.PermanentRedirects);
+            result.ExecuteResult(filterContext);
+        }
     }
 }

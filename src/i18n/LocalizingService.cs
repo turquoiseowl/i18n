@@ -17,7 +17,7 @@ namespace i18n
     public class LocalizingService : ILocalizingServiceEnhanced
     {
 
-    // [ILocalizingServiceEnhanced]
+    #region [ILocalizingServiceEnhanced]
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
@@ -86,7 +86,7 @@ namespace i18n
             return null;
         }
 
-    // Implementation
+    #endregion
 
         private static readonly object Sync = new object();
 

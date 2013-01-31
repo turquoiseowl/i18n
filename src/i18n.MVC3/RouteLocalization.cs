@@ -5,7 +5,7 @@ using container;
 namespace i18n
 {
     /// <summary>
-    /// Describes the configuration of the i18n MVC Route Localization feature.
+    /// Manages the configuration of the i18n MVC Route Localization feature.
     /// </summary>
     public static class RouteLocalization
     {
