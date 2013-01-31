@@ -9,8 +9,23 @@ namespace i18n
     {
         /// <summary>
         /// The default language for all localized keys; when a PO database
-        /// is built, the default key file is stored at this locale location
+        /// is built, the default key file is stored at this locale location.
         /// </summary>
+        /// <remarks>
+        /// Supports a subset of BCP 47 language tag spec corresponding to the Windows
+        /// support for language names, namely the following subtags:
+        ///     language (mandatory, 2 alphachars)
+        ///     script   (optional, 4 alphachars)
+        ///     region   (optional, 2 alphachars | 3 decdigits)
+        /// Example tags supported:
+        ///     "en"            [language]
+        ///     "en-US"         [language + region]
+        ///     "zh"            [language]
+        ///     "zh-HK"         [language + region]
+        ///     "zh-123"        [language + region]
+        ///     "zh-Hant"       [language + script]
+        ///     "zh-Hant-HK"    [language + script + region]
+        /// </remarks>
         public static string DefaultLanguage { 
             get {
                 return DefaultLanguageTag.ToString();

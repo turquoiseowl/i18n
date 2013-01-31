@@ -11,6 +11,8 @@ namespace i18n
 {
     /// <summary>
     /// Helper class for parsing and manipulating language tags.
+    /// </summary>
+    /// <remarks>
     /// Supports a subset of BCP 47 language tag spec corresponding to the Windows
     /// support for language names, namely the following subtags:
     ///     language (mandatory, 2 alphachars)
@@ -24,7 +26,7 @@ namespace i18n
     ///     "zh-123"        [language + region]
     ///     "zh-Hant"       [language + script]
     ///     "zh-Hant-HK"    [language + script + region]
-    /// </summary>
+    /// </remarks>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
     public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>
     {
