@@ -127,7 +127,7 @@ namespace i18n
                 filterContext.HttpContext.Request.Url.ToString(), 
                 langtag.ToString());
             // Redirect user agent to new URL.
-            var result = new RedirectResult(urlNew.ToString(), LocalizedApplication.PermanentRedirects);
+            var result = new RedirectResult(urlNew.ToString(), RouteLocalization.PermanentRedirects);
             result.ExecuteResult(filterContext);
         }
     }

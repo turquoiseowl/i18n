@@ -11,12 +11,20 @@ namespace i18n
     {
         internal static Container Container { get; set; }
 
-        public static bool Enabled { get; set; }
+        public static bool Enabled { get; private set; }
         
+        /// <summary>
+        /// Specifies the type of HTTP redirect to be issued by automatic language routing:
+        /// true for 301 (permanent) redirects; false for 302 (temporary) ones.
+        /// Defaults to false.
+        /// </summary>
+        public static bool PermanentRedirects { get; set; }
+
         static RouteLocalization()
         {
             Container = new Container();
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
+            PermanentRedirects = false;
             Enabled = false;
         }
 
