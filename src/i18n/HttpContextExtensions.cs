@@ -95,7 +95,7 @@ namespace i18n
         //
             ILanguageTag langtag = GetRequestUserLanguages(context)[0].LanguageTag;
             if (langtag == null) {
-                langtag = LocalizedApplication.DefaultTwoLetterISOLanguageTag; }
+                langtag = LocalizedApplication.DefaultLanguageTag; }
             return langtag;
         }
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)

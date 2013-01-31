@@ -11,19 +11,19 @@ namespace i18n
         /// The default language for all localized keys; when a PO database
         /// is built, the default key file is stored at this locale location
         /// </summary>
-        public static string DefaultTwoLetterISOLanguage { 
+        public static string DefaultLanguage { 
             get {
-                return DefaultTwoLetterISOLanguageTag.ToString();
+                return DefaultLanguageTag.ToString();
             }
             set {
-                DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance(value);
+                DefaultLanguageTag = LanguageTag.GetCachedInstance(value);
             }
         }
-        public static LanguageTag DefaultTwoLetterISOLanguageTag { get; set; }
+        public static LanguageTag DefaultLanguageTag { get; set; }
 
         static LocalizedApplication()
         {
-            DefaultTwoLetterISOLanguage = ("en");
+            DefaultLanguage = ("en");
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
         }
