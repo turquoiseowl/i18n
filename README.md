@@ -144,9 +144,9 @@ From here, you use any of the widely available PO editing tools (like [POEdit](h
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
 If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
 
-#### Automatic routing
+#### Route Localization
 
-To participate in the automatic routing features of this library, call `I18N.Register()` in your startup code;
+To participate in the automatic routing features of this library, call `i18n.RouteLocalization.Enable()` in your startup code;
 this will register a global filter and route decorator to provide the feature.
 
 I18N comes with the ability to build on top of your existing routes to automatically redirect language choice to
@@ -221,7 +221,7 @@ include the following in your Application_Start() method:
 
 ```csharp
     i18n.DefaultSettings.TheMode = i18n.DefaultSettings.Mode.Enhanced;
-    i18n.I18N.Register();
+    i18n.RouteLocalization.Enable();
 ```
 
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
