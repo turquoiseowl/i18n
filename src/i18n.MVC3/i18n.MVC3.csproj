@@ -63,12 +63,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RouteLocalization.cs" />
-    <Compile Include="I18N.cs" />
     <Compile Include="I18NController.cs" />
     <Compile Include="I18NWebViewPage.cs" />
     <Compile Include="LanguageFilter.cs" />
     <Compile Include="LanguageRouteDecorator.cs" />
-    <Compile Include="MvcHtmlStringFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteDecoratorBase.cs" />
     <Compile Include="UrlLocalizer.cs" />

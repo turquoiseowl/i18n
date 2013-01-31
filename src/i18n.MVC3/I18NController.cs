@@ -18,7 +18,7 @@ namespace i18n
     {
         public virtual IHtmlString _(string text)
         {
-            return new MvcHtmlString(HttpContext.GetText(text));
+            return new HtmlString(HttpContext.GetText(text));
         }
 
         public virtual string __(string text)

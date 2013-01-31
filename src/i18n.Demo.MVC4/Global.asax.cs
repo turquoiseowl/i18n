@@ -15,8 +15,6 @@ namespace i18n.Demo.MVC4
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            I18N.Register();
         }
     }
 }

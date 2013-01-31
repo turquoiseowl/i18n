@@ -56,9 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\i18n.MVC3\I18N.cs">
-      <Link>I18N.cs</Link>
-    </Compile>
     <Compile Include="..\i18n.MVC3\I18NController.cs">
       <Link>I18NController.cs</Link>
     </Compile>
@@ -70,9 +67,6 @@
     </Compile>
     <Compile Include="..\i18n.MVC3\LanguageRouteDecorator.cs">
       <Link>LanguageRouteDecorator.cs</Link>
-    </Compile>
-    <Compile Include="..\i18n.MVC3\MvcHtmlStringFormatter.cs">
-      <Link>MvcHtmlStringFormatter.cs</Link>
     </Compile>
     <Compile Include="..\i18n.MVC3\RouteDecoratorBase.cs">
       <Link>RouteDecoratorBase.cs</Link>

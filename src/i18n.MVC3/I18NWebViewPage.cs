@@ -11,7 +11,7 @@ namespace i18n
     {
         public IHtmlString _(string text)
         {
-            return new MvcHtmlString(Context.GetText(text));
+            return new HtmlString(Context.GetText(text));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace i18n
     {
         public IHtmlString _(string text)
         {
-            return new MvcHtmlString(Context.GetText(text));
+            return new HtmlString(Context.GetText(text));
         }
  
         /// <summary>

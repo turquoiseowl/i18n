@@ -30,16 +30,6 @@ namespace i18n
 
         internal static Container Container { get; set; }
         
-        public static IHtmlStringFormatter HtmlStringFormatter
-        {
-            get { return Container.Resolve<IHtmlStringFormatter>(); }
-            set
-            {
-                Container.Remove<IHtmlStringFormatter>();
-                Container.Register(r => value);
-            }
-        }
-
         public static ILocalizingService LocalizingService
         {
             get { return Container.Resolve<ILocalizingService>(); }
