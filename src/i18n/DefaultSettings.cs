@@ -22,7 +22,7 @@ namespace i18n
             DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance("en");
             PermanentRedirects = false;
             Container = new Container();
-            Container.Register<ILocalizingServiceEnhanced>(r => new LocalizingService());
+            Container.Register<ILocalizingService>(r => new LocalizingService());
         }
 
         internal static Container Container { get; set; }
@@ -37,12 +37,12 @@ namespace i18n
             }
         }
 
-        public static ILocalizingServiceEnhanced LocalizingServiceEnhanced
+        public static ILocalizingService LocalizingService
         {
-            get { return Container.Resolve<ILocalizingServiceEnhanced>(); }
+            get { return Container.Resolve<ILocalizingService>(); }
             set
             {
-                Container.Remove<ILocalizingServiceEnhanced>();
+                Container.Remove<ILocalizingService>();
                 Container.Register(r => value);
             }
         }

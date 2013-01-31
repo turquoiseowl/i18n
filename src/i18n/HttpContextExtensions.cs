@@ -48,7 +48,7 @@ namespace i18n
         {
             // Lookup resource.
             LanguageTag lt;
-            msgid = DefaultSettings.LocalizingServiceEnhanced.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
+            msgid = DefaultSettings.LocalizingService.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
         public static string GetText(this HttpContext context, string msgid)

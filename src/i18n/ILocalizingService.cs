@@ -3,10 +3,9 @@
     using System.Collections.Concurrent;
 
     /// <summary>
-    /// Defines a service for retrieving localized text from a data source using the
-    /// DefaultSettings.LanguageMatching.Enhanced algorithm.
+    /// Defines a service for retrieving localized text from a data source.
     /// </summary>
-    public interface ILocalizingServiceEnhanced
+    public interface ILocalizingService
     {
         /// <summary>
         /// Obtains collection of language tags describing the set of Po-valid languages, that
@@ -17,8 +16,7 @@
         ConcurrentDictionary<string, LanguageTag> GetAppLanguages();
 
         /// <summary>
-        /// Looks up and returns localized text for a resource id using the
-        /// DefaultSettings.LanguageMatching.Enhanced algorithm.
+        /// Looks up and returns localized text for a resource.
         /// </summary>
         /// <param name="key">
         /// Idenfities the msgid of the subject resource.

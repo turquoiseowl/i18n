@@ -14,10 +14,10 @@ namespace i18n
     /// <summary>
     /// A service for retrieving localized text from PO resource files
     /// </summary>
-    public class LocalizingService : ILocalizingServiceEnhanced
+    public class LocalizingService : ILocalizingService
     {
 
-    #region [ILocalizingServiceEnhanced]
+    #region [ILocalizingService]
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {

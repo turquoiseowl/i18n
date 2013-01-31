@@ -14,13 +14,9 @@ namespace i18n
         /// Note that the AppLanguages collection is unordered; this is because there is no innate 
         /// precedence at the resource level: precedence is only relevant to UserLanguages.
         /// </summary>
-        /// <remarks>Requires i18n to be in Enhanced mode.</remarks>
         public static ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
-            if (DefaultSettings.LocalizingServiceEnhanced == null) {
-                throw new System.InvalidOperationException("Expected Enhanced mode."); }
-
-            return DefaultSettings.LocalizingServiceEnhanced.GetAppLanguages();
+            return DefaultSettings.LocalizingService.GetAppLanguages();
         }
 
         /// <summary>
@@ -38,18 +34,14 @@ namespace i18n
         /// <returns>
         /// A language tag identifying an AppLanguage that will be the same as, or related langtag.
         /// </returns>
-        /// <remarks>Requires i18n to be in Enhanced mode.</remarks>
         public static LanguageTag GetMatchingAppLanguage(string langtag, int maxPasses = -1)
         {
             return GetMatchingAppLanguage(LanguageItem.ParseHttpLanguageHeader(langtag), maxPasses);
         }
         public static LanguageTag GetMatchingAppLanguage(LanguageItem[] languages, int maxPasses = -1)
         {
-            if (DefaultSettings.LocalizingServiceEnhanced == null) {
-                throw new System.InvalidOperationException("Expected Enhanced mode."); }
-
             LanguageTag lt = null;
-            DefaultSettings.LocalizingServiceEnhanced.GetText(null, languages, out lt, maxPasses);
+            DefaultSettings.LocalizingService.GetText(null, languages, out lt, maxPasses);
             return lt;
         }
     }
