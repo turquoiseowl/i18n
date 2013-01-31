@@ -60,7 +60,8 @@ namespace i18n
             if (maxPasses > (int)LanguageTag.MatchGrade._MaxMatch +1) { 
                 maxPasses = (int)LanguageTag.MatchGrade._MaxMatch +1; }
             // Init.
-            bool fallbackOnDefault = maxPasses == (int)LanguageTag.MatchGrade._MaxMatch +1;
+            bool fallbackOnDefault = maxPasses == (int)LanguageTag.MatchGrade._MaxMatch +1
+                || maxPasses == -1;
             string text;
             // Perform language matching based on UserLanguaes, AppLanguages, and presence of
             // resource under key for any particular AppLanguage.

@@ -34,7 +34,7 @@
         /// 1 - allow exact match or default-region match only
         /// 2 - allow exact match or default-region match or script match only
         /// 3 - allow exact match or default-region match or script match or language match only
-        /// 4 - allow exact match or default-region match or script or language match only, or failing return the default language.
+        /// 4 - allow exact match or default-region match or script match or language match only, or failing return the default language.
         /// -1 to set to most tolerant (i.e. 4).
         /// </param>
         /// <returns>
