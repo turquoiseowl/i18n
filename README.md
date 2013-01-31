@@ -100,27 +100,11 @@ to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controlle
 
     namespace MyApplication
     {
-        public abstract class MyController : Controller, ILocalizing
+        public class MyController : Controller, ILocalizing
         {
-            private static ILocalizingService _service;
-
-            protected MyController()
+            public virtual IHtmlString _(string text)
             {
-                _service = new LocalizingService();
-            }
-            
-            public string _(string text)
-            {
-                // Prefer a stored value to browser-supplied preferences
-                var stored = LanguageSession.GetLanguageFromSession(ControllerContext.HttpContext);
-                if (stored != null)
-                {
-                    return _service.GetText(text, new[] { stored });
-                }
-
-                // Find the most appropriate fit from the user's browser settings
-                var languages = HttpContext.Request.UserLanguages;                
-                return _service.GetText(text, languages);
+                return new HtmlString(HttpContext.GetText(text));
             }
         }
     }
