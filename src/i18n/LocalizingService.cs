@@ -14,95 +14,8 @@ namespace i18n
     /// <summary>
     /// A service for retrieving localized text from PO resource files
     /// </summary>
-    public class LocalizingService : ILocalizingService, ILocalizingServiceEnhanced
+    public class LocalizingService : ILocalizingServiceEnhanced
     {
-
-    // [ILocalizingService]
-
-        /// <summary>
-        /// Returns the best matching language for this application's resources, based the provided languages
-        /// </summary>
-        /// <param name="languages">A sorted list of language preferences</param>
-        public virtual string GetBestAvailableLanguageFrom(string[] languages)
-        {
-            foreach (var language in languages)
-            {
-                var culture = GetCultureInfoFromLanguage(language);
-                if (culture == null)
-                {
-                    continue;
-                }
-                
-                // en-US
-                if (IsLanguageValid(culture.IetfLanguageTag))
-                {
-                    return culture.IetfLanguageTag;
-                }
-
-                // Don't process the same culture code again
-                if (culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                // en
-                if (IsLanguageValid(culture.TwoLetterISOLanguageName))
-                {
-                    return culture.TwoLetterISOLanguageName;
-                }
-            }
-
-            return DefaultSettings.DefaultTwoLetterISOLanguageName;
-        }
-
-        /// <summary>
-        /// Returns localized text for a given default language key, or the default itself,
-        /// based on the provided languages and application resources
-        /// </summary>
-        /// <param name="key">The default language key to search for</param>
-        /// <param name="languages">A sorted list of language preferences</param>
-        /// <returns></returns>
-        public virtual string GetText(string key, string[] languages)
-        {
-            // Prefer 'en-US', then 'en', before moving to next language choice
-            foreach (var language in languages)
-            {
-                var culture = GetCultureInfoFromLanguage(language);
-                if (culture == null)
-                {
-                    continue;
-                }
-
-                // Save cycles processing beyond the default; just return the original key
-                // TODO: this is probably now made redundant by the equivalent check in TryGetTextFor;
-                // however that check is done AFTER the PO lookup which is probably better for this
-                // case anyway, as it allows the default PO file to override the key when the key is not
-                // intended to also be the default message.
-                if (culture.TwoLetterISOLanguageName.Equals(DefaultSettings.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return key;
-                }
-
-                // E.g. en-US
-                var regional = TryGetTextFor(culture.IetfLanguageTag, key);
-                if (regional != null)
-                {
-                    return regional;
-                }
-
-                // Now that region-specific lookup failed...try a region-neutral lookup. E.g. fr-CH -> fr.
-                if (!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    var neutral = TryGetTextFor(culture.TwoLetterISOLanguageName, key);
-                    if (neutral != null)
-                    {
-                        return neutral;
-                    }
-                }
-            }
-
-            return key;
-        }
 
     // [ILocalizingServiceEnhanced]
 
@@ -164,9 +77,9 @@ namespace i18n
             // Optionally try default language.
             if (fallbackOnDefault)
             {
-                text = TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageName, key);
-                o_langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag;
+                text = TryGetTextFor(DefaultSettings.DefaultTwoLetterISOLanguageTag.ToString(), key);
                 if (text != null) {
+                    o_langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag;
                     return text; }
             }
 
@@ -241,7 +154,7 @@ namespace i18n
 
             // If the language is the default language, by definition the text always exists
             // and as there isn't a translation defined for the key, we return the key itself.
-            if (string.Compare(langtag, DefaultSettings.DefaultTwoLetterISOLanguageName, true) == 0) {
+            if (string.Compare(langtag, DefaultSettings.DefaultTwoLetterISOLanguageTag.ToString(), true) == 0) {
                 return key; }
 
             // Lookup failed.

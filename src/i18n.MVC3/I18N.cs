@@ -8,18 +8,8 @@ namespace i18n
     /// </summary>
     public class I18N
     {
-        public static string DefaultTwoLetterISOLanguageName
-        {
-            get { return DefaultSettings.DefaultTwoLetterISOLanguageName; }
-            set { DefaultSettings.DefaultTwoLetterISOLanguageName = value; }
-        }
-
         static I18N()
         {
-            DefaultTwoLetterISOLanguageName = "en";
-            DefaultSettings.LocalizingService = new LocalizingService();
-                // BUGBUG: the above two lines are redundant: already done by DefaultSettings static constructor.
-
             DefaultSettings.HtmlStringFormatter = new MvcHtmlStringFormatter();
         }
 
