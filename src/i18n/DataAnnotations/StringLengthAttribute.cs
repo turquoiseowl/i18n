@@ -4,16 +4,13 @@ namespace i18n.DataAnnotations
 {
     public class StringLengthAttribute : System.ComponentModel.DataAnnotations.StringLengthAttribute, ILocalizing
     {
-        private readonly I18NSession _session;
-
         public StringLengthAttribute(int maximumLength): base(maximumLength)
         {
-            _session = new I18NSession();
         }
 
         public virtual IHtmlString _(string text)
         {
-            return new HtmlString(_session.GetText(HttpContext.Current, text));
+            return new HtmlString(HttpContext.Current.GetText(text));
         }
 
         public override string FormatErrorMessage(string name)

@@ -9,16 +9,9 @@ namespace i18n
     /// <typeparam name="T"></typeparam>
     public abstract class I18NWebViewPage<T> : WebViewPage<T>, ILocalizing
     {
-        private readonly I18NSession _session;
-
-        protected I18NWebViewPage()
-        {
-            _session = new I18NSession();
-        }
-
         public IHtmlString _(string text)
         {
-            return new MvcHtmlString(_session.GetText(Context, text));
+            return new MvcHtmlString(Context.GetText(text));
         }
 
         /// <summary>
@@ -61,7 +54,7 @@ namespace i18n
         /// <seealso href="https://github.com/danielcrenna/i18n/issues/8"/>
         public IHtmlString _(string value, string attrname)
         {
-            value = _session.GetText(Context, value);
+            value = Context.GetText(value);
             string raw = string.IsNullOrEmpty(attrname) ?
                 string.Format("\"{0}\"", value):
                 string.Format("{0}=\"{1}\"", attrname, value);
@@ -70,7 +63,7 @@ namespace i18n
 
         public string __(string text)
         {
-            return _session.GetText(Context, text);
+            return Context.GetText(text);
         }    
     }
 
@@ -80,16 +73,9 @@ namespace i18n
     /// </summary>
     public abstract class I18NWebViewPage : WebViewPage, ILocalizing
     {
-        private readonly I18NSession _session;
-
-        protected I18NWebViewPage()
-        {
-            _session = new I18NSession();
-        }
-
         public IHtmlString _(string text)
         {
-            return new MvcHtmlString(_session.GetText(Context, text));
+            return new MvcHtmlString(Context.GetText(text));
         }
  
         /// <summary>
@@ -132,7 +118,7 @@ namespace i18n
         /// <seealso href="https://github.com/danielcrenna/i18n/issues/8"/>
         public IHtmlString _(string value, string attrname)
         {
-            value = _session.GetText(Context, value);
+            value = Context.GetText(value);
             string raw = string.IsNullOrEmpty(attrname) ?
                 string.Format("\"{0}\"", value):
                 string.Format("{0}=\"{1}\"", attrname, value);
@@ -141,7 +127,7 @@ namespace i18n
 
         public string __(string text)
         {
-            return _session.GetText(Context, text);
+            return Context.GetText(text);
         }    
    }
 }

@@ -16,21 +16,14 @@ namespace i18n
     /// </summary>
     public abstract class I18NController : Controller, ILocalizing
     {
-        private readonly I18NSession _session;
-
-        protected I18NController()
-        {
-            _session = new I18NSession();
-        }
-
         public virtual IHtmlString _(string text)
         {
-            return new MvcHtmlString(_session.GetText(HttpContext, text));
+            return new MvcHtmlString(HttpContext.GetText(text));
         }
 
         public virtual string __(string text)
         {
-            return _session.GetText(HttpContext, text);
+            return HttpContext.GetText(text);
         }
     }
 }

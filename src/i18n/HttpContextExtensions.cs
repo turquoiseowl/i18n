@@ -33,6 +33,30 @@ namespace i18n
         }
 
         /// <summary>
+        /// Returns any translation for the passed message.
+        /// </summary>
+        /// <remarks>
+        /// This this the main entry point into i18n library for translating strings.
+        /// Selection of acceptable user languages is determined per-request and that
+        /// is used to resolve the msgid against any existing localized versions of that string.
+        /// Should no translation exist, the msgid string is returned.
+        /// </remarks>
+        /// <param name="context">Describes the current request.</param>
+        /// <param name="msgid">Identifies the message to be translated.</param>
+        /// <returns>Localized string, or msgid if no translation exists.</returns>
+        public static string GetText(this HttpContextBase context, string msgid)
+        {
+            // Lookup resource.
+            LanguageTag lt;
+            msgid = DefaultSettings.LocalizingServiceEnhanced.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
+            return HttpUtility.HtmlDecode(msgid);
+        }
+        public static string GetText(this HttpContext context, string msgid)
+        {
+            return context.GetHttpContextBase().GetText(msgid);
+        }
+
+        /// <summary>
         /// Helper for caching a per-request value that identifies the principal language
         /// under which the current request is to be handled.
         /// </summary>

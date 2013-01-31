@@ -8,15 +8,12 @@ namespace i18n.DataAnnotations
     /// </summary>
     public class DataTypeAttribute : System.ComponentModel.DataAnnotations.DataTypeAttribute, ILocalizing
     {
-        private readonly I18NSession _session;
-
         ///<summary>
         /// Initializes a new instance of the <see cref="DataTypeAttribute"/> class by using the specified type name
         ///</summary>
         ///<param name="dataType"></param>
         public DataTypeAttribute(DataType dataType) : base(Convert(dataType))
         {
-            _session = new I18NSession();
         }
 
         private static System.ComponentModel.DataAnnotations.DataType Convert(DataType dataType)
@@ -62,7 +59,6 @@ namespace i18n.DataAnnotations
         ///<param name="customDataType"></param>
         public DataTypeAttribute(string customDataType) : base(customDataType)
         {
-            _session = new I18NSession();   
         }
 
         /// <summary>
@@ -71,7 +67,7 @@ namespace i18n.DataAnnotations
         /// <param name="text">The text to localize</param>
         public virtual IHtmlString _(string text)
         {
-            return new HtmlString(_session.GetText(HttpContext.Current, text));
+            return new HtmlString(HttpContext.Current.GetText(text));
         }
 
         /// <summary>
