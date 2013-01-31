@@ -80,7 +80,7 @@
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
     <Compile Include="DataAnnotations\ValidationAttribute.cs" />
     <Compile Include="Configuration.cs" />
-    <Compile Include="I18NMessage.cs" />
+    <Compile Include="PoMessage.cs" />
     <Compile Include="ILocalizing.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
     <Compile Include="LanguageMatching.cs" />

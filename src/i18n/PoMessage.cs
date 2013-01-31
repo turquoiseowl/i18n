@@ -5,7 +5,7 @@ namespace i18n
     /// <summary>
     /// A localized message residing in a PO resource file
     /// </summary>
-    public class I18NMessage
+    public class PoMessage
     {
         public string Comment { get; set; }
         public string MsgId { get; set; }
@@ -21,4 +21,3 @@ namespace i18n
         }
     }
 }
-

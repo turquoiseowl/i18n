@@ -99,7 +99,7 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            ConcurrentDictionary<string, I18NMessage> messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
+            ConcurrentDictionary<string, PoMessage> messages = (ConcurrentDictionary<string, PoMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
@@ -113,7 +113,7 @@ namespace i18n
                 }
 
                 // Address messages just loaded.
-                messages = (ConcurrentDictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
+                messages = (ConcurrentDictionary<string, PoMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
             }
 
             // The language is considered to be available if one or more message strings exist.
@@ -181,7 +181,7 @@ namespace i18n
 
                 // Cache messages.
                 // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                HttpRuntime.Cache.Insert(GetCacheKey(langtag), new ConcurrentDictionary<string, I18NMessage>(), new CacheDependency(path));
+                HttpRuntime.Cache.Insert(GetCacheKey(langtag), new ConcurrentDictionary<string, PoMessage>(), new CacheDependency(path));
             }
         }
 
@@ -232,7 +232,7 @@ namespace i18n
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
 
-                    var messages = new ConcurrentDictionary<string, I18NMessage>();
+                    var messages = new ConcurrentDictionary<string, PoMessage>();
                     string line;
                     while ((line = fs.ReadLine()) != null)
                     {
@@ -241,7 +241,7 @@ namespace i18n
                             continue;
                         }
 
-                        var message = new I18NMessage();
+                        var message = new PoMessage();
                         var sb = new StringBuilder();
 
                         if (line.StartsWith("#"))
@@ -281,7 +281,7 @@ namespace i18n
             }
         }
 
-        private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message)
+        private static void ParseBody(TextReader fs, string line, StringBuilder sb, PoMessage message)
         {
             if (!string.IsNullOrEmpty(line))
             {
@@ -324,8 +324,8 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            var messages = (ConcurrentDictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(langtag)];
-            I18NMessage message = null;
+            var messages = (ConcurrentDictionary<string, PoMessage>) HttpRuntime.Cache[GetCacheKey(langtag)];
+            PoMessage message = null;
 
             if (messages == null || !messages.TryGetValue(key, out message))
             {
