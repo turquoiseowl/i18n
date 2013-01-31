@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace i18n
+namespace VSPackage.i18n_POTGenerator
 {
     /// <summary>
     /// A post-build task for building a localization message database using GNU xgettext

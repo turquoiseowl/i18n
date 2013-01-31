@@ -84,7 +84,6 @@
     <Compile Include="LanguageMatching.cs" />
     <Compile Include="LanguageTag.cs" />
     <Compile Include="LocalizingService.cs" />
-    <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />
     <Compile Include="RouteExtensions.cs" />

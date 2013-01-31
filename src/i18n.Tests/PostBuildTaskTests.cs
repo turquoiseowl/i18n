@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using i18n.PostBuild;
 
 namespace i18n.Tests
 {
