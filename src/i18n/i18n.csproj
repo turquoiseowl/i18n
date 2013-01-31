@@ -79,7 +79,7 @@
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
     <Compile Include="DataAnnotations\ValidationAttribute.cs" />
-    <Compile Include="DefaultSettings.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="I18NMessage.cs" />
     <Compile Include="ILocalizing.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />

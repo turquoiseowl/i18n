@@ -48,7 +48,7 @@ namespace i18n
         {
             // Lookup resource.
             LanguageTag lt;
-            msgid = DefaultSettings.LocalizingService.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
+            msgid = Configuration.LocalizingService.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
         public static string GetText(this HttpContext context, string msgid)
@@ -95,7 +95,7 @@ namespace i18n
         //
             ILanguageTag langtag = GetRequestUserLanguages(context)[0].LanguageTag;
             if (langtag == null) {
-                langtag = DefaultSettings.DefaultTwoLetterISOLanguageTag; }
+                langtag = Configuration.DefaultTwoLetterISOLanguageTag; }
             return langtag;
         }
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)

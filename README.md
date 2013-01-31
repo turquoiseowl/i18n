@@ -220,7 +220,7 @@ To enable Enhanced mode in your project (the default mode being the original, Ba
 include the following in your Application_Start() method:
 
 ```csharp
-    i18n.DefaultSettings.TheMode = i18n.DefaultSettings.Mode.Enhanced;
+    i18n.Configuration.TheMode = i18n.Configuration.Mode.Enhanced;
     i18n.RouteLocalization.Enable();
 ```
 
