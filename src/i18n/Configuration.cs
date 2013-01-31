@@ -3,9 +3,9 @@ using container;
 namespace i18n
 {
     /// <summary>
-    /// Manages the configuration of the i18n feature of your web application.
+    /// Manages the configuration of the i18n features of your localized application.
     /// </summary>
-    public class Configuration
+    public class LocalizedApplication
     {
         /// <summary>
         /// The default language for all localized keys; when a PO database
@@ -20,7 +20,7 @@ namespace i18n
         /// </summary>
         public static bool PermanentRedirects { get; set; }
 
-        static Configuration()
+        static LocalizedApplication()
         {
             DefaultTwoLetterISOLanguageTag = LanguageTag.GetCachedInstance("en");
             PermanentRedirects = false;
