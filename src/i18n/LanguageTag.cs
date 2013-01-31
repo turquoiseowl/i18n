@@ -416,13 +416,13 @@ namespace i18n
         /// On success, set to the URL with the prefix path part removed.
         /// On failure, set to value of url param.
         /// </param>
-        /// <returns>On success a LanguageTag instance, otherwise null.</returns>
+        /// <returns>On success a langtag string, otherwise null.</returns>
         /// <remarks>
         /// <para>
         /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
         /// </para>
         /// </remarks>
-        public static LanguageTag UrlExtractLangTag(string url, out string urlPatched)
+        public static string UrlExtractLangTag(string url, out string urlPatched)
         {
            // Parse the url.
             System.Text.RegularExpressions.Match match = m_regex_parseUrl.Match(url);
@@ -436,7 +436,7 @@ namespace i18n
                 if (urlPatched.Length == 0) {
                     urlPatched = "/"; }
                // Success.
-                return GetCachedInstance(langtag);
+                return langtag;
             }
            // No match.
             urlPatched = url;
@@ -457,14 +457,14 @@ namespace i18n
         /// <para>"example.com/account/signup"         , "en" -> "example.com/en/account/signup"</para>
         /// <para>"example.com/zh-Hans/account/signup" , "en" -> "example.com/en/account/signup"</para>
         /// </remarks>
-        public static UriBuilder UrlSetLangTag(string url, LanguageTag langtag)
+        public static UriBuilder UrlSetLangTag(string url, string langtag)
         {
             UriBuilder ub = new UriBuilder(url);
             string urlPatched;
             UrlExtractLangTag(ub.Path, out urlPatched);
             ub.Path = urlPatched;
-            if (langtag.IsValid()) {
-                ub.PrependPath(langtag.ToString()); }
+            if (langtag.IsSet()) {
+                ub.PrependPath(langtag); }
             return ub;
         }
     // Trace

@@ -12,10 +12,13 @@ namespace i18n.Tests
         private void UrlExtractLangTagHelper(string url, string expectedLangTag, string expectedUrlPatched)
         {
             string urlPatched;
-            i18n.LanguageTag lt = i18n.LanguageTag.UrlExtractLangTag(url, out urlPatched);
-            string langtag = lt != null ? lt.ToString() : null;
+            string langtag = i18n.LanguageTag.UrlExtractLangTag(url, out urlPatched);
             Assert.AreEqual(expectedLangTag, langtag);
             Assert.AreEqual(expectedUrlPatched, urlPatched);
+        }
+        private void UrlExtractLangTagHelper(string url, string expectedLangTag)
+        {
+            UrlExtractLangTagHelper(url, expectedLangTag, url);
         }
 
         [Test]
@@ -49,27 +52,27 @@ namespace i18n.Tests
             UrlExtractLangTagHelper("/zh-Hans-HK/account/x" , "zh-Hans-HK" , "/account/x");
             UrlExtractLangTagHelper("/zh-Hans-123/account/x", "zh-Hans-123", "/account/x");
 
-            UrlExtractLangTagHelper("/azh"         , null         , null);
-            UrlExtractLangTagHelper("/azh-HK"      , null         , null);
-            UrlExtractLangTagHelper("/azh-123"     , null         , null);
-            UrlExtractLangTagHelper("/azh-Hans"    , null         , null);
-            UrlExtractLangTagHelper("/azh-Hans-HK" , null         , null);
-            UrlExtractLangTagHelper("/azh-Hans-123", null         , null);
+            UrlExtractLangTagHelper("/azh"         , null);
+            UrlExtractLangTagHelper("/azh-HK"      , null);
+            UrlExtractLangTagHelper("/azh-123"     , null);
+            UrlExtractLangTagHelper("/azh-Hans"    , null);
+            UrlExtractLangTagHelper("/azh-Hans-HK" , null);
+            UrlExtractLangTagHelper("/azh-Hans-123", null);
 
-            UrlExtractLangTagHelper("/zh-a"        , null         , null);
-            UrlExtractLangTagHelper("/zh-aHK"      , null         , null);
-            UrlExtractLangTagHelper("/zh-a123"     , null         , null);
-            UrlExtractLangTagHelper("/zh-aHans"    , null         , null);
-            UrlExtractLangTagHelper("/zh-aHans-HK" , null         , null);
-            UrlExtractLangTagHelper("/zh-aHans-123", null         , null);
+            UrlExtractLangTagHelper("/zh-a"        , null);
+            UrlExtractLangTagHelper("/zh-aHK"      , null);
+            UrlExtractLangTagHelper("/zh-a123"     , null);
+            UrlExtractLangTagHelper("/zh-aHans"    , null);
+            UrlExtractLangTagHelper("/zh-aHans-HK" , null);
+            UrlExtractLangTagHelper("/zh-aHans-123", null);
 
-            UrlExtractLangTagHelper("/zh-Hans-K"   , null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-23"  , null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-aHK" , null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-a123", null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-H23" , null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-12K" , null         , null);
-            UrlExtractLangTagHelper("/zh-Hans-12"  , null         , null);
+            UrlExtractLangTagHelper("/zh-Hans-K"   , null);
+            UrlExtractLangTagHelper("/zh-Hans-23"  , null);
+            UrlExtractLangTagHelper("/zh-Hans-aHK" , null);
+            UrlExtractLangTagHelper("/zh-Hans-a123", null);
+            UrlExtractLangTagHelper("/zh-Hans-H23" , null);
+            UrlExtractLangTagHelper("/zh-Hans-12K" , null);
+            UrlExtractLangTagHelper("/zh-Hans-12"  , null);
         }
     }
 }

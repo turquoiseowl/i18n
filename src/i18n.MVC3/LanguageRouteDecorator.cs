@@ -13,6 +13,8 @@ namespace i18n
     {
         private readonly I18NSession _session;
 
+        protected IUrlLocalizer m_localizer = RouteLocalization.UrlLocalizer;
+
         public LanguageRouteDecorator(RouteBase route) : base(route)
         {
             _session = new I18NSession();
@@ -85,11 +87,12 @@ namespace i18n
                     // 1.
                     string urlOrg = context.Request.Url.AbsolutePath;
                     string urlPatched;
-                    ILanguageTag urlLangTag = LanguageTag.UrlExtractLangTag(urlOrg, out urlPatched);
-                    if (urlLangTag.IsValid())
+                    string urlLangTag = m_localizer.ExtractLangTagFromUrl(urlOrg, out urlPatched);
+                    LanguageTag lt = LanguageTag.GetCachedInstance(urlLangTag);
+                    if (lt.IsValid())
                     {
                         // If language matches an AppLanguage
-                        LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(urlLangTag.ToString());
+                        LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(urlLangTag);
                         if (appLangTag != null)
                         {
                             // Attempt to match the patched URL.
@@ -100,7 +103,7 @@ namespace i18n
                             context.RewritePath(urlOrg);
                             // If we have a match...store details of the language in the route, and success.
                             if (routedata != null) {
-                                routedata.DataTokens["i18n.langtag_url"] = urlLangTag;
+                                routedata.DataTokens["i18n.langtag_url"] = lt;
                                     // langtag found in and stripped from the url.
                                 routedata.DataTokens["i18n.langtag_app"] = appLangTag;
                                     // Relative of langtag_url for which we know resource are available (AppLanguage).
@@ -206,10 +209,9 @@ namespace i18n
                            // Prepend the virtual path with the PAL langtag.
                            // E.g. "account/signup" -> "fr-CH/account/signup"
                            // E.g. ""               -> "fr-CH"
-                            result.VirtualPath = string.Format("{0}{1}{2}",
-                                pal.ToString(),
-                                result.VirtualPath.IsSet() ? "/" : "",
-                                result.VirtualPath.IsSet() ? result.VirtualPath : "");
+                            result.VirtualPath = m_localizer.InsertLangTagIntoVirtualPath(
+                                pal.ToString(), 
+                                result.VirtualPath);
                         }
                     }
                     return result;

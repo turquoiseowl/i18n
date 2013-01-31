@@ -92,9 +92,9 @@ namespace i18n
                 // (PAL) for the rest of the request. This may involve issuing a redirect result to get the
                 // user agent on a URL that is an AppLanguage.
                 //
-                // 1. If langtag is in URL but does not equal an AppLanguage...redirect to the 
+                // 1. If langtag is in URL but does not directly equal an AppLanguage (only indirectly)...redirect to the 
                 //    closest matching AppLanguage (falling back to default language if necessary).
-                //    We can then expect to get back here with a the new request and effectively goto 2..
+                //    We can then expect to get back here with the new request and effectively goto 2..
                 //
                 // 2. If langtag is in URL and does equal an AppLanguage...establish the PAL for the request
                 //    and done.
@@ -129,20 +129,7 @@ namespace i18n
                         && appLangTag.IsValid()
                         && !urlLangTag.Equals(appLangTag))
                     {
-                       // Construct new URL.
-                        string urlOrg = filterContext.HttpContext.Request.Url.ToString();
-                        string langTagPrefix = string.Format("/{0}", urlLangTag);
-                        int pos = urlOrg.IndexOf(langTagPrefix);
-                        if (pos == -1) {
-                            throw new System.ApplicationException(); }
-                        string urlNew = string.Format("{0}{1}{2}{3}", 
-                            urlOrg.Substring(0, pos), 
-                            "/", 
-                            appLangTag,
-                            urlOrg.Substring(pos + langTagPrefix.Length));
-                       // Redirect user agent to new URL.
-                        var result = new RedirectResult(urlNew, DefaultSettings.PermanentRedirects);
-                        result.ExecuteResult(filterContext);
+                        RedirectWithLanguage(filterContext, appLangTag);
                         break;
                     }
 
@@ -165,12 +152,7 @@ namespace i18n
                     // If we have got a PAL (from either the cookie or UserLanguages)...redirect to new URL based on it.
                     if (appLangTag != null)
                     {
-                        Uri urlOrg = filterContext.HttpContext.Request.Url;
-                        UriBuilder urlNew = new UriBuilder(urlOrg);
-                        urlNew.PrependPath(appLangTag.ToString());
-                        // Redirect user agent to new URL.
-                        var result = new RedirectResult(urlNew.ToString(), DefaultSettings.PermanentRedirects);
-                        result.ExecuteResult(filterContext);
+                        RedirectWithLanguage(filterContext, appLangTag);
                         break;
                     }
 
@@ -181,6 +163,17 @@ namespace i18n
                 default:
                     throw new System.ApplicationException();
             }
+        }
+
+        protected static void RedirectWithLanguage(ControllerContext filterContext, LanguageTag langtag)
+        {
+            // Construct new URL.
+            string urlNew = RouteLocalization.UrlLocalizer.SetLangTagInUrl(
+                filterContext.HttpContext.Request.Url.ToString(), 
+                langtag.ToString());
+            // Redirect user agent to new URL.
+            var result = new RedirectResult(urlNew.ToString(), DefaultSettings.PermanentRedirects);
+            result.ExecuteResult(filterContext);
         }
         
         private static void RedirectWithLanguage(ControllerContext filterContext, RouteValueDictionary values, string language)
