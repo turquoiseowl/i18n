@@ -150,7 +150,7 @@ To participate in the automatic routing features of this library, call `i18n.Rou
 this will register a global filter and route decorator to provide the feature.
 
 I18N comes with the ability to build on top of your existing routes to automatically redirect language choice to
-an appropriate URL suffix. In Basic mode (i18n now supports an [Enhanced mode](#EM)), when a regular route is accessed, I18N will inspect the browser's `Accept-Language` header
+an appropriate URL suffix. In Basic mode (i18n now supports an [Enhanced mode](#enhanced-mode)), when a regular route is accessed, I18N will inspect the browser's `Accept-Language` header
 to find the most appropriate choice of language from those you've prepared from PO files; for example, if the user's
 most preferred language is `fr-CA` followed by `en-US`, and your application has PO files for `en-US` and `fr`, I18N 
 will select `fr` as the best language choice. At this point, the regular route is then redirected to the language
