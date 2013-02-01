@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LanguageTagTests.cs" />
+    <Compile Include="ResponseFilterTests.cs" />
     <Compile Include="PostBuildTaskTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

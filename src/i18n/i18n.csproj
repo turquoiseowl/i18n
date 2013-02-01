@@ -26,7 +26,7 @@
     <DocumentationFile>..\..\bin\lib\net40\i18n.XML</DocumentationFile>
     <NoWarn>1591 1573</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,6 +74,7 @@
     <Compile Include="ILanguageTag.cs" />
     <Compile Include="LanguageHelpers.cs" />
     <Compile Include="LanguageItem.cs" />
+    <Compile Include="ResponseFilter.cs" />
     <Compile Include="ParseHelpers.cs" />
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
     <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
