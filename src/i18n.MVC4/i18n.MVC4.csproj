@@ -74,9 +74,6 @@
     <Compile Include="..\i18n.MVC3\RouteLocalization.cs">
       <Link>RouteLocalization.cs</Link>
     </Compile>
-    <Compile Include="..\i18n.MVC3\UrlLocalizer.cs">
-      <Link>UrlLocalizer.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

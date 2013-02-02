@@ -41,6 +41,7 @@ namespace i18n
             DefaultLanguage = ("en");
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
+            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
         }
 
         internal static Container Container { get; set; }
@@ -54,5 +55,18 @@ namespace i18n
                 Container.Register(r => value);
             }
         }
+        /// <summary>
+        /// Gets or sets the current IUrlLocalizer implementation used by i18n route localization.
+        /// </summary>
+        public static IUrlLocalizer UrlLocalizer
+        {
+            get { return Container.Resolve<IUrlLocalizer>(); }
+            set
+            {
+                Container.Remove<IUrlLocalizer>();
+                Container.Register(r => value);
+            }
+        }
+
     }
 }

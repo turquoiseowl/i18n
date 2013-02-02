@@ -123,7 +123,7 @@ namespace i18n
         protected static void RedirectWithLanguage(ControllerContext filterContext, LanguageTag langtag)
         {
             // Construct new URL.
-            string urlNew = RouteLocalization.UrlLocalizer.SetLangTagInUrl(
+            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrl(
                 filterContext.HttpContext.Request.Url.ToString(), 
                 langtag.ToString());
             // Redirect user agent to new URL.

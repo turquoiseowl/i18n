@@ -9,8 +9,6 @@ namespace i18n
     /// </summary>
     public static class RouteLocalization
     {
-        internal static Container Container { get; set; }
-
         public static bool Enabled { get; private set; }
         
         /// <summary>
@@ -22,23 +20,8 @@ namespace i18n
 
         static RouteLocalization()
         {
-            Container = new Container();
-            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
             PermanentRedirects = false;
             Enabled = false;
-        }
-
-        /// <summary>
-        /// Gets or sets the current IUrlLocalizer implementation used by i18n route localization.
-        /// </summary>
-        public static IUrlLocalizer UrlLocalizer
-        {
-            get { return Container.Resolve<IUrlLocalizer>(); }
-            set
-            {
-                Container.Remove<IUrlLocalizer>();
-                Container.Register(r => value);
-            }
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace i18n
     /// </summary>
     internal class LanguageRouteDecorator : RouteDecoratorBase<LanguageRouteDecorator>
     {
-        protected IUrlLocalizer m_localizer = RouteLocalization.UrlLocalizer;
+        protected IUrlLocalizer m_localizer = LocalizedApplication.UrlLocalizer;
 
         public LanguageRouteDecorator(RouteBase route) : base(route)
         {
