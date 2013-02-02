@@ -34,30 +34,125 @@ namespace i18n
     /// </summary>
     public class ResponseFilterModule : IHttpModule
     {
+
+    // Implementation
+
         /// <summary>
         /// Regular expression that controls the ContextTypes elligible for localization
         /// by the filter.
         /// </summary>
         /// <remarks>
         /// Defaults to text/html and application/javascript.
-        /// Client may modify, for instance in Application_Start.
+        /// Client may customise this member, for instance in Application_Start.
         /// </remarks>
         public static Regex m_regex_contenttypes = new Regex("^(?:text/html|application/javascript)$");
 
-        private void HandleReleaseRequestState(object sender, EventArgs e)
+        protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
+        {
+            // Construct local URL.
+            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, langtag);
+
+            // Redirect user agent to new local URL.
+            if (LocalizedApplication.PermanentRedirects) {
+                context.Response.StatusCode = 301;
+                context.Response.Status = "301 Moved Permanently";
+            }
+            else {
+                context.Response.StatusCode = 302;
+                context.Response.Status = "302 Moved Temporarily";
+            }
+            context.Response.RedirectLocation = urlNew;
+            context.Response.End();
+        }
+
+        /// <summary>
+        /// Implements the Early Url Localization logic.
+        /// </summary>
+        protected static void EarlyUrlLocalization(HttpContextBase context)
+        {
+        // https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing
+        //
+            LanguageTag lt = null;
+            string urlNonlocalized;
+            string langtag = LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, out urlNonlocalized);
+
+            // Is URL localized?
+            if (langtag == null)
+            {
+                // NO.
+                // langtag = best match between
+                // 1. Inferred user languages (cookie and Accept-Language header)
+                // 2. App Languages.
+                HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
+                if (cookie_langtag != null) {
+                    lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
+                if (lt == null) {
+                    lt = LanguageHelpers.GetMatchingAppLanguage(context.GetRequestUserLanguages()); }
+                if (lt == null) {
+                    throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
+
+                // Redirect user agent to localized URL.
+                RedirectWithLanguage(context, lt.ToString());
+                return;
+            }
+            // YES. Does langtag EXACTLY match an App Language?
+            LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(langtag);
+            if (appLangTag.IsValid()
+                && appLangTag.Equals(langtag))
+            {
+                // YES. Establish langtag as the PAL for the request.
+                context.SetPrincipalAppLanguageForRequest(appLangTag);
+
+                // Rewrite URL for this request.
+                context.RewritePath(urlNonlocalized);
+
+                // Continue handling request.
+                return;
+            }
+            // NO. Does langtag LOOSELY match an App Language?
+            else if (appLangTag.IsValid()
+                && !appLangTag.Equals(langtag))
+            {
+                // YES. Localize URL with matching App Language.
+                // Redirect user agent to localized URL.
+                RedirectWithLanguage(context, appLangTag.ToString());
+                return;
+            }
+            // NO. Do nothing to URL; expect a 404 which corresponds to language not supported.
+            // Continue handling request.
+        }
+
+    // Events handlers
+
+        private void OnBeginRequest(object sender, EventArgs e)
+        {
+            HttpContextBase context = HttpContext.Current.GetHttpContextBase();
+            DebugHelpers.WriteLine("ResponseFilterModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
+
+            EarlyUrlLocalization(context);
+        }
+
+        private void OnReleaseRequestState(object sender, EventArgs e)
         {
         // We get here once per request late on in the pipeline but prior to the response being filtered.
         // We take the opportunity to insert our filter in order to intercept that.
         //
-            DebugHelpers.WriteLine("ResponseFilterModule::HandleReleaseRequestState -- sender: {0}, e:{1}", sender, e);
-            
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
-            DebugHelpers.WriteLine("ResponseFilterModule::HandleReleaseRequestState -- ContentType: {0}", context.Response.ContentType);
+            DebugHelpers.WriteLine("ResponseFilterModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
+            // If the content type of the entity is eligible for processing...wire up our filter
+            // to do the processing. The entity data will be run through the filter a bit later on
+            // in the pipeline.
             if (m_regex_contenttypes.Match(context.Response.ContentType).Success) {
-                DebugHelpers.WriteLine("ResponseFilterModule::HandleReleaseRequestState -- Installing filter");
+                DebugHelpers.WriteLine("ResponseFilterModule::OnReleaseRequestState -- Installing filter");
                 context.Response.Filter = new ResponseFilter(context, context.Response.Filter);
             }
+        }
+
+        private void OnEndRequest(object sender, EventArgs e)
+        {
+            HttpContextBase context = HttpContext.Current.GetHttpContextBase();
+            DebugHelpers.WriteLine("ResponseFilterModule::OnEndRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
         }
 
     #region [IHttpModule]
@@ -65,7 +160,11 @@ namespace i18n
         public void Init(HttpApplication application)
         {
             DebugHelpers.WriteLine("ResponseFilterModule::Init -- application: {0}", application);
-            application.ReleaseRequestState += HandleReleaseRequestState;
+            
+            // Wire up our event handlers into the ASP.NET pipeline.
+            application.BeginRequest += OnBeginRequest;
+            application.ReleaseRequestState += OnReleaseRequestState;
+            application.EndRequest += OnEndRequest;
         }
 
         public void Dispose() {}
@@ -160,7 +259,7 @@ namespace i18n
 
         /// <summary>
         /// Helper for post-processing the response entity in order to replace any
-        /// msgid nuggets with the GetText string.
+        /// msgid nuggets such as [[[Translate me!]]] with the GetText string.
         /// </summary>
         /// <param name="entity">Subject HTTP response entity to be processed.</param>
         /// <param name="httpContext">
@@ -171,6 +270,10 @@ namespace i18n
         /// Processed (and possibly modified) entity.
         /// </returns>
         /// <remarks>
+        /// An example replacement is as follows:
+        /// <para>
+        /// [[[Translate me!]]] -> Übersetzen mich!
+        /// </para>
         /// This method supports a testing mode which is enabled by passing httpContext as null.
         /// In this mode, we output "test.message" for every msgid nugget.
         /// </remarks>

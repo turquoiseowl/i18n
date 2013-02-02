@@ -123,11 +123,12 @@ namespace i18n
         protected static void RedirectWithLanguage(ControllerContext filterContext, LanguageTag langtag)
         {
             // Construct new URL.
-            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrl(
-                filterContext.HttpContext.Request.Url.ToString(), 
+            UriBuilder ub = new UriBuilder(filterContext.HttpContext.Request.Url);
+            ub.Path = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(
+                filterContext.HttpContext.Request.RawUrl, 
                 langtag.ToString());
             // Redirect user agent to new URL.
-            var result = new RedirectResult(urlNew.ToString(), LocalizedApplication.PermanentRedirects);
+            var result = new RedirectResult(ub.ToString(), LocalizedApplication.PermanentRedirects);
             result.ExecuteResult(filterContext);
         }
     }

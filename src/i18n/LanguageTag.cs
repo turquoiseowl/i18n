@@ -284,6 +284,10 @@ namespace i18n
         {
             return 0 == string.Compare(m_langtag, other.m_langtag, true);
         }
+        public bool Equals(string other)
+        {
+            return 0 == string.Compare(m_langtag, other, true);
+        }
     // Operations
         /// <summary>
         /// Performs 'language matching' between lang described by this (A)
@@ -459,8 +463,9 @@ namespace i18n
         /// <para>"example.com/account/signup"         , "en" -> "example.com/en/account/signup"</para>
         /// <para>"example.com/zh-Hans/account/signup" , "en" -> "example.com/en/account/signup"</para>
         /// </remarks>
-        public static UriBuilder UrlSetLangTag(string url, string langtag)
+        public static string UrlSetLangTag(string url, string langtag)
         {
+/*#37
             UriBuilder ub = new UriBuilder(url);
             string urlPatched;
             UrlExtractLangTag(ub.Path, out urlPatched);
@@ -468,6 +473,11 @@ namespace i18n
             if (langtag.IsSet()) {
                 ub.PrependPath(langtag); }
             return ub;
+*/
+            string urlPatched;
+            UrlExtractLangTag(url, out urlPatched);
+            urlPatched = urlPatched.UrlPrependPath(langtag);
+            return urlPatched;
         }
     // Trace
         [Conditional("DEBUG")]

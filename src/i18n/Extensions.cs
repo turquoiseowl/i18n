@@ -132,5 +132,20 @@ namespace i18n
             if (s1.IsSet() && s1 != "/") {
                 uriBuilder.Path += s1; }
         }
+
+        public static string UrlPrependPath(this string path, string folder)
+        {
+            StringBuilder sb = new StringBuilder(path.Length + folder.Length + 10);
+
+            sb.Append("/");
+            sb.Append(folder);
+            if (path.IsSet() && path != "/") {
+                if (path[0] != '/') {
+                    sb.Append("/"); }
+                sb.Append(path);
+            }
+            path = sb.ToString();
+            return path;
+        }
     }
 }

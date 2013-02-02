@@ -32,21 +32,23 @@ namespace i18n
         string ExtractLangTagFromUrl(string url, out string urlPatched);
 
         /// <summary>
-        /// Patches in the langtag into the passed url, replacing any extant langtag in the url if necessary.
+        /// Patches in the langtag into the passed url path part, replacing any extant langtag 
+        /// in the part if necessary.
         /// </summary>
-        /// <param name="url">
-        /// URL to be patched.
+        /// <param name="path">
+        /// URL path part to be patched.
         /// </param>
         /// <param name="langtag">
-        /// Optional langtag to be patched into the URL, or null if any langtag 
-        /// to be removed from the URL.
+        /// Optional langtag to be patched into the part, or null/empty if any langtag 
+        /// to be removed from the part.
         /// </param>
-        /// <returns>UriBuilder containing the modified version of url.</returns>
+        /// <returns>Modified path part string.</returns>
         /// <remarks>
-        /// <para>"example.com/account/signup"         , "en" -> "example.com/en/account/signup"</para>
-        /// <para>"example.com/zh-Hans/account/signup" , "en" -> "example.com/en/account/signup"</para>
+        /// <para>"/account/signup"         , "en" -> "/en/account/signup"</para>
+        /// <para>"/zh-Hans/account/signup" , "en" -> "/en/account/signup"</para>
+        /// <para>"/zh-Hans/account/signup" , null -> "/account/signup"</para>
         /// </remarks>
-        string SetLangTagInUrl(string url, string langtag);
+        string SetLangTagInUrlPath(string path, string langtag);
 
         /// <summary>
         /// Method for injecting a language tag into a route's virtual path.
