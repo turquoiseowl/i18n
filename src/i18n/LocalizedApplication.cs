@@ -36,9 +36,17 @@ namespace i18n
         }
         public static LanguageTag DefaultLanguageTag { get; set; }
 
+        /// <summary>
+        /// Specifies the type of HTTP redirect to be issued by automatic language routing:
+        /// true for 301 (permanent) redirects; false for 302 (temporary) ones.
+        /// Defaults to false.
+        /// </summary>
+        public static bool PermanentRedirects { get; set; }
+
         static LocalizedApplication()
         {
             DefaultLanguage = ("en");
+            PermanentRedirects = false;
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
