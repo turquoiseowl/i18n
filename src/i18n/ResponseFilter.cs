@@ -79,7 +79,7 @@ namespace i18n
         /// <summary>
         /// Regex for finding and replacing msgid nuggets.
         /// </summary>
-        protected static readonly Regex m_regex = new Regex(
+        protected static readonly Regex m_regex_nugget = new Regex(
             //@"«««(.+?)»»»", 
             @"\[\[\[(.+?)\]\]\]", 
             RegexOptions.CultureInvariant);
@@ -117,7 +117,10 @@ namespace i18n
             string entity = enc.GetString(buffer, offset, count);
 
             // Translate any embedded messages.
-            entity = ProcessEntity(entity, m_httpContext);
+            entity = ProcessNuggets(entity, m_httpContext);
+
+            //#37
+            entity = PatchScriptUrls(entity, "i18n-langtag=fr");
 
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
@@ -156,7 +159,8 @@ namespace i18n
     #endregion
 
         /// <summary>
-        /// Helper for post-processing the response entity.
+        /// Helper for post-processing the response entity in order to replace any
+        /// msgid nuggets with the GetText string.
         /// </summary>
         /// <param name="entity">Subject HTTP response entity to be processed.</param>
         /// <param name="httpContext">
@@ -170,10 +174,10 @@ namespace i18n
         /// This method supports a testing mode which is enabled by passing httpContext as null.
         /// In this mode, we output "test.message" for every msgid nugget.
         /// </remarks>
-        public static string ProcessEntity(string entity, HttpContextBase httpContext)
+        public static string ProcessNuggets(string entity, HttpContextBase httpContext)
         {
-            // Lookup any/all msgid nuggets in the entity and replace with any 
-            entity = m_regex.Replace(entity, delegate(Match match)
+            // Lookup any/all msgid nuggets in the entity and replace with any translated message.
+            entity = m_regex_nugget.Replace(entity, delegate(Match match)
 	            {
 	                string msgid = match.Groups[1].Value;
                     string message = httpContext != null ? httpContext.GetText(msgid) : "test.message";
@@ -181,6 +185,42 @@ namespace i18n
 	            });
 
             return entity;
+        }
+        /// <summary>
+        /// Helper for post-processing the response entity to append the passed string to
+        /// URLs in the src attribute of script tags.
+        /// </summary>
+        /// <param name="entity">Subject HTTP response entity to be processed.</param>
+        /// <param name="queryString">
+        /// Query string component to be appended to the URLs e.g. "i18n-langtag=fr".
+        /// Note that if this is the first query string the a ? is prepended to this value,
+        /// otherwise a &amp; is prepended to this value.
+        /// </param>
+        /// <returns>
+        /// Processed (and possibly modified) entity.
+        /// </returns>
+        public static string PatchScriptUrls(string entity, string queryString)
+        {
+            string str = Regex.Replace(
+                entity,
+                //"(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'].*?>)",
+                "(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+                    // Notes:
+                    //      \s = whitespace
+                delegate(Match match)
+                {
+                    string url = match.Groups[2].Value;
+                    string res = string.Format("{0}{1}{2}{3}{4}", 
+                        match.Groups[1].Value,
+                        url, 
+                        url.Contains("?") ? "&" : "?", 
+                        queryString,
+                        match.Groups[3].Value);
+                    return res;
+                },
+                RegexOptions.IgnoreCase);
+                //TODO: move to static member.
+            return str;
         }
     }
 }
