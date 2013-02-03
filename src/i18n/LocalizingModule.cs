@@ -52,16 +52,6 @@ namespace i18n
 
     // Implementation
 
-        /// <summary>
-        /// Regular expression that controls the ContextTypes elligible for localization
-        /// by the filter.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to text/html and application/javascript.
-        /// Client may customise this member, for instance in Application_Start.
-        /// </remarks>
-        public static Regex ContentTypesExpression = new Regex("^(?:text/html|application/javascript)$");
-
         protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
         {
             // Construct localized URL.
@@ -162,7 +152,8 @@ namespace i18n
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
             // in the pipeline.
-            if (ContentTypesExpression.Match(context.Response.ContentType).Success) {
+            if (LocalizedApplication.ContentTypesToLocalize != null
+                && LocalizedApplication.ContentTypesToLocalize.Match(context.Response.ContentType).Success) {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
                 context.Response.Filter = new ResponseFilter(context, context.Response.Filter);
             }

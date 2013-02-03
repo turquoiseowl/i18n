@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using container;
 
 namespace i18n
@@ -44,13 +45,24 @@ namespace i18n
         public static bool PermanentRedirects { get; set; }
 
         /// <summary>
-        /// Specifies whether Early URL localization is to be enabled.
-        /// Defaults to true although requires the LocalizedModule HTTP module to be intalled in web.config.
+        /// Specifies whether Early URL Localization is to be enabled.
         /// </summary>
         /// <remarks>
+        /// Defaults to true. This feature requires the LocalizedModule HTTP module to be intalled in web.config.
         /// <see cref="!:https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
         /// </remarks>
         public static bool EnableEarlyUrlLocalization { get; set; }
+
+        /// <summary>
+        /// Regular expression that controls the ContextTypes elligible for localization
+        /// by the i18n post-processing response filter.
+        /// </summary>
+        /// <remarks>
+        /// Set to null to disable post-processing. Defaults to text/html and 
+        /// application/javascript. Client may customise this member, for instance in Application_Start.
+        /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.
+        /// </remarks>
+        public static Regex ContentTypesToLocalize = new Regex("^(?:text/html|application/javascript)$");
 
         static LocalizedApplication()
         {
