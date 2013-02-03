@@ -17,9 +17,9 @@ namespace i18n.Tests
             string pre = "[[[123]]] [[[123]]]";
             string post = i18n.ResponseFilter.ProcessNuggets(null, pre);
             Assert.AreEqual("test.message test.message", post);
+
+            //#37 TODO -- more tests.
         }
-
-
 
         [Test]
         public void ResponseFilter_can_patch_html_urls()
@@ -323,12 +323,10 @@ namespace i18n.Tests
                 "fr",
                 "\r\r\n\n\n\r\n\n\r\t\n\r\t<script\r\r\n\n\n\r\n\n\r\t\n\r\tsrc\r\r\n\n\n\r\n\n\r\t\n\r\t=\r\r\n\n\n\r\n\n\r\t\n\r\t\"123\"\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t</script\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t",
                 "\r\r\n\n\n\r\n\n\r\t\n\r\t<script\r\r\n\n\n\r\n\n\r\t\n\r\tsrc\r\r\n\n\n\r\n\n\r\t\n\r\t=\r\r\n\n\n\r\n\n\r\t\n\r\t\"/fr/123\"\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t</script\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t");
-
-
         }
-        void ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched)
+        void ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, Uri requestUrl = null)
         {
-            string post = i18n.ResponseFilter.PatchHtmlUrls(null, pre, suffix, new UrlLocalizer());
+            string post = i18n.ResponseFilter.PatchHtmlUrls(requestUrl, pre, suffix, new UrlLocalizer());
             Assert.AreEqual(expectedPatched, post);
         }
     }

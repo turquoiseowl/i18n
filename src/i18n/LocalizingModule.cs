@@ -60,7 +60,7 @@ namespace i18n
         /// Defaults to text/html and application/javascript.
         /// Client may customise this member, for instance in Application_Start.
         /// </remarks>
-        public static Regex m_regex_contenttypes = new Regex("^(?:text/html|application/javascript)$");
+        public static Regex ContentTypesExpression = new Regex("^(?:text/html|application/javascript)$");
 
         protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
         {
@@ -162,7 +162,7 @@ namespace i18n
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
             // in the pipeline.
-            if (m_regex_contenttypes.Match(context.Response.ContentType).Success) {
+            if (ContentTypesExpression.Match(context.Response.ContentType).Success) {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
                 context.Response.Filter = new ResponseFilter(context, context.Response.Filter);
             }

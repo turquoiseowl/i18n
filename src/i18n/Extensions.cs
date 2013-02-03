@@ -6,6 +6,8 @@ namespace i18n
 {
     internal static class Extensions
     {
+        static readonly Regex m_regex_unescape = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
+
         /// <summary>
         /// String extension method to simplify testing for non-null/non-empty values.
         /// </summary>
@@ -59,8 +61,7 @@ namespace i18n
         public static string Unescape(this string s)
         {
             StringBuilder sb = new StringBuilder();
-            Regex r = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
-            MatchCollection mc = r.Matches(s, 0);
+            MatchCollection mc = m_regex_unescape.Matches(s, 0);
 
             foreach (Match m in mc) {
                 if (m.Length == 1) {
