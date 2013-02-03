@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 namespace i18n
 {
@@ -11,7 +12,11 @@ namespace i18n
         /// Method for detecting a URL containing a language tag part, and if found outputs
         /// both the language tag and the URL with the that part removed.
         /// </summary>
-        /// <param name="url">Either an absolute or relative URL string.</param>
+        /// <param name="url">Either an absolute or relative URL string, as specified by the uriKind parameter.</param>
+        /// <param name="uriKind">
+        /// Indicates the type of URI in the url parameter. If the URL is known to be relative, this method is more efficient if this 
+        /// parameter is set to UriKind.Relative.
+        /// </param>
         /// <param name="urlPatched">
         /// On success, set to the URL with the langtag part removed.
         /// On failure, set to value of url param.
@@ -27,13 +32,17 @@ namespace i18n
         /// return "zh-Hans" and output "/account/signup".
         /// </para>
         /// </remarks>
-        string ExtractLangTagFromUrl(string url, out string urlPatched);
+        string ExtractLangTagFromUrl(string url, UriKind uriKind, out string urlPatched);
 
         /// <summary>
         /// Patches in the langtag into the passed url path part, replacing any extant langtag 
         /// in the part if necessary.
         /// </summary>
-        /// <param name="url">Either an absolute or relative URL string.</param>
+        /// <param name="url">Either an absolute or relative URL string, as specified by the uriKind parameter.</param>
+        /// <param name="uriKind">
+        /// Indicates the type of URI in the url parameter. If the URL is known to be relative, this method is more efficient if this 
+        /// parameter is set to UriKind.Relative.
+        /// </param>
         /// <param name="langtag">
         /// Optional langtag to be patched into the part, or null/empty if any langtag 
         /// to be removed from the part.
@@ -44,7 +53,7 @@ namespace i18n
         /// <para>"/zh-Hans/account/signup" , "en" -> "/en/account/signup"</para>
         /// <para>"/zh-Hans/account/signup" , null -> "/account/signup"</para>
         /// </remarks>
-        string SetLangTagInUrlPath(string url, string langtag);
+        string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag);
 
         /// <summary>
         /// Method for injecting a language tag into a route's virtual path.

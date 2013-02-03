@@ -38,7 +38,7 @@ namespace i18n
             // 1.
             string urlOrg = context.Request.Url.AbsolutePath;
             string urlPatched;
-            string urlLangTag = m_localizer.ExtractLangTagFromUrl(urlOrg, out urlPatched);
+            string urlLangTag = m_localizer.ExtractLangTagFromUrl(urlOrg, UriKind.Relative, out urlPatched);
             LanguageTag lt = LanguageTag.GetCachedInstance(urlLangTag);
             if (lt.IsValid())
             {

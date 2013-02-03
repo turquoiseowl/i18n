@@ -126,6 +126,7 @@ namespace i18n
             UriBuilder ub = new UriBuilder(filterContext.HttpContext.Request.Url);
             ub.Path = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(
                 filterContext.HttpContext.Request.RawUrl, 
+                UriKind.Relative,
                 langtag.ToString());
             // Redirect user agent to new URL.
             var result = new RedirectResult(ub.Uri.ToString(), LocalizedApplication.PermanentRedirects); // Go via Uri to avoid port 80 being added.

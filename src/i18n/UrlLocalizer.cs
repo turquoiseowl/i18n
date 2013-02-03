@@ -10,13 +10,13 @@ namespace i18n
 
     #region [IUrlLocalizer]
 
-        public string ExtractLangTagFromUrl(string url, out string urlPatched)
+        public string ExtractLangTagFromUrl(string url, UriKind uriKind, out string urlPatched)
         {
-            return LanguageTag.UrlExtractLangTag(url, out urlPatched);
+            return LanguageTag.ExtractLangTagFromUrl(url, uriKind, out urlPatched);
         }
-        public string SetLangTagInUrlPath(string url, string langtag)
+        public string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag)
         {
-            return LanguageTag.UrlSetLangTag(url, langtag);
+            return LanguageTag.SetLangTagInUrlPath(url, uriKind, langtag);
         }
         public string InsertLangTagIntoVirtualPath(string langtag, string virtualPath)
         {

@@ -417,7 +417,11 @@ namespace i18n
         /// This method does not check for the validity of the returned langtag other than
         /// it matching the pattern of a langtag as supported by this LanguageTag class.
         /// </remarks>
-        /// <param name="url">Either an absolute or relative URL string.</param>
+        /// <param name="url">Either an absolute or relative URL string, as specified by the uriKind parameter.</param>
+        /// <param name="uriKind">
+        /// Indicates the type of URI in the url parameter. If the URL is known to be relative, this method is more efficient if this 
+        /// parameter is set to UriKind.Relative.
+        /// </param>
         /// <param name="urlPatched">
         /// On success, set to the URL with the prefix path part removed.
         /// On failure, set to value of url param.
@@ -428,17 +432,24 @@ namespace i18n
         /// For URL /zh-Hans/account/signup we return "zh-Hans" and output /account/signup.
         /// </para>
         /// </remarks>
-        public static string UrlExtractLangTag(string url, out string urlPatched)
+        public static string ExtractLangTagFromUrl(string url, UriKind uriKind, out string urlPatched)
         {
-            // If absolute url (include host and optionally scheme)
-            Uri uri;
-            if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
-                UriBuilder ub = new UriBuilder(url);
-                url = UrlExtractLangTag(ub.Path, out urlPatched);
-                if (url == null) {
-                    return null; }
-                ub.Path = url;
-                return ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
+           // If url is possibly absolute
+            if (uriKind != UriKind.Relative) {
+               // If absolute url (include host and optionally scheme)
+                Uri uri;
+                if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
+                    UriBuilder ub = new UriBuilder(url);
+                    string urlNew = ExtractLangTagFromUrl(ub.Path, UriKind.Relative, out urlPatched);
+                   // Match?
+                    if (urlNew != null) {
+                        ub.Path = urlNew;
+                        return ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
+                    }
+                   // No match.
+                    urlPatched = url;
+                    return null;
+                }
             }
 
            // Url is relative. Parse it.
@@ -462,8 +473,10 @@ namespace i18n
         /// <summary>
         /// Patches in the langtag into the passed url, replacing any extant langtag in the url if necessary.
         /// </summary>
-        /// <param name="url">
-        /// URL to be patched.
+        /// <param name="url">Either an absolute or relative URL string, as specified by the uriKind parameter.</param>
+        /// <param name="uriKind">
+        /// Indicates the type of URI in the url parameter. If the URL is known to be relative, this method is more efficient if this 
+        /// parameter is set to UriKind.Relative.
         /// </param>
         /// <param name="langtag">
         /// Optional langtag to be patched into the URL, or null if any langtag 
@@ -471,13 +484,13 @@ namespace i18n
         /// </param>
         /// <returns>UriBuilder containing the modified version of url.</returns>
         /// <remarks>
-        /// <para>"example.com/account/signup"         , "en" -> "example.com/en/account/signup"</para>
-        /// <para>"example.com/zh-Hans/account/signup" , "en" -> "example.com/en/account/signup"</para>
+        /// <para>"http://example.com/account/signup"         , "en" -> "http://example.com/en/account/signup"</para>
+        /// <para>"http://example.com/zh-Hans/account/signup" , "en" -> "http://example.com/en/account/signup"</para>
         /// </remarks>
-        public static string UrlSetLangTag(string url, string langtag)
+        public static string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag)
         {
             string urlPatched;
-            UrlExtractLangTag(url, out urlPatched);
+            ExtractLangTagFromUrl(url, uriKind, out urlPatched);
             urlPatched = urlPatched.UrlPrependPath(langtag);
             return urlPatched;
         }
