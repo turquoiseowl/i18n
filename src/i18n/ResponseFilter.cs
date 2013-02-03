@@ -49,7 +49,7 @@ namespace i18n
 
         protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
         {
-            // Construct local URL.
+            // Construct localized URL.
             string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, langtag);
 
             // Redirect user agent to new local URL.
@@ -164,7 +164,7 @@ namespace i18n
             // Wire up our event handlers into the ASP.NET pipeline.
             application.BeginRequest += OnBeginRequest;
             application.ReleaseRequestState += OnReleaseRequestState;
-            application.EndRequest += OnEndRequest;
+            //application.EndRequest += OnEndRequest;
         }
 
         public void Dispose() {}
@@ -188,6 +188,11 @@ namespace i18n
             //      Lazily match chars up to
             // ]]]
             //      ... closing sequence
+        protected static readonly Regex m_regex_script = new Regex(
+            "(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                // Notes:
+                //      \s = whitespace
 
         /// <summary>
         /// The stream onto which we pass data once processed.
@@ -218,8 +223,16 @@ namespace i18n
             // Translate any embedded messages.
             entity = ProcessNuggets(entity, m_httpContext);
 
-            //#37
-            entity = PatchScriptUrls(entity, "i18n-langtag=fr");
+            // Patch all URLs in the entity which are:
+            // 1. local (non-remote)
+            // 2. are not already localized
+            //#37 TODO: Extend this to path all local (non-remote) URLs in the entity.
+            // This will save a redirect on subsequent requests.
+            // <img src="..."> tags
+            // <a href="..."> tags
+            // <link href="..."> tags
+            // Test embedded tags e.g. <a src="..."><img  src="..."/><a> etc.
+            entity = PatchScriptUrls(entity, m_httpContext.GetPrincipalAppLanguageForRequest().ToString());
 
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
@@ -294,36 +307,40 @@ namespace i18n
         /// URLs in the src attribute of script tags.
         /// </summary>
         /// <param name="entity">Subject HTTP response entity to be processed.</param>
-        /// <param name="queryString">
-        /// Query string component to be appended to the URLs e.g. "i18n-langtag=fr".
-        /// Note that if this is the first query string the a ? is prepended to this value,
-        /// otherwise a &amp; is prepended to this value.
+        /// <param name="langtag">
+        /// Langtag to be patched into URLs.
         /// </param>
         /// <returns>
         /// Processed (and possibly modified) entity.
         /// </returns>
-        public static string PatchScriptUrls(string entity, string queryString)
+        public static string PatchScriptUrls(string entity, string langtag)
         {
-            string str = Regex.Replace(
+            return m_regex_script.Replace(
                 entity,
-                //"(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'].*?>)",
-                "(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
-                    // Notes:
-                    //      \s = whitespace
                 delegate(Match match)
                 {
-                    string url = match.Groups[2].Value;
-                    string res = string.Format("{0}{1}{2}{3}{4}", 
-                        match.Groups[1].Value,
-                        url, 
-                        url.Contains("?") ? "&" : "?", 
-                        queryString,
-                        match.Groups[3].Value);
-                    return res;
-                },
-                RegexOptions.IgnoreCase);
-                //TODO: move to static member.
-            return str;
+                    try {
+                        string url = match.Groups[2].Value;
+                        
+                        // If URL is already localized...leave matched token alone.
+                        string urlNonlocalized;
+                        if (LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(url, out urlNonlocalized) != null) {
+                            return match.Groups[0].Value; } // original
+
+                        // Localized the URL.
+                        url = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(url, langtag);
+
+                        // Rebuild and return matched token.
+                        string res = string.Format("{0}{1}{2}", 
+                            match.Groups[1].Value,
+                            url, 
+                            match.Groups[3].Value);
+                        return res;
+                    }
+                    catch (System.UriFormatException) {
+                        return match.Groups[0].Value; // original
+                    }
+                });
         }
     }
 }

@@ -128,7 +128,7 @@ namespace i18n
                 filterContext.HttpContext.Request.RawUrl, 
                 langtag.ToString());
             // Redirect user agent to new URL.
-            var result = new RedirectResult(ub.ToString(), LocalizedApplication.PermanentRedirects);
+            var result = new RedirectResult(ub.Uri.ToString(), LocalizedApplication.PermanentRedirects); // Go via Uri to avoid port 80 being added.
             result.ExecuteResult(filterContext);
         }
     }

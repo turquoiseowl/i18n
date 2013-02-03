@@ -11,9 +11,7 @@ namespace i18n
         /// Method for detecting a URL containing a language tag part, and if found outputs
         /// both the language tag and the URL with the that part removed.
         /// </summary>
-        /// <param name="url">
-        /// URL to be inspected for a valid langtag part.
-        /// </param>
+        /// <param name="url">Either an absolute or relative URL string.</param>
         /// <param name="urlPatched">
         /// On success, set to the URL with the langtag part removed.
         /// On failure, set to value of url param.
@@ -35,9 +33,7 @@ namespace i18n
         /// Patches in the langtag into the passed url path part, replacing any extant langtag 
         /// in the part if necessary.
         /// </summary>
-        /// <param name="path">
-        /// URL path part to be patched.
-        /// </param>
+        /// <param name="url">Either an absolute or relative URL string.</param>
         /// <param name="langtag">
         /// Optional langtag to be patched into the part, or null/empty if any langtag 
         /// to be removed from the part.
@@ -48,7 +44,7 @@ namespace i18n
         /// <para>"/zh-Hans/account/signup" , "en" -> "/en/account/signup"</para>
         /// <para>"/zh-Hans/account/signup" , null -> "/account/signup"</para>
         /// </remarks>
-        string SetLangTagInUrlPath(string path, string langtag);
+        string SetLangTagInUrlPath(string url, string langtag);
 
         /// <summary>
         /// Method for injecting a language tag into a route's virtual path.
@@ -73,5 +69,6 @@ namespace i18n
         /// </para>
         /// </remarks>
         string InsertLangTagIntoVirtualPath(string langtag, string virtualPath);
+            //#37 TODO: deprecated.
     }
 }

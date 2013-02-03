@@ -417,7 +417,7 @@ namespace i18n
         /// This method does not check for the validity of the returned langtag other than
         /// it matching the pattern of a langtag as supported by this LanguageTag class.
         /// </remarks>
-        /// <param name="url">URL to be inspected for a valid langtag prefix forming the first path part of the URL.</param>
+        /// <param name="url">Either an absolute or relative URL string.</param>
         /// <param name="urlPatched">
         /// On success, set to the URL with the prefix path part removed.
         /// On failure, set to value of url param.
@@ -430,7 +430,18 @@ namespace i18n
         /// </remarks>
         public static string UrlExtractLangTag(string url, out string urlPatched)
         {
-           // Parse the url.
+            // If absolute url (include host and optionally scheme)
+            Uri uri;
+            if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
+                UriBuilder ub = new UriBuilder(url);
+                url = UrlExtractLangTag(ub.Path, out urlPatched);
+                if (url == null) {
+                    return null; }
+                ub.Path = url;
+                return ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
+            }
+
+           // Url is relative. Parse it.
             System.Text.RegularExpressions.Match match = m_regex_parseUrl.Match(url);
            // If successful
             if (match.Success
@@ -465,15 +476,6 @@ namespace i18n
         /// </remarks>
         public static string UrlSetLangTag(string url, string langtag)
         {
-/*#37
-            UriBuilder ub = new UriBuilder(url);
-            string urlPatched;
-            UrlExtractLangTag(ub.Path, out urlPatched);
-            ub.Path = urlPatched;
-            if (langtag.IsSet()) {
-                ub.PrependPath(langtag); }
-            return ub;
-*/
             string urlPatched;
             UrlExtractLangTag(url, out urlPatched);
             urlPatched = urlPatched.UrlPrependPath(langtag);

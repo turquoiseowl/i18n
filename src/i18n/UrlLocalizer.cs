@@ -14,9 +14,9 @@ namespace i18n
         {
             return LanguageTag.UrlExtractLangTag(url, out urlPatched);
         }
-        public string SetLangTagInUrlPath(string path, string langtag)
+        public string SetLangTagInUrlPath(string url, string langtag)
         {
-            return LanguageTag.UrlSetLangTag(path, langtag);
+            return LanguageTag.UrlSetLangTag(url, langtag);
         }
         public string InsertLangTagIntoVirtualPath(string langtag, string virtualPath)
         {
