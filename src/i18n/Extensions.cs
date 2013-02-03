@@ -173,5 +173,35 @@ namespace i18n
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Indicates whether a URI is local to this URI.
+        /// </summary>
+        /// <param name="lhs">An absolute URI.</param>
+        /// <param name="rhs">A relative or absolute URI. A relative 'root' URI should be '/'.</param>
+        /// <returns>
+        /// true if rhs is relative, or it is absolute and addresses the same host as lhs;
+        /// otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// We consider one uri to be local relative to another if they have an equivalent Authority
+        /// component (host name and any port number).
+        /// </remarks>
+        public static bool IsLocal(this Uri lhs, string rhs)
+        {
+            if (!rhs.IsSet()) {
+                return false; }
+           // If rhs is a valid absolute uri, compare Authority.
+            Uri rhs1;
+            if (Uri.TryCreate(rhs, UriKind.Absolute, out rhs1)) {
+                return String.Equals(lhs.Authority, rhs1.Authority, StringComparison.OrdinalIgnoreCase); }
+           // If rhs is valid relative Uri then treat as local.
+           // NB: this code was based on HttpRequestBase.IsUrlLocalToHost in MVC3 which seems to be broken 
+           // now with MVC4.
+            bool isLocal = !rhs.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
+                && !rhs.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
+                && Uri.IsWellFormedUriString(rhs, UriKind.Relative);
+            return isLocal;
+        }
     }
 }

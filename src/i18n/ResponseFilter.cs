@@ -32,8 +32,10 @@ namespace i18n
         /// Regex for finding and replacing urls in html.
         /// </summary>
         protected static readonly Regex m_regex_html_urls = new Regex(
-            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b[.\\s]*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
-            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b.*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+            //"(?<pre><[.\\s]*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+            //"(?<pre><.*(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 // The above supports most common ways for a URI to appear in HTML/XHTML.
                 // Note that if we fail to catch a URL here, it is not fata; only means we don't avoid a redirect
                 // round-trip in some cases.
@@ -71,7 +73,7 @@ namespace i18n
             string entity = enc.GetString(buffer, offset, count);
 
             // Translate any embedded messages.
-            entity = ProcessNuggets(entity, m_httpContext);
+            entity = ProcessNuggets(m_httpContext, entity);
 
             // Patch all URLs in the entity which are:
             // 1. local (non-remote)
@@ -84,6 +86,7 @@ namespace i18n
             //   <link href="..."> tags
             //#37 TODO: Test embedded tags e.g. <a src="..."><img  src="..."/><a> etc.
             entity = PatchHtmlUrls(
+                m_httpContext.Request.Url,
                 entity, 
                 m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
                 LocalizedApplication.UrlLocalizer);
@@ -128,7 +131,9 @@ namespace i18n
         /// Helper for post-processing the response entity in order to replace any
         /// msgid nuggets such as [[[Translate me!]]] with the GetText string.
         /// </summary>
-        /// <param name="entity">Subject HTTP response entity to be processed.</param>
+        /// <param name="entity">
+        /// Subject HTTP response entity to be processed.
+        /// </param>
         /// <param name="httpContext">
         /// Represents the current request.
         /// May be null when testing this interface. See remarks.
@@ -144,7 +149,7 @@ namespace i18n
         /// This method supports a testing mode which is enabled by passing httpContext as null.
         /// In this mode, we output "test.message" for every msgid nugget.
         /// </remarks>
-        public static string ProcessNuggets(string entity, HttpContextBase httpContext)
+        public static string ProcessNuggets(HttpContextBase httpContext, string entity)
         {
             // Lookup any/all msgid nuggets in the entity and replace with any translated message.
             entity = m_regex_nugget.Replace(entity, delegate(Match match)
@@ -160,14 +165,24 @@ namespace i18n
         /// Helper for post-processing the response entity to append the passed string to
         /// URLs in the src/href/action attribute of tags in the passed html.
         /// </summary>
-        /// <param name="entity">Subject HTTP response entity to be processed.</param>
+        /// <param name="requestUrl">
+        /// The URL of the current request, or null if the call is not associated with
+        /// a specific URL. If set, only URLs relatively local to the requested URL are subject to being patched.
+        /// </param>
+        /// <param name="entity">
+        /// Subject HTTP response entity to be processed.
+        /// </param>
         /// <param name="langtag">
         /// Langtag to be patched into URLs.
         /// </param>
         /// <returns>
         /// Processed (and possibly modified) entity.
         /// </returns>
-        public static string PatchHtmlUrls(string entity, string langtag, IUrlLocalizer urlLocalizer)
+        public static string PatchHtmlUrls(
+            Uri requestUrl,
+            string entity, 
+            string langtag, 
+            IUrlLocalizer urlLocalizer)
         {
             return m_regex_html_urls.Replace(
                 entity,
@@ -181,10 +196,9 @@ namespace i18n
                         if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, out urlNonlocalized) != null) {
                             return match.Groups[0].Value; } // original
 
-
-                        //#37 Also, if remote URL leave alone.
-                        //#37 Add test for local & remote URLs (already written helper for IsLocal).
-
+                        // If URL is not local (i.e. remote host)...leave matched token alone.
+                        if (requestUrl != null && !requestUrl.IsLocal(url)) {
+                            return match.Groups[0].Value; } // original
 
                         // Localized the URL.
                         url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
