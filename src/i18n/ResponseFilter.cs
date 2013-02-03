@@ -50,7 +50,7 @@ namespace i18n
         protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
         {
             // Construct localized URL.
-            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, langtag);
+            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, UriKind.Relative, langtag);
 
             // Redirect user agent to new local URL.
             if (LocalizedApplication.PermanentRedirects) {
@@ -73,8 +73,10 @@ namespace i18n
         // https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing
         //
             LanguageTag lt = null;
+
+            // Check the URL for a langtag.
             string urlNonlocalized;
-            string langtag = LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, out urlNonlocalized);
+            string langtag = LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, out urlNonlocalized);
 
             // Is URL localized?
             if (langtag == null)
@@ -232,7 +234,10 @@ namespace i18n
             // <a href="..."> tags
             // <link href="..."> tags
             // Test embedded tags e.g. <a src="..."><img  src="..."/><a> etc.
-            entity = PatchScriptUrls(entity, m_httpContext.GetPrincipalAppLanguageForRequest().ToString());
+            entity = PatchScriptUrls(
+                entity, 
+                m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
+                LocalizedApplication.UrlLocalizer);
 
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
@@ -313,7 +318,7 @@ namespace i18n
         /// <returns>
         /// Processed (and possibly modified) entity.
         /// </returns>
-        public static string PatchScriptUrls(string entity, string langtag)
+        public static string PatchScriptUrls(string entity, string langtag, IUrlLocalizer urlLocalizer)
         {
             return m_regex_script.Replace(
                 entity,
@@ -324,11 +329,11 @@ namespace i18n
                         
                         // If URL is already localized...leave matched token alone.
                         string urlNonlocalized;
-                        if (LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(url, out urlNonlocalized) != null) {
+                        if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, out urlNonlocalized) != null) {
                             return match.Groups[0].Value; } // original
 
                         // Localized the URL.
-                        url = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(url, langtag);
+                        url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
 
                         // Rebuild and return matched token.
                         string res = string.Format("{0}{1}{2}", 
