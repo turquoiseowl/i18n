@@ -24,6 +24,30 @@ namespace i18n.Tests
         [Test]
         public void ResponseFilter_can_patch_script_urls()
         {
+            // Nonrelevant tag.
+            ResponseFilter_can_patch_script_urls(
+                "fr",
+                "<script1 src=\"123\"></script1>",
+                "<script1 src=\"123\"></script1>");
+
+            // script tag.
+            ResponseFilter_can_patch_script_urls(
+                "fr",
+                "<script src=\"123\"></script>",
+                "<script src=\"/fr/123\"></script>");
+
+            // img tag.
+            ResponseFilter_can_patch_script_urls(
+                "fr",
+                "<img src=\"123\"></img>",
+                "<img src=\"/fr/123\"></img>");
+
+            // a tag.
+            ResponseFilter_can_patch_script_urls(
+                "fr",
+                "<a href=\"123\"></a>",
+                "<a href=\"/fr/123\"></a>");
+
             // Different langtags.
             ResponseFilter_can_patch_script_urls(
                 "fr",
@@ -262,7 +286,7 @@ namespace i18n.Tests
         }
         void ResponseFilter_can_patch_script_urls(string suffix, string pre, string expectedPatched)
         {
-            string post = i18n.ResponseFilter.PatchScriptUrls(pre, suffix, new UrlLocalizer());
+            string post = i18n.ResponseFilter.PatchHtmlUrls(pre, suffix, new UrlLocalizer());
             Assert.AreEqual(expectedPatched, post);
         }
     }

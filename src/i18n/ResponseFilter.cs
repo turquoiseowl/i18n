@@ -27,11 +27,22 @@ namespace i18n
             //      Lazily match chars up to
             // ]]]
             //      ... closing sequence
-        protected static readonly Regex m_regex_script = new Regex(
-            "(?<pre><script[.\\s]*?src\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+
+        /// <summary>
+        /// Regex for finding and replacing urls in html.
+        /// </summary>
+        protected static readonly Regex m_regex_html_urls = new Regex(
+            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b[.\\s]*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
             RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-                // Notes:
-                //      \s = whitespace
+                // The above supports most common ways for a URI to appear in HTML/XHTML.
+                // Note that if we fail to catch a URL here, it is not fata; only means we don't avoid a redirect
+                // round-trip in some cases.
+                // TODO: scope for improvement here:
+                //  1. Restrict pairing between element and attribute e.g. "script" goes with "src" but not "href".
+                //     This will probably require multiple passes with separate regex, one for each attribute name.
+                // \s = whitespace
+                // See also: http://www.w3.org/TR/REC-html40/index/attributes.html
+                // See also: http://www.mikesdotnetting.com/Article/46/CSharp-Regular-Expressions-Cheat-Sheet
 
         /// <summary>
         /// The stream onto which we pass data once processed.
@@ -65,13 +76,14 @@ namespace i18n
             // Patch all URLs in the entity which are:
             // 1. local (non-remote)
             // 2. are not already localized
-            //#37 TODO: Extend this to path all local (non-remote) URLs in the entity.
-            // This will save a redirect on subsequent requests.
-            // <img src="..."> tags
-            // <a href="..."> tags
-            // <link href="..."> tags
-            // Test embedded tags e.g. <a src="..."><img  src="..."/><a> etc.
-            entity = PatchScriptUrls(
+            // This will save a redirect on subsequent requests to those URLs by the user-agent.
+            // Examples of attributes containing urls include:
+            //   <script src="..."> tags
+            //   <img src="..."> tags
+            //   <a href="..."> tags
+            //   <link href="..."> tags
+            //#37 TODO: Test embedded tags e.g. <a src="..."><img  src="..."/><a> etc.
+            entity = PatchHtmlUrls(
                 entity, 
                 m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
                 LocalizedApplication.UrlLocalizer);
@@ -146,7 +158,7 @@ namespace i18n
         }
         /// <summary>
         /// Helper for post-processing the response entity to append the passed string to
-        /// URLs in the src attribute of script tags.
+        /// URLs in the src/href/action attribute of tags in the passed html.
         /// </summary>
         /// <param name="entity">Subject HTTP response entity to be processed.</param>
         /// <param name="langtag">
@@ -155,9 +167,9 @@ namespace i18n
         /// <returns>
         /// Processed (and possibly modified) entity.
         /// </returns>
-        public static string PatchScriptUrls(string entity, string langtag, IUrlLocalizer urlLocalizer)
+        public static string PatchHtmlUrls(string entity, string langtag, IUrlLocalizer urlLocalizer)
         {
-            return m_regex_script.Replace(
+            return m_regex_html_urls.Replace(
                 entity,
                 delegate(Match match)
                 {
@@ -168,6 +180,11 @@ namespace i18n
                         string urlNonlocalized;
                         if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, out urlNonlocalized) != null) {
                             return match.Groups[0].Value; } // original
+
+
+                        //#37 Also, if remote URL leave alone.
+                        //#37 Add test for local & remote URLs (already written helper for IsLocal).
+
 
                         // Localized the URL.
                         url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
