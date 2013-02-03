@@ -74,6 +74,7 @@
     <Compile Include="ILanguageTag.cs" />
     <Compile Include="LanguageHelpers.cs" />
     <Compile Include="LanguageItem.cs" />
+    <Compile Include="LocalizingModule.cs" />
     <Compile Include="ResponseFilter.cs" />
     <Compile Include="ParseHelpers.cs" />
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />

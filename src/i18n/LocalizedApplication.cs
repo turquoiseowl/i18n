@@ -43,10 +43,20 @@ namespace i18n
         /// </summary>
         public static bool PermanentRedirects { get; set; }
 
+        /// <summary>
+        /// Specifies whether Early URL localization is to be enabled.
+        /// Defaults to true although requires the LocalizedModule HTTP module to be intalled in web.config.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="!:https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
+        /// </remarks>
+        public static bool EnableEarlyUrlLocalization { get; set; }
+
         static LocalizedApplication()
         {
             DefaultLanguage = ("en");
             PermanentRedirects = false;
+            EnableEarlyUrlLocalization = true;
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
