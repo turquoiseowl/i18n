@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 using container;
 
@@ -54,11 +55,10 @@ namespace i18n
         public static bool EnableEarlyUrlLocalization { get; set; }
 
         /// <summary>
-        /// Regular expression that controls the ContextTypes elligible for localization
-        /// by the i18n post-processing response filter.
+        /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
         /// </summary>
         /// <remarks>
-        /// Set to null to disable post-processing. Defaults to text/html and 
+        /// Set to null to disable Late URL Localization. Defaults to text/html and 
         /// application/javascript. Client may customise this member, for instance in Application_Start.
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.
         /// </remarks>

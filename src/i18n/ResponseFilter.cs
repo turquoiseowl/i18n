@@ -200,6 +200,10 @@ namespace i18n
                         if (requestUrl != null && !requestUrl.IsLocal(url)) {
                             return match.Groups[0].Value; } // original
 
+                        // Is URL explicitly excluded from localization?
+                        if (!LocalizedApplication.UrlLocalizer.FilterOutgoing(url, requestUrl)) {
+                            return match.Groups[0].Value; } // original
+
                         // Localized the URL.
                         url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
 

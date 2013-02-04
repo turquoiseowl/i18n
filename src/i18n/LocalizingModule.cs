@@ -30,7 +30,7 @@ namespace i18n
     /// <summary>
     /// HTTP module responsible for:
     /// 1. Implementing early URL localization
-    /// 2. Installing ResponseFilter into the ASP.NET pipeline.
+    /// 2. Installing our ResponseFilter into the ASP.NET pipeline.
     /// </summary>
     public class LocalizingModule : IHttpModule
     {
@@ -76,21 +76,20 @@ namespace i18n
         /// </summary>
         protected static void EarlyUrlLocalization(HttpContextBase context)
         {
-        // https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing
-        //
-            LanguageTag lt = null;
+            // Is URL explicitly excluded from localization?
+            if (!LocalizedApplication.UrlLocalizer.FilterIncoming(context.Request.Url)) {
+                return; } // YES. Continue handling request.
 
-            // Check the URL for a langtag.
+            // NO. Is request URL localized?
             string urlNonlocalized;
             string langtag = LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, out urlNonlocalized);
-
-            // Is URL localized?
             if (langtag == null)
             {
                 // NO.
                 // langtag = best match between
                 // 1. Inferred user languages (cookie and Accept-Language header)
                 // 2. App Languages.
+                LanguageTag lt = null;
                 HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
                 if (cookie_langtag != null) {
                     lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
@@ -103,6 +102,7 @@ namespace i18n
                 RedirectWithLanguage(context, lt.ToString());
                 return;
             }
+
             // YES. Does langtag EXACTLY match an App Language?
             LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(langtag);
             if (appLangTag.IsValid()
@@ -117,6 +117,7 @@ namespace i18n
                 // Continue handling request.
                 return;
             }
+
             // NO. Does langtag LOOSELY match an App Language?
             else if (appLangTag.IsValid()
                 && !appLangTag.Equals(langtag))
@@ -132,6 +133,10 @@ namespace i18n
 
     // Events handlers
 
+        /// <summary>
+        /// Handler for the BeginRequest ASP.NET request pipeline event, where we inject our
+        /// Early URL Localization logic.
+        /// </summary>
         private void OnBeginRequest(object sender, EventArgs e)
         {
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
@@ -141,10 +146,13 @@ namespace i18n
                 EarlyUrlLocalization(context); }
         }
 
+        /// <summary>
+        /// Handler for the ReleaseRequestState ASP.NET request pipeline event.
+        /// This event occurs late on in the pipeline but prior to the response being filtered.
+        /// We take the opportunity to inject our i8n post-processing of the response.
+        /// </summary>
         private void OnReleaseRequestState(object sender, EventArgs e)
         {
-        // We get here once per request late on in the pipeline but prior to the response being filtered.
-        // We take the opportunity to insert our filter in order to intercept that.
         //
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
