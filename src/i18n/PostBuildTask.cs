@@ -18,25 +18,28 @@ namespace i18n
         ///<param name="path"></param>
         ///<param name="gettext"> </param>
         ///<param name="msgmerge"> </param>
-        public void Execute(string path, string gettext = null, string msgmerge = null)
+        ///<param name="inputPath"></param>
+        public void Execute(string outputPath, string gettext = null, string msgmerge = null, string[] inputPaths = null)
         {
-            var manifest = BuildProjectFileManifest(path);
+            if (inputPaths == null || inputPaths.Length == 0) inputPaths = new string[] { outputPath };
 
-            CreateMessageTemplate(path, manifest, gettext);
+            var manifest = BuildProjectFileManifest(inputPaths);
 
-            MergeTemplateWithExistingLocales(path, msgmerge);
+            CreateMessageTemplate(outputPath, manifest, gettext);
+
+            MergeTemplateWithExistingLocales(outputPath, msgmerge);
 
             File.Delete(manifest);
         }
 
-        private static void MergeTemplateWithExistingLocales(string path, string options)
+        private static void MergeTemplateWithExistingLocales(string outputPath, string options)
         {
-            var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", path));
-            var template = string.Format("{0}\\locale\\messages.pot", path);
+            var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", outputPath));
+            var template = string.Format("{0}\\locale\\messages.pot", outputPath);
 
             foreach (var messages in locales.Select(locale => string.Format("{0}\\messages.po", locale)))
             {
-                if(File.Exists(messages))
+                if (File.Exists(messages))
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html
                     var args = string.Format("{2} -U \"{0}\" \"{1}\"", messages, template, options);
@@ -49,10 +52,10 @@ namespace i18n
             }
         }
 
-        private static void CreateMessageTemplate(string path, string manifest, string options)
+        private static void CreateMessageTemplate(string outputPath, string manifest, string options)
         {
             // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("{2} -LC# -k_ -k__ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", path, manifest, options);
+            var args = string.Format("{2} -LC# -k_ -k__ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", outputPath, manifest, options);
             RunWithOutput("gettext\\xgettext.exe", args); // Mark H bodge
         }
 
@@ -80,28 +83,33 @@ namespace i18n
             }
         }
 
-		private static string[] GetFiles(string path, string pattern) {
-			var files = new List<string>();
-
-			var directories = Directory.GetDirectories( path );
-
-			foreach ( var dir in directories.Where( x => !x.EndsWith( "\\obj" ) ) ) {
-				files.AddRange( Directory.GetFiles( dir, pattern, SearchOption.AllDirectories ) );
-			}
-
-
-			return files.ToArray();
-		}
-
-        private static string BuildProjectFileManifest(string path)
+        private static string[] GetFiles(string[] paths, string pattern)
         {
-			var cs = GetFiles( path, "*.cs" );
-            var razor = GetFiles(path, "*.cshtml");
-            var files = (new[] {cs, razor}).SelectMany(f => f).ToList();
-            var temp = Path.GetTempFileName();
-            using(var sw = File.CreateText(temp))
+            var files = new List<string>();
+
+            foreach (var path in paths)
             {
-                foreach(var file in files)
+                var directories = Directory.GetDirectories(path);
+
+                foreach (var dir in directories.Where(x => !x.EndsWith("\\obj")))
+                {
+                    files.AddRange(Directory.GetFiles(dir, pattern, SearchOption.AllDirectories));
+                }
+            }
+
+            return files.ToArray();
+        }
+
+        private static string BuildProjectFileManifest(string[] paths)
+        {
+            var cs = GetFiles(paths, "*.cs");
+            var razor = GetFiles(paths, "*.cshtml");
+            var files = (new[] { cs, razor }).SelectMany(f => f).ToList();
+
+            var temp = Path.GetTempFileName();
+            using (var sw = File.CreateText(temp))
+            {
+                foreach (var file in files)
                 {
                     sw.WriteLine(file);
                 }

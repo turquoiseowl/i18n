@@ -133,12 +133,18 @@ adding `i18n.PostBuild.exe` as a project reference:
 
 ```
     "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
+    //using all available parameter:
+    // msgmerge: optional parameter for msgmerge
+    // gettext: optional parameter for gettext
+    // inputpaths: comma delimited input paths. Useful if the project is split in several sub projects. i.e. "inputpaths:C:\temp\Project1,C:\temp\Project2"
+    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)" "msgmerge:(optional params for msgmerge)" "gettext:(optional params for gettext)" "inputpaths:(comma delimited input paths)"
 ```
     
-After a successful build, this task will rip through your source code, finding everywhere you've used the `ILocalizing._("text")` alias, 
-and uses this to build a master .PO template file located at `/locale/messages.pot` relative to your web application folder. After the
-new template is constructed, any locales that exist inside the `/locale` folder are automatically merged with the template, so that
-new strings can be flagged for further translation.
+After a successful build, this task will rip through your source code, finding everywhere you've used the
+`ILocalizing._("text")` or the `ILocalizing.__("text")` alias, and uses this to build a master .PO template file
+located at `/locale/messages.pot` relative to your web application folder. After the new template is constructed, any
+locales that exist inside the `/locale` folder are automatically merged with the template, so that new strings can be
+flagged for further translation.
 
 From here, you use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
