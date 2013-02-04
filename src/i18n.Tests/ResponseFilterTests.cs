@@ -13,9 +13,11 @@ namespace i18n.Tests
         [Test]
         public void ResponseFilter_can_process_nuggets()
         {
+            i18n.ResponseFilter filter = new i18n.ResponseFilter(null, null);
+
             //string pre = "«««123»»» «««123»»»";
             string pre = "[[[123]]] [[[123]]]";
-            string post = i18n.ResponseFilter.ProcessNuggets(null, pre);
+            string post = filter.ProcessNuggets(null, pre);
             Assert.AreEqual("test.message test.message", post);
 
             //#37 TODO -- more tests.
@@ -326,7 +328,8 @@ namespace i18n.Tests
         }
         void ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, Uri requestUrl = null)
         {
-            string post = i18n.ResponseFilter.PatchHtmlUrls(requestUrl, pre, suffix, new UrlLocalizer());
+            i18n.ResponseFilter filter = new i18n.ResponseFilter(null, null);
+            string post = filter.PatchHtmlUrls(requestUrl, pre, suffix, new UrlLocalizer());
             Assert.AreEqual(expectedPatched, post);
         }
     }
