@@ -17,7 +17,7 @@ namespace i18n.PostBuild
 
             string gettext = null;
             string msgmerge = null;
-
+            string[] inputPaths = null;
             for (int i = 1; i < args.Length; i++)
             {
                 if (args[i].StartsWith("gettext:", StringComparison.InvariantCultureIgnoreCase))
@@ -25,9 +25,11 @@ namespace i18n.PostBuild
 
                 if (args[i].StartsWith("msgmerge:", StringComparison.InvariantCultureIgnoreCase))
                     msgmerge = args[i].Substring(9);
+                if (args[i].StartsWith("inputpaths:", StringComparison.InvariantCultureIgnoreCase))
+                    inputPaths = args[i].Substring(11).Split(',');
             }
 
-            new PostBuildTask().Execute(path, gettext, msgmerge);
+            new PostBuildTask().Execute(path, gettext, msgmerge, inputPaths);
         }
     }
 }

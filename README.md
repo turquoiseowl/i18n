@@ -133,6 +133,11 @@ adding `i18n.PostBuild.exe` as a project reference:
 
 ```
     "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
+    //using all available parameter:
+    // msgmerge: optional parameter for msgmerge
+    // gettext: optional parameter for gettext
+    // inputpaths: comma delimited input paths. Useful if the project is split in several sub projects. i.e. "inputpaths:C:\temp\Project1,C:\temp\Project2"
+    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)" "msgmerge:(optional params for msgmerge)" "gettext:(optional params for gettext)" "inputpaths:(comma delimited input paths)"
 ```
     
 After a successful build, this task will rip through your source code, finding everywhere you've used the `ILocalizing._("text")` alias, 
