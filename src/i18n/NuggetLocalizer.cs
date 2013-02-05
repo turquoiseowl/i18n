@@ -24,6 +24,8 @@ namespace i18n
                 // Lookup resource.
                 LanguageTag lt;
                 string message = textLocalizer.GetText(msgid, languages, out lt) ?? msgid;
+
+                DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", msgid, message);
                 return HttpUtility.HtmlDecode(message);
 	        });
         }
