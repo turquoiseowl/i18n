@@ -71,6 +71,15 @@ namespace i18n
         //
             LanguageItem[] UserLanguages = GetRequestUserLanguages(context);
             UserLanguages[0] = new LanguageItem(pal, LanguageItem.PalQualitySetting, 0);
+
+            // Run through any handlers installed for this event.
+            if (LocalizedApplication.SetPrincipalAppLanguageForRequestHandlers != null) {
+                foreach (LocalizedApplication.SetLanguageHandler handler in LocalizedApplication.SetPrincipalAppLanguageForRequestHandlers.GetInvocationList())
+                {
+                    handler(context, pal);
+                }
+            }
+
         }
         public static void SetPrincipalAppLanguageForRequest(this HttpContext context, ILanguageTag pal)
         {

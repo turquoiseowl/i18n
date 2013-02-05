@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Web;
 using System.Text.RegularExpressions;
 using container;
 
@@ -39,6 +41,25 @@ namespace i18n
         public static LanguageTag DefaultLanguageTag { get; set; }
 
         /// <summary>
+        /// Declares a method type for handling the setting of the language.
+        /// </summary>
+        /// <param name="context">Current http context.</param>
+        /// <param name="langtag">Language being set.</param>
+        public delegate void SetLanguageHandler(HttpContextBase context, ILanguageTag langtag);
+
+        /// <summary>
+        /// Describes one or more procedures to be called when the principal application
+        /// language (PAL) is set for an HTTP request.
+        /// </summary>
+        /// <remarks>
+        /// A default handlers is installed which applies the PAL setting to both the 
+        /// CurrentCulture and CurrentUICulture settings of the current thread.
+        /// This behaviour can be altered by removing (nulling) the value of this property
+        /// or replacing with a new delegate.
+        /// </remarks>
+        public static SetLanguageHandler SetPrincipalAppLanguageForRequestHandlers { get; set; }
+
+        /// <summary>
         /// Specifies the type of HTTP redirect to be issued by automatic language routing:
         /// true for 301 (permanent) redirects; false for 302 (temporary) ones.
         /// Defaults to false.
@@ -64,6 +85,15 @@ namespace i18n
             Container.Register<INuggetLocalizer>(r => new NuggetLocalizer());
             Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
+
+            // Install default handler for Set-PAL event.
+            // The default handler applies the setting to both the CurrentCulture and CurrentUICulture
+            // settings of the thread.
+            SetPrincipalAppLanguageForRequestHandlers = delegate(HttpContextBase context, ILanguageTag langtag)
+            {
+                if (langtag != null) {
+                    Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = langtag.GetCultureInfo(); }
+            };
         }
 
         internal static Container Container { get; set; }

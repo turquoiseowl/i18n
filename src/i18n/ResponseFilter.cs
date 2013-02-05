@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 
 namespace i18n
