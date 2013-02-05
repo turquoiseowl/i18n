@@ -46,15 +46,6 @@ namespace i18n
         public static bool PermanentRedirects { get; set; }
 
         /// <summary>
-        /// Specifies whether Early URL Localization is to be enabled.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to true. This feature requires the LocalizedModule HTTP module to be intalled in web.config.
-        /// <see cref="!:https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
-        /// </remarks>
-        public static bool EnableEarlyUrlLocalization { get; set; }
-
-        /// <summary>
         /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
         /// </summary>
         /// <remarks>
@@ -68,11 +59,11 @@ namespace i18n
         {
             DefaultLanguage = ("en");
             PermanentRedirects = false;
-            EnableEarlyUrlLocalization = true;
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
-            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
             Container.Register<INuggetLocalizer>(r => new NuggetLocalizer());
+            Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer());
+            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
         }
 
         internal static Container Container { get; set; }
@@ -86,27 +77,57 @@ namespace i18n
                 Container.Register(r => value);
             }
         }
+
         /// <summary>
-        /// Gets or sets the current IUrlLocalizer implementation used by i18n route localization.
+        /// Gets or sets the current IEarlyUrlLocalizer implementation used by i18n route localization.
         /// </summary>
-        public static IUrlLocalizer UrlLocalizer
+        /// <remarks>
+        /// Setting this interface implicity enables or disables the respective feacture.
+        /// This feature depends on the LocalizedModule HTTP module being enabled in web.config.
+        /// By default, the interface is set to the default implementation.
+        /// </remarks>
+        public static IEarlyUrlLocalizer EarlyUrlLocalizer
         {
-            get { return Container.Resolve<IUrlLocalizer>(); }
+            get { return Container.Resolve<IEarlyUrlLocalizer>(); }
             set
             {
-                Container.Remove<IUrlLocalizer>();
+                Container.Remove<IEarlyUrlLocalizer>();
                 Container.Register(r => value);
             }
         }
+
         /// <summary>
         /// Gets or sets the current INuggetLocalizer implementation used by i18n route localization.
         /// </summary>
+        /// <remarks>
+        /// Setting this interface implicity enables or disables the respective feacture.
+        /// This feature depends on the LocalizedModule HTTP module being enabled in web.config.
+        /// By default, the interface is set to the default implementation.
+        /// </remarks>
         public static INuggetLocalizer NuggetLocalizer
         {
             get { return Container.Resolve<INuggetLocalizer>(); }
             set
             {
                 Container.Remove<INuggetLocalizer>();
+                Container.Register(r => value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current IUrlLocalizer implementation used by i18n route localization.
+        /// </summary>
+        /// <remarks>
+        /// This interface is used by the default EarlyUrlLocalizer and NuggetLocalizer implementations.
+        /// [Deprecated] It is also used by the MVC RouteLocalization implementation.
+        /// By default, the interface is set to the default implementation.
+        /// </remarks>
+        public static IUrlLocalizer UrlLocalizer
+        {
+            get { return Container.Resolve<IUrlLocalizer>(); }
+            set
+            {
+                Container.Remove<IUrlLocalizer>();
                 Container.Register(r => value);
             }
         }

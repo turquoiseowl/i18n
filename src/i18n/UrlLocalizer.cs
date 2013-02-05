@@ -21,6 +21,7 @@ namespace i18n
         /// Describes one or more procedures for filtering a URL during Late URL Localization.
         /// </summary>
         /// <param name="url">Subject URL.</param>
+        /// <param name="currentRequestUrl">Url of the current request context. May be null if/when testing.</param>
         /// <returns>true if URL is to be localized, false if not.</returns>
         public delegate bool OutgoingUrlFilter(string url, Uri currentRequestUrl);
 

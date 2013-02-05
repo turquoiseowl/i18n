@@ -45,7 +45,7 @@ namespace i18n
         /// the outgoing entity body.
         /// </summary>
         /// <param name="url">Subject URL.</param>
-        /// <param name="currentRequestUrl">Url of the current request context.</param>
+        /// <param name="currentRequestUrl">Url of the current request context. May be null if/when testing.</param>
         /// <returns>true to localize the subject URL, false to not localize it.</returns>
         /// <remarks>
         /// This method is called before other methods of this interface during Late Url Localization.

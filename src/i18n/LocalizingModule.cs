@@ -42,7 +42,7 @@ namespace i18n
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
             
             // Wire up our event handlers into the ASP.NET pipeline.
-            if (LocalizedApplication.EnableEarlyUrlLocalization) {
+            if (LocalizedApplication.EarlyUrlLocalizer != null) {
                 application.BeginRequest += OnBeginRequest; }
             application.ReleaseRequestState += OnReleaseRequestState;
         }
@@ -51,85 +51,6 @@ namespace i18n
     #endregion
 
     // Implementation
-
-        protected static void RedirectWithLanguage(HttpContextBase context, string langtag)
-        {
-            // Construct localized URL.
-            string urlNew = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, UriKind.Relative, langtag);
-
-            // Redirect user agent to new local URL.
-            if (LocalizedApplication.PermanentRedirects) {
-                context.Response.StatusCode = 301;
-                context.Response.Status = "301 Moved Permanently";
-            }
-            else {
-                context.Response.StatusCode = 302;
-                context.Response.Status = "302 Moved Temporarily";
-            }
-            context.Response.RedirectLocation = urlNew;
-            context.Response.End();
-        }
-
-        /// <summary>
-        /// Implements the Early Url Localization logic.
-        /// <see href="https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
-        /// </summary>
-        protected static void EarlyUrlLocalization(HttpContextBase context)
-        {
-            // Is URL explicitly excluded from localization?
-            if (!LocalizedApplication.UrlLocalizer.FilterIncoming(context.Request.Url)) {
-                return; } // YES. Continue handling request.
-
-            // NO. Is request URL localized?
-            string urlNonlocalized;
-            string langtag = LocalizedApplication.UrlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, out urlNonlocalized);
-            if (langtag == null)
-            {
-                // NO.
-                // langtag = best match between
-                // 1. Inferred user languages (cookie and Accept-Language header)
-                // 2. App Languages.
-                LanguageTag lt = null;
-                HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
-                if (cookie_langtag != null) {
-                    lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
-                if (lt == null) {
-                    lt = LanguageHelpers.GetMatchingAppLanguage(context.GetRequestUserLanguages()); }
-                if (lt == null) {
-                    throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
-
-                // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, lt.ToString());
-                return;
-            }
-
-            // YES. Does langtag EXACTLY match an App Language?
-            LanguageTag appLangTag = LanguageHelpers.GetMatchingAppLanguage(langtag);
-            if (appLangTag.IsValid()
-                && appLangTag.Equals(langtag))
-            {
-                // YES. Establish langtag as the PAL for the request.
-                context.SetPrincipalAppLanguageForRequest(appLangTag);
-
-                // Rewrite URL for this request.
-                context.RewritePath(urlNonlocalized);
-
-                // Continue handling request.
-                return;
-            }
-
-            // NO. Does langtag LOOSELY match an App Language?
-            else if (appLangTag.IsValid()
-                && !appLangTag.Equals(langtag))
-            {
-                // YES. Localize URL with matching App Language.
-                // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, appLangTag.ToString());
-                return;
-            }
-            // NO. Do nothing to URL; expect a 404 which corresponds to language not supported.
-            // Continue handling request.
-        }
 
     // Events handlers
 
@@ -142,8 +63,12 @@ namespace i18n
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            if (LocalizedApplication.EnableEarlyUrlLocalization) {
-                EarlyUrlLocalization(context); }
+            if (LocalizedApplication.EarlyUrlLocalizer != null)
+            {
+                LocalizedApplication.EarlyUrlLocalizer.ProcessIncoming(
+                    context, 
+                    LocalizedApplication.UrlLocalizer);
+            }
         }
 
         /// <summary>

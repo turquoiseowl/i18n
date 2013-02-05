@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -328,8 +329,8 @@ namespace i18n.Tests
         }
         void ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, Uri requestUrl = null)
         {
-            i18n.ResponseFilter filter = new i18n.ResponseFilter(null, null);
-            string post = filter.PatchHtmlUrls(requestUrl, pre, suffix, new UrlLocalizer());
+            i18n.EarlyUrlLocalizer obj = new i18n.EarlyUrlLocalizer();
+            string post = obj.ProcessOutgoing(pre, suffix, null, new UrlLocalizer());
             Assert.AreEqual(expectedPatched, post);
         }
     }

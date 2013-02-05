@@ -8,7 +8,7 @@ namespace i18n
     public interface INuggetLocalizer
     {
         /// <summary>
-        /// Helper for post-processing the response entity in order to replace any
+        /// Method for post-processing the response entity in order to replace any
         /// msgid nuggets such as [[[Translate me!]]] with the GetText string.
         /// </summary>
         /// <param name="entity">

@@ -35,8 +35,7 @@ namespace i18n
         /// <summary>
         /// Regex for finding and replacing msgid nuggets.
         /// </summary>
-        static Regex m_regexNugget = new Regex(
-            //@"«««(.+?)»»»", 
+        public static Regex m_regexNugget = new Regex(
             @"\[\[\[(.+?)\]\]\]", 
             RegexOptions.CultureInvariant);
             // [[[

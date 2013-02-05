@@ -17,22 +17,6 @@ namespace i18n
     public class ResponseFilter : Stream
     {
         /// <summary>
-        /// Regex for finding and replacing urls in html.
-        /// </summary>
-        protected static readonly Regex m_regexHtmlUrls = new Regex(
-            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b.*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
-            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                // The above supports most common ways for a URI to appear in HTML/XHTML.
-                // Note that if we fail to catch a URL here, it is not fata; only means we don't avoid a redirect
-                // round-trip in some cases.
-                // TODO: scope for improvement here:
-                //  1. Restrict pairing between element and attribute e.g. "script" goes with "src" but not "href".
-                //     This will probably require multiple passes with separate regex, one for each attribute name.
-                // \s = whitespace
-                // See also: http://www.w3.org/TR/REC-html40/index/attributes.html
-                // See also: http://www.mikesdotnetting.com/Article/46/CSharp-Regular-Expressions-Cheat-Sheet
-
-        /// <summary>
         /// The stream onto which we pass data once processed. This will typically be set 
         /// to the stream which was the original value of Response.Filter before we got there.
         /// </summary>
@@ -69,7 +53,7 @@ namespace i18n
                     m_httpContext.GetRequestUserLanguages());
             }
 
-            // Perform Late URL Localization.
+            // If Early Localization is enabled, we balance that here with Late URL Localization.
             // The goal is to localize same-host URLs in the entity body and so save a redirect 
             // on subsequent requests to those URLs by the user-agent (Early URL Localization).
             // We patch all URLs in the entity which are:
@@ -81,11 +65,14 @@ namespace i18n
             //   <img src="..."> tags
             //   <a href="..."> tags
             //   <link href="..."> tags
-            entity = PatchHtmlUrls(
-                m_httpContext.Request.Url,
-                entity, 
-                m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
-                LocalizedApplication.UrlLocalizer);
+            if (LocalizedApplication.EarlyUrlLocalizer != null)
+            {
+                entity = LocalizedApplication.EarlyUrlLocalizer.ProcessOutgoing(
+                    entity, 
+                    m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
+                    m_httpContext,
+                    LocalizedApplication.UrlLocalizer);
+            }
 
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
@@ -96,6 +83,12 @@ namespace i18n
             // Forward data on to the original response stream.
             m_outputStream.Write(buffer, 0, count);
         }
+
+        // The following overrides may be unnecessary. Instead we could have derived this class
+        // from MemoryStream or something like that which was the original approach.
+        // However, some odd behaviour occurred when doing this and these methods were wired
+        // in to diagnose. Problems have gone away now that we derived straight from Stream
+        // and cause was not found.
 
         public override bool CanRead  { get { DebugHelpers.WriteLine("ResponseFilter::CanRead::get"); return m_outputStream.CanRead; } }
         public override bool CanSeek  { get { DebugHelpers.WriteLine("ResponseFilter::CanSeek::get"); return m_outputStream.CanSeek; } }
@@ -123,63 +116,5 @@ namespace i18n
 
     #endregion
 
-        /// <summary>
-        /// Helper for post-processing the response entity to append the passed string to
-        /// URLs in the src/href/action attribute of tags in the passed html.
-        /// </summary>
-        /// <param name="requestUrl">
-        /// The URL of the current request, or null if the call is not associated with
-        /// a specific URL. If set, only URLs relatively local to the requested URL are subject to being patched.
-        /// </param>
-        /// <param name="entity">
-        /// Subject HTTP response entity to be processed.
-        /// </param>
-        /// <param name="langtag">
-        /// Langtag to be patched into URLs.
-        /// </param>
-        /// <returns>
-        /// Processed (and possibly modified) entity.
-        /// </returns>
-        public virtual string PatchHtmlUrls(
-            Uri requestUrl,
-            string entity, 
-            string langtag, 
-            IUrlLocalizer urlLocalizer)
-        {
-            return m_regexHtmlUrls.Replace(
-                entity,
-                delegate(Match match)
-                {
-                    try {
-                        string url = match.Groups[2].Value;
-                        
-                        // If URL is already localized...leave matched token alone.
-                        string urlNonlocalized;
-                        if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, out urlNonlocalized) != null) {
-                            return match.Groups[0].Value; } // original
-
-                        // If URL is not local (i.e. remote host)...leave matched token alone.
-                        if (requestUrl != null && !requestUrl.IsLocal(url)) {
-                            return match.Groups[0].Value; } // original
-
-                        // Is URL explicitly excluded from localization?
-                        if (!LocalizedApplication.UrlLocalizer.FilterOutgoing(url, requestUrl)) {
-                            return match.Groups[0].Value; } // original
-
-                        // Localized the URL.
-                        url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
-
-                        // Rebuild and return matched token.
-                        string res = string.Format("{0}{1}{2}", 
-                            match.Groups[1].Value,
-                            url, 
-                            match.Groups[3].Value);
-                        return res;
-                    }
-                    catch (System.UriFormatException) {
-                        return match.Groups[0].Value; // original
-                    }
-                });
-        }
     }
 }
