@@ -72,6 +72,7 @@ namespace i18n
             Container = new Container();
             Container.Register<ILocalizingService>(r => new LocalizingService());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
+            Container.Register<INuggetLocalizer>(r => new NuggetLocalizer());
         }
 
         internal static Container Container { get; set; }
@@ -97,6 +98,17 @@ namespace i18n
                 Container.Register(r => value);
             }
         }
-
+        /// <summary>
+        /// Gets or sets the current INuggetLocalizer implementation used by i18n route localization.
+        /// </summary>
+        public static INuggetLocalizer NuggetLocalizer
+        {
+            get { return Container.Resolve<INuggetLocalizer>(); }
+            set
+            {
+                Container.Remove<INuggetLocalizer>();
+                Container.Register(r => value);
+            }
+        }
     }
 }

@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="INuggetLocalizer.cs" />
     <Compile Include="IUrlLocalizer.cs" />
     <Compile Include="DebugHelpers.cs" />
     <Compile Include="FsCacheDependency.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="LanguageHelpers.cs" />
     <Compile Include="LanguageItem.cs" />
     <Compile Include="LocalizingModule.cs" />
+    <Compile Include="NuggetLocalizer.cs" />
     <Compile Include="ResponseFilter.cs" />
     <Compile Include="ParseHelpers.cs" />
     <Compile Include="DataAnnotations\LocalizingAttribute.cs" />

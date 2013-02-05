@@ -17,20 +17,6 @@ namespace i18n
     public class ResponseFilter : Stream
     {
         /// <summary>
-        /// Regex for finding and replacing msgid nuggets.
-        /// </summary>
-        protected static readonly Regex m_regexNugget = new Regex(
-            //@"«««(.+?)»»»", 
-            @"\[\[\[(.+?)\]\]\]", 
-            RegexOptions.CultureInvariant);
-            // [[[
-            //      Match opening sequence.
-            // .+?
-            //      Lazily match chars up to
-            // ]]]
-            //      ... closing sequence
-
-        /// <summary>
         /// Regex for finding and replacing urls in html.
         /// </summary>
         protected static readonly Regex m_regexHtmlUrls = new Regex(
@@ -47,7 +33,8 @@ namespace i18n
                 // See also: http://www.mikesdotnetting.com/Article/46/CSharp-Regular-Expressions-Cheat-Sheet
 
         /// <summary>
-        /// The stream onto which we pass data once processed.
+        /// The stream onto which we pass data once processed. This will typically be set 
+        /// to the stream which was the original value of Response.Filter before we got there.
         /// </summary>
         protected Stream m_outputStream;
 
@@ -68,12 +55,19 @@ namespace i18n
         {
             DebugHelpers.WriteLine("ResponseFilter::Write -- count: {0}", count);
 
-            // Get a string out of input bytes.
+            // Convert byte array into string.
             Encoding enc = m_httpContext.Response.ContentEncoding;
             string entity = enc.GetString(buffer, offset, count);
 
-            // Translate any embedded messages.
-            entity = ProcessNuggets(m_httpContext, entity);
+            // Translate any embedded messages aka 'nuggets'.
+            if (LocalizedApplication.NuggetLocalizer != null
+                && LocalizedApplication.LocalizingService != null)
+            {
+                entity = LocalizedApplication.NuggetLocalizer.ProcessNuggets(
+                    entity,
+                    LocalizedApplication.LocalizingService,
+                    m_httpContext.GetRequestUserLanguages());
+            }
 
             // Perform Late URL Localization.
             // The goal is to localize same-host URLs in the entity body and so save a redirect 
@@ -129,40 +123,6 @@ namespace i18n
 
     #endregion
 
-        /// <summary>
-        /// Helper for post-processing the response entity in order to replace any
-        /// msgid nuggets such as [[[Translate me!]]] with the GetText string.
-        /// </summary>
-        /// <param name="entity">
-        /// Subject HTTP response entity to be processed.
-        /// </param>
-        /// <param name="httpContext">
-        /// Represents the current request.
-        /// May be null when testing this interface. See remarks.
-        /// </param>
-        /// <returns>
-        /// Processed (and possibly modified) entity.
-        /// </returns>
-        /// <remarks>
-        /// An example replacement is as follows:
-        /// <para>
-        /// [[[Translate me!]]] -> Übersetzen mich!
-        /// </para>
-        /// This method supports a testing mode which is enabled by passing httpContext as null.
-        /// In this mode, we output "test.message" for every msgid nugget.
-        /// </remarks>
-        public virtual string ProcessNuggets(HttpContextBase httpContext, string entity)
-        {
-            // Lookup any/all msgid nuggets in the entity and replace with any translated message.
-            entity = m_regexNugget.Replace(entity, delegate(Match match)
-	            {
-	                string msgid = match.Groups[1].Value;
-                    string message = httpContext != null ? httpContext.GetText(msgid) : "test.message";
-                    return message;
-	            });
-
-            return entity;
-        }
         /// <summary>
         /// Helper for post-processing the response entity to append the passed string to
         /// URLs in the src/href/action attribute of tags in the passed html.

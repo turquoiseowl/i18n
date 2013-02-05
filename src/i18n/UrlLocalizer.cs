@@ -5,6 +5,9 @@ using System.Text;
 
 namespace i18n
 {
+    /// <summary>
+    /// The i18n default implementaion of the IUrlLocalizer service.
+    /// </summary>
     public class UrlLocalizer : IUrlLocalizer
     {
         /// <summary>

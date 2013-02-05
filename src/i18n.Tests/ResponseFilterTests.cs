@@ -13,11 +13,11 @@ namespace i18n.Tests
         [Test]
         public void ResponseFilter_can_process_nuggets()
         {
-            i18n.ResponseFilter filter = new i18n.ResponseFilter(null, null);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer();
 
             //string pre = "«««123»»» «««123»»»";
             string pre = "[[[123]]] [[[123]]]";
-            string post = filter.ProcessNuggets(null, pre);
+            string post = obj.ProcessNuggets(pre, null, null);
             Assert.AreEqual("test.message test.message", post);
 
             //#37 TODO -- more tests.
