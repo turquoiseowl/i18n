@@ -16,7 +16,7 @@ namespace i18n
         /// </summary>
         public static ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
-            return LocalizedApplication.LocalizingService.GetAppLanguages();
+            return LocalizedApplication.TextLocalizer.GetAppLanguages();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace i18n
         public static LanguageTag GetMatchingAppLanguage(LanguageItem[] languages, int maxPasses = -1)
         {
             LanguageTag lt = null;
-            LocalizedApplication.LocalizingService.GetText(null, languages, out lt, maxPasses);
+            LocalizedApplication.TextLocalizer.GetText(null, languages, out lt, maxPasses);
             return lt;
         }
     }

@@ -27,7 +27,7 @@ namespace i18n
         /// </param>
         /// <param name="TryGetTextFor">
         /// Optional delegate to be called in order to validate a language for selection.
-        /// See LocalizingService.TryGetTextFor for more details.
+        /// See TextLocalizer.TryGetTextFor for more details.
         /// </param>
         /// <param name="o_text">
         /// When language validation is enabled (TryGetTextFor is non-null) outputs the translated

@@ -45,11 +45,11 @@ namespace i18n
 
             // Translate any embedded messages aka 'nuggets'.
             if (LocalizedApplication.NuggetLocalizer != null
-                && LocalizedApplication.LocalizingService != null)
+                && LocalizedApplication.TextLocalizer != null)
             {
                 entity = LocalizedApplication.NuggetLocalizer.ProcessNuggets(
                     entity,
-                    LocalizedApplication.LocalizingService,
+                    LocalizedApplication.TextLocalizer,
                     m_httpContext.GetRequestUserLanguages());
             }
 

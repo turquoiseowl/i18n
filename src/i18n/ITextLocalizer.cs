@@ -5,7 +5,7 @@
     /// <summary>
     /// Defines a service for retrieving localized text from a data source.
     /// </summary>
-    public interface ILocalizingService
+    public interface ITextLocalizer
     {
         /// <summary>
         /// Obtains collection of language tags describing the set of Po-valid languages, that

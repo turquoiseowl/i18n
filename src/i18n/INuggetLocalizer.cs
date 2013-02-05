@@ -33,6 +33,6 @@ namespace i18n
         /// This method supports a testing mode which is enabled by passing httpContext as null.
         /// In this mode, we output "test.message" for every msgid nugget.
         /// </remarks>
-        string ProcessNuggets(string entity, ILocalizingService textLocalizer, LanguageItem[] languages);
+        string ProcessNuggets(string entity, ITextLocalizer textLocalizer, LanguageItem[] languages);
     }
 }

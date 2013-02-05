@@ -60,7 +60,7 @@ namespace i18n
             DefaultLanguage = ("en");
             PermanentRedirects = false;
             Container = new Container();
-            Container.Register<ILocalizingService>(r => new LocalizingService());
+            Container.Register<ITextLocalizer>(r => new TextLocalizer());
             Container.Register<INuggetLocalizer>(r => new NuggetLocalizer());
             Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
@@ -68,12 +68,12 @@ namespace i18n
 
         internal static Container Container { get; set; }
         
-        public static ILocalizingService LocalizingService
+        public static ITextLocalizer TextLocalizer
         {
-            get { return Container.Resolve<ILocalizingService>(); }
+            get { return Container.Resolve<ITextLocalizer>(); }
             set
             {
-                Container.Remove<ILocalizingService>();
+                Container.Remove<ITextLocalizer>();
                 Container.Register(r => value);
             }
         }

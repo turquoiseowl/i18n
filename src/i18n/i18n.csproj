@@ -69,7 +69,7 @@
     <Compile Include="DebugHelpers.cs" />
     <Compile Include="FsCacheDependency.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="ILocalizingService.cs" />
+    <Compile Include="ITextLocalizer.cs" />
     <Compile Include="DataAnnotations\DataType.cs" />
     <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
     <Compile Include="DataAnnotations\DisplayAttribute.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="ILocalizing.cs" />
     <Compile Include="LanguageMatching.cs" />
     <Compile Include="LanguageTag.cs" />
-    <Compile Include="LocalizingService.cs" />
+    <Compile Include="TextLocalizer.cs" />
     <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />

@@ -12,7 +12,7 @@ namespace i18n
 
     #region INuggetLocalizer
 
-        public string ProcessNuggets(string entity, ILocalizingService textLocalizer, LanguageItem[] languages)
+        public string ProcessNuggets(string entity, ITextLocalizer textLocalizer, LanguageItem[] languages)
         {
             // Lookup any/all msgid nuggets in the entity and replace with any translated message.
             return m_regexNugget.Replace(entity, delegate(Match match)
