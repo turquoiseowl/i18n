@@ -80,7 +80,7 @@ namespace i18n
         /// return "zh-Hans" and output "/account/signup".
         /// </para>
         /// </remarks>
-        string ExtractLangTagFromUrl(string url, UriKind uriKind, out string urlPatched);
+        string ExtractLangTagFromUrl(string url, UriKind uriKind, bool incomingUrl, out string urlPatched);
 
         /// <summary>
         /// Patches in the langtag into the passed url path part, replacing any extant langtag 

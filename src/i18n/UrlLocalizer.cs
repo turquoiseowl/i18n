@@ -6,10 +6,65 @@ using System.Text;
 namespace i18n
 {
     /// <summary>
+    /// Enumerate various approaches to handling and redirection of localized URLs.
+    /// </summary>
+    public enum UrlLocalizationScheme
+    {
+        /// <summary>
+        /// Everything is explicit, so any URLs/routes not containing a language tag are patched 
+        /// and redirected, whether or not the language is the app-default.
+        /// </summary>
+        /// <remarks>
+        /// E.g. if selected language for the request is en then
+        /// <para>
+        /// example.com -> example.com/fr
+        /// example.com/fr -> example.com/fr
+        /// </para>
+        /// </remarks>
+        Scheme1,
+
+        /// <summary>
+        /// Everything to be explicit except the default language which MAY be implicit.
+        /// </summary>
+        /// <remarks>
+        /// E.g. if selected language for the request is en then
+        /// <para>
+        /// example.com -> example.com/fr
+        /// example.com/fr -> example.com/fr
+        /// </para>
+        /// </remarks>
+        Scheme2,
+
+        /// <summary>
+        /// Everything to be explicit except the default language which MUST be implicit.
+        /// </summary>
+        /// <remarks>
+        /// E.g. if selected language for the request is en then
+        /// <para>
+        /// example.com -> example.com
+        /// example.com/fr -> example.com
+        /// </para>
+        /// </remarks>
+        Scheme3,
+    }
+
+    /// <summary>
     /// The i18n default implementaion of the IUrlLocalizer service.
     /// </summary>
     public class UrlLocalizer : IUrlLocalizer
     {
+
+    // Implementation
+
+        /// <summary>
+        /// Specifies the URL localization used by ALL instances of UrlLocalizer.
+        /// May be changed in application start.
+        /// </summary>
+        /// <remarks>
+        /// Presently, only Scheme1 and Scheme2 are supported by this class.
+        /// </remarks>
+        public static UrlLocalizationScheme UrlLocalizationScheme = UrlLocalizationScheme.Scheme1;
+
         /// <summary>
         /// Describes one or more procedures for filtering a URL during Early URL Localization.
         /// </summary>
@@ -72,12 +127,48 @@ namespace i18n
             return true;
         }
         
-        public string ExtractLangTagFromUrl(string url, UriKind uriKind, out string urlPatched)
+        public string ExtractLangTagFromUrl(string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
         {
-            return LanguageTag.ExtractLangTagFromUrl(url, uriKind, out urlPatched);
+            string result = LanguageTag.ExtractLangTagFromUrl(url, uriKind, out urlPatched);
+
+            switch (UrlLocalizationScheme)
+            {
+                case UrlLocalizationScheme.Scheme1:
+                {
+                    return result;
+                }
+                case UrlLocalizationScheme.Scheme2:
+                {
+                    // If the URL is nonlocalized incoming URL, this implies default language.
+                    if (result == null && incomingUrl) {
+                        result = LocalizedApplication.DefaultLanguage;
+                        urlPatched = url;
+                    }
+                    return result;
+                }
+                case UrlLocalizationScheme.Scheme3:
+                default:
+                {
+                    throw new InvalidOperationException();
+                }
+            }
         }
         public string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag)
         {
+            switch (UrlLocalizationScheme)
+            {
+                case UrlLocalizationScheme.Scheme2:
+                {
+                    if (LocalizedApplication.DefaultLanguageTag.Equals(langtag)) {
+                        return url; }
+                    break;
+                }
+                case UrlLocalizationScheme.Scheme3:
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+
             return LanguageTag.SetLangTagInUrlPath(url, uriKind, langtag);
         }
         public string InsertLangTagIntoVirtualPath(string langtag, string virtualPath)

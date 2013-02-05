@@ -23,7 +23,7 @@ namespace i18n
 
             // NO. Is request URL localized?
             string urlNonlocalized;
-            string langtag = urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, out urlNonlocalized);
+            string langtag = urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
             if (langtag == null)
             {
                 // NO.
@@ -102,7 +102,7 @@ namespace i18n
                         
                         // If URL is already localized...leave matched token alone.
                         string urlNonlocalized;
-                        if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, out urlNonlocalized) != null) {
+                        if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
                             return match.Groups[0].Value; } // original
 
                         // If URL is not local (i.e. remote host)...leave matched token alone.
