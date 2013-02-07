@@ -16,11 +16,38 @@ namespace i18n
     /// </summary>
     public abstract class LocalizingController : Controller, ILocalizing
     {
+
+    #region [ILocalizing]
+
+        /// <summary>
+        /// Looks up and returns any translation available of the given text.
+        /// </summary>
+        /// <param name="text">The text to localize.</param>
+        /// <returns>
+        /// Either a translation of the text or if none found, returns text as is.
+        /// </returns>
+        /// <remarks>
+        /// This is one of the special alias methods recognised by the i18n library
+        /// post-build process for extracting translatable strings from the project.
+        /// </remarks>
         public virtual IHtmlString _(string text)
         {
             return new HtmlString(HttpContext.GetText(text));
         }
 
+    #endregion
+
+        /// <summary>
+        /// Looks up and returns a plain string containing any translation available of the given text.
+        /// </summary>
+        /// <param name="text">The text to localize.</param>
+        /// <returns>
+        /// Plain string containing either a translation of the text or if none found, the text as is.
+        /// </returns>
+        /// <remarks>
+        /// This is one of the special alias methods recognised by the i18n library
+        /// post-build process for extracting translatable strings from the project.
+        /// </remarks>
         public virtual string __(string text)
         {
             return HttpContext.GetText(text);
