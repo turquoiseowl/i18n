@@ -14,7 +14,7 @@ namespace i18n
     /// <summary>
     /// A base controller providing an alias for localizable resources
     /// </summary>
-    public abstract class I18NController : Controller, ILocalizing
+    public abstract class LocalizingController : Controller, ILocalizing
     {
         public virtual IHtmlString _(string text)
         {

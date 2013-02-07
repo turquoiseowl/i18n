@@ -63,8 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RouteLocalization.cs" />
-    <Compile Include="I18NController.cs" />
-    <Compile Include="I18NWebViewPage.cs" />
+    <Compile Include="LocalizingController.cs" />
+    <Compile Include="LocalizingWebViewPage.cs" />
     <Compile Include="LanguageFilter.cs" />
     <Compile Include="LanguageRouteDecorator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

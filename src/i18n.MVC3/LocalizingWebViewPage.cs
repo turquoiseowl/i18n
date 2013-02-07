@@ -7,7 +7,7 @@ namespace i18n
     /// A base view providing an alias for localizable resources
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class I18NWebViewPage<T> : WebViewPage<T>, ILocalizing
+    public abstract class LocalizingWebViewPage<T> : WebViewPage<T>, ILocalizing
     {
         public IHtmlString _(string text)
         {
@@ -71,7 +71,7 @@ namespace i18n
     /// <summary>
     /// A base view providing an alias for localizable resources
     /// </summary>
-    public abstract class I18NWebViewPage : WebViewPage, ILocalizing
+    public abstract class LocalizingWebViewPage : WebViewPage, ILocalizing
     {
         public IHtmlString _(string text)
         {

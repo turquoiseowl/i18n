@@ -39,7 +39,7 @@ And here's an example in a controller:
     
     namespace MyApplication
     {
-        public class HomeController : I18NController
+        public class HomeController : LocalizingController
         {
             public ActionResult Index()
             {
@@ -77,12 +77,12 @@ And the same overload can be used for Javascript embedded into your Razor view:
 In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
 Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
 you'll want to change the `~/Views/web.config` file to point Razor to the base class containing the alias.
-Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
+Here is how you'd set up the alias using the provided `LocalizingWebViewPage` class:
 
 ```xml
      <system.web.webPages.razor>
         <!-- ... -->
-        <pages pageBaseType="i18n.I18NWebViewPage">
+        <pages pageBaseType="i18n.LocalizingWebViewPage">
           <!-- ... -->
         </pages>
       </system.web.webPages.razor>
@@ -90,8 +90,8 @@ Here is how you'd set up the alias using the provided `I18NWebViewPage` class:
 
 #### Using base classes vs. interfaces
 The central service is `ITextLocalizer`; anywhere you need localization, implement the `ILocalizing` interface.
-The package comes with default base classes for convenience, including `I18NController`, `I18NWebViewPage`, and
-`I18NWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
+The package comes with default base classes for convenience, including `LocalizingController`, `LocalizingWebViewPage`, and
+`LocalizingWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
 to `ITextLocalizer`; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
 
 ```csharp

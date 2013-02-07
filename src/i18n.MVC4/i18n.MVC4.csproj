@@ -56,17 +56,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\i18n.MVC3\I18NController.cs">
-      <Link>I18NController.cs</Link>
-    </Compile>
-    <Compile Include="..\i18n.MVC3\I18NWebViewPage.cs">
-      <Link>I18NWebViewPage.cs</Link>
-    </Compile>
     <Compile Include="..\i18n.MVC3\LanguageFilter.cs">
       <Link>LanguageFilter.cs</Link>
     </Compile>
     <Compile Include="..\i18n.MVC3\LanguageRouteDecorator.cs">
       <Link>LanguageRouteDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\i18n.MVC3\LocalizingController.cs">
+      <Link>LocalizingController.cs</Link>
+    </Compile>
+    <Compile Include="..\i18n.MVC3\LocalizingWebViewPage.cs">
+      <Link>LocalizingWebViewPage.cs</Link>
     </Compile>
     <Compile Include="..\i18n.MVC3\RouteDecoratorBase.cs">
       <Link>RouteDecoratorBase.cs</Link>
