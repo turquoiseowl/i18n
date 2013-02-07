@@ -34,6 +34,10 @@ namespace i18n
         {
             return new HtmlString(HttpContext.GetText(text));
         }
+        public IHtmlString _(string text, params object[] parameters)
+        {
+            return new HtmlString(string.Format(HttpContext.GetText(text), parameters));
+        }
 
     #endregion
 
@@ -51,6 +55,10 @@ namespace i18n
         public virtual string __(string text)
         {
             return HttpContext.GetText(text);
+        }
+        public string __(string text, params object[] parameters)
+        {
+            return string.Format(HttpContext.GetText(text), parameters);
         }
     }
 }
