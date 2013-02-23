@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
 
 namespace i18n.Tests
 {
@@ -8,9 +11,27 @@ namespace i18n.Tests
         [Test]
         public void Can_process_message_template()
         {
-            const string path = @"TEST_PROJECT_DIR";
-            var task = new PostBuildTask();
-            task.Execute(path);
+            var task = new PostBuildTask(new PostBuildTaskConfiguration
+                                             {
+                                                 GetTextExecutable = @"gettext\xgettext.exe",
+                                                 MsgMergeExecutable = @"gettext\msgmerge.exe",
+                                                 InputPaths = new string[]{},
+                                                 FileExtensions = new string[]{},
+                                                 OutputPath = Path.GetTempPath(),
+                                                 LocaleDirectoryName = "locale",
+                                                 OutputFileNameWithoutPrefix = "messages",
+                                                 TranslationFunctions = new []{"a","b"},
+                                                 ProgramLanguage = "C#",
+                                                 DryRun = "true",
+                                                 Encoding = "UTF-8"
+                                             });
+
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+            task.Execute();
+            
+            const string expected = @"^gettext\\xgettext.exe -LC# -ka -kb --omit-header --from-code=UTF-8 -o"".+"" -f"".+""\s*$";
+            Assert.True(Regex.IsMatch(writer.ToString(), expected));
         }
     }
 }

@@ -12,54 +12,77 @@ namespace i18n
     /// </summary>
     public class PostBuildTask
     {
+        private readonly PostBuildTaskConfiguration _config;
+
+        public PostBuildTask(PostBuildTaskConfiguration config)
+        {
+            _config = config;
+        }
+
         ///<summary>
         /// Runs GNU xgettext to extract a messages template file
         ///</summary>
-        ///<param name="path"></param>
-        ///<param name="gettext"> </param>
-        ///<param name="msgmerge"> </param>
-        ///<param name="inputPath"></param>
-        public void Execute(string outputPath, string gettext = null, string msgmerge = null, string[] inputPaths = null)
+        public void Execute()
         {
-            if (inputPaths == null || inputPaths.Length == 0) inputPaths = new string[] { outputPath };
+            var manifest = BuildProjectFileManifest();
 
-            var manifest = BuildProjectFileManifest(inputPaths);
+            try
+            {
+                var localePath = Path.Combine(_config.OutputPath, _config.LocaleDirectoryName);
 
-            CreateMessageTemplate(outputPath, manifest, gettext);
+                if (!Directory.Exists(localePath))
+                {
+                    Directory.CreateDirectory(localePath);
+                }
 
-            MergeTemplateWithExistingLocales(outputPath, msgmerge);
-
-            File.Delete(manifest);
+                CreateMessageTemplate(manifest);
+                MergeTemplateWithExistingLocales();
+            }
+            finally
+            {
+                File.Delete(manifest);
+            }
         }
 
-        private static void MergeTemplateWithExistingLocales(string outputPath, string options)
+        private void MergeTemplateWithExistingLocales()
         {
-            var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", outputPath));
-            var template = string.Format("{0}\\locale\\messages.pot", outputPath);
+            var localePath = Path.Combine(_config.OutputPath, _config.LocaleDirectoryName);
+            var localeFile = Path.Combine(localePath, _config.OutputFileNameWithoutPrefix + ".pot");
 
-            foreach (var messages in locales.Select(locale => string.Format("{0}\\messages.po", locale)))
+            var locales = Directory.GetDirectories(localePath);
+
+            foreach (var messages in locales.Select(locale => Path.Combine(locale, _config.OutputFileNameWithoutPrefix + ".po")))
             {
                 if (File.Exists(messages))
                 {
                     // http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html
-                    var args = string.Format("{2} -U \"{0}\" \"{1}\"", messages, template, options);
-                    RunWithOutput("gettext\\msgmerge.exe", args);
+                    var args = string.Format("-U \"{0}\" \"{1}\"", messages, localeFile);
+                    RunWithOutput(_config.MsgMergeExecutable, args);
                 }
                 else
                 {
-                    File.Copy(template, messages);
+                    File.Copy(localeFile, messages);
                 }
             }
         }
 
-        private static void CreateMessageTemplate(string outputPath, string manifest, string options)
+        private void CreateMessageTemplate(string manifest)
         {
+            var functions = string.Join(" -k", _config.TranslationFunctions);
+
+            var outputFile = Path.Combine(_config.OutputPath, _config.LocaleDirectoryName,
+                                          _config.OutputFileNameWithoutPrefix + ".pot");
+
+            var encoding = string.IsNullOrEmpty(_config.Encoding) ? "" : "--from-code=" + _config.Encoding;
+
             // http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html
-            var args = string.Format("{2} -LC# -k_ -k__ --omit-header --from-code=UTF-8 -o\"{0}\\locale\\messages.pot\" -f\"{1}\"", outputPath, manifest, options);
-            RunWithOutput("gettext\\xgettext.exe", args); // Mark H bodge
+            var args = string.Format("-L{2} -k{3} --omit-header {4} -o\"{0}\" -f\"{1}\"", 
+                outputFile, manifest, _config.ProgramLanguage, functions, encoding);
+
+            RunWithOutput(_config.GetTextExecutable, args); // Mark H bodge
         }
 
-        private static void RunWithOutput(string filename, string args)
+        private void RunWithOutput(string filename, string args)
         {
             var info = new ProcessStartInfo(filename, args)
             {
@@ -71,6 +94,8 @@ namespace i18n
             };
 
             Console.WriteLine("{0} {1}", info.FileName, info.Arguments);
+            if (!string.IsNullOrEmpty(_config.DryRun)) return;
+
             var process = Process.Start(info);
             while (!process.StandardError.EndOfStream)
             {
@@ -83,28 +108,24 @@ namespace i18n
             }
         }
 
-        private static string[] GetFiles(string[] paths, string pattern)
+        private static string[] GetFiles(string path, string pattern)
         {
             var files = new List<string>();
+            var directories = Directory.GetDirectories(path);
 
-            foreach (var path in paths)
+            foreach (var dir in directories.Where(x => !x.EndsWith("\\obj")))
             {
-                var directories = Directory.GetDirectories(path);
-
-                foreach (var dir in directories.Where(x => !x.EndsWith("\\obj")))
-                {
-                    files.AddRange(Directory.GetFiles(dir, pattern, SearchOption.AllDirectories));
-                }
+                files.AddRange(Directory.GetFiles(dir, pattern, SearchOption.AllDirectories));
             }
 
             return files.ToArray();
         }
 
-        private static string BuildProjectFileManifest(string[] paths)
+        private string BuildProjectFileManifest()
         {
-            var cs = GetFiles(paths, "*.cs");
-            var razor = GetFiles(paths, "*.cshtml");
-            var files = (new[] { cs, razor }).SelectMany(f => f).ToList();
+            var files = (from path in _config.InputPaths
+                         from extension in _config.FileExtensions
+                         select GetFiles(path, extension)).SelectMany(s => s);
 
             var temp = Path.GetTempFileName();
             using (var sw = File.CreateText(temp))
@@ -114,6 +135,7 @@ namespace i18n
                     sw.WriteLine(file);
                 }
             }
+
             return temp;
         }
     }
