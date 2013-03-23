@@ -2,7 +2,7 @@
 
 namespace i18n.DataAnnotations
 {
-    public class RequiredAttribute : System.ComponentModel.DataAnnotations.RequiredAttribute, ILocalizing
+    public class RequiredAttribute : System.ComponentModel.DataAnnotations.RequiredAttribute, ILocalizing, System.Web.Mvc.IClientValidatable
     {
         private readonly I18NSession _session;
 
@@ -21,5 +21,14 @@ namespace i18n.DataAnnotations
             var formatted = base.FormatErrorMessage(name);
             return _(formatted).ToHtmlString();
         }
+
+        #region IClientValidatable Members
+
+        public System.Collections.Generic.IEnumerable<System.Web.Mvc.ModelClientValidationRule> GetClientValidationRules(System.Web.Mvc.ModelMetadata metadata, System.Web.Mvc.ControllerContext context)
+        {
+            yield return new System.Web.Mvc.ModelClientValidationRequiredRule(FormatErrorMessage(metadata.GetDisplayName()));
+        }
+
+        #endregion
     }
 }

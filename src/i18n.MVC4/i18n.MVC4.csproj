@@ -74,6 +74,9 @@
     <Compile Include="..\i18n.MVC3\RouteDecoratorBase.cs">
       <Link>RouteDecoratorBase.cs</Link>
     </Compile>
+    <Compile Include="..\i18n.MVC3\I18nModelMetadataProvider.cs">
+      <Link>I18nModelMetadataProvider.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
