@@ -280,7 +280,7 @@ namespace i18n
             var messages = (Dictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
             I18NMessage message = null;
 
-            if (messages == null || !messages.TryGetValue(key, out message))
+            if (messages == null || key==null || !messages.TryGetValue(key, out message) )
             {
                 return key;
             }

@@ -146,6 +146,7 @@ namespace i18n
                 string transformed = null;
                 if (TransformAnnotations(fileText, out transformed))
                 {
+                    //if backup exists, do not overwrite, implies that earlier post build didnt perform backup restore.
                     if (!File.Exists(path + cTransformedFileExtension))
                     {
                         File.WriteAllText(path: path + cTransformedFileExtension, contents: fileText, encoding: System.Text.Encoding.UTF8);

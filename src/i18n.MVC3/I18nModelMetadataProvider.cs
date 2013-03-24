@@ -24,14 +24,10 @@ namespace i18n
             DisplayAttribute display = attributes.OfType<DisplayAttribute>().FirstOrDefault();
             if (display != null)
             {
-                string name = display.Name;
-                if (name != null)
-                {
-                    metadata.DisplayName = name;
-                }
+                metadata.DisplayName = display.Name ?? metadata.DisplayName;
 
-                metadata.Description = display.Description;
-                metadata.Watermark = display.Prompt;
+                metadata.Description = display.Description ?? metadata.Description;
+                metadata.Watermark = display.Prompt ?? metadata.Watermark;
             }
 
             return metadata;
