@@ -25,18 +25,18 @@ namespace i18n
         {
             if (inputPaths == null || inputPaths.Length == 0) inputPaths = new string[] { outputPath };
 
-            string manifest = null;  
+            string manifest = null;
             try
             {
                 manifest = BuildProjectFileManifest(inputPaths);
 
-            CreateMessageTemplate(outputPath, manifest, gettext);
+                CreateMessageTemplate(outputPath, manifest, gettext);
 
-            MergeTemplateWithExistingLocales(outputPath, msgmerge);
+                MergeTemplateWithExistingLocales(outputPath, msgmerge);
             }
             finally
             {
-                if(manifest !=  null) File.Delete(manifest);
+                if (manifest != null) File.Delete(manifest);
                 RestoreTransformBackups(inputPaths);
             }
         }
@@ -149,6 +149,9 @@ namespace i18n
                     if (!File.Exists(path + cTransformedFileExtension))
                     {
                         File.WriteAllText(path: path + cTransformedFileExtension, contents: fileText, encoding: System.Text.Encoding.UTF8);
+                        //backup last modified date, so that visual studio doesnt prompt to reload the view model after build
+                        File.SetLastWriteTime(path: path + cTransformedFileExtension,
+                            lastWriteTime: File.GetLastWriteTime(path));
                     }
                     File.WriteAllText(path: path, contents: transformed, encoding: System.Text.Encoding.UTF8);
                 }
