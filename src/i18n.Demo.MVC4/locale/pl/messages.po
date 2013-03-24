@@ -49,7 +49,7 @@ msgstr ""
 msgid ""
 "ASP.NET MVC gives you a powerful, patterns-based way to build dynamic "
 "websites that"
-msgstr ""
+msgstr "Polish ASP.NET"
 
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Views\Home\Index.cshtml:26
 msgid ""
@@ -76,8 +76,8 @@ msgstr ""
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Views\Home\TestLanguage.cshtml:4
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Views\Home\TestLanguage.cshtml:7
 msgid "TestLanguage"
-msgstr ""
+msgstr "Polsih Test"
 
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Views\Home\TestLanguage.cshtml:34
 msgid "Back to List"
-msgstr ""
+msgstr "Never go back"
