@@ -131,6 +131,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AttributeTestViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -172,7 +173,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Filters\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -182,6 +182,33 @@
       <Project>{6164a297-9111-4d8a-9889-b4b6c02bc387}</Project>
       <Name>i18n.MVC4</Name>
     </ProjectReference>
+    <ProjectReference Include="..\i18n.PostBuild\i18n.PostBuild.csproj">
+      <Project>{9be8e007-c6b8-43f7-83d2-e89f51ef8614}</Project>
+      <Name>i18n.PostBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\i18n\i18n.csproj">
+      <Project>{e7a9bba3-8a95-492c-8806-4de63c1dba06}</Project>
+      <Name>i18n</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="locale\en-us\messages.po" />
+    <Content Include="locale\messages.pot" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Home\TestLanguage.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="locale\Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="locale\en\messages.po" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="locale\en-gb\messages.po" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="locale\pl\messages.po" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -212,6 +239,9 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

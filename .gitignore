@@ -33,3 +33,4 @@ Examples*/
 *.testrunconfig
 publish.xml
 TestResults
+*.po~

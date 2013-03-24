@@ -1,0 +1,35 @@
+﻿@model i18n.Demo.MVC4.Models.AttributeTestViewModel
+
+@{
+    ViewBag.Title = _("TestLanguage");
+}
+
+<h2>@_("TestLanguage")</h2>
+
+<fieldset>
+    <legend>AttributeTestViewModel</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.FirstName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FirstName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.LastName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LastName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Email)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Email)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink(__("Back to List"), "Index")
+</p>

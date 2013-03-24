@@ -17,7 +17,7 @@ msgstr ""
 
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Models\AttributeTestViewModel.cs:12
 msgid "First Name"
-msgstr "US first"
+msgstr "UK First"
 
 #: D:\Users\Setebos\Documents\code\c#\i18n\src\i18n.Demo.MVC4\Models\AttributeTestViewModel.cs:12
 msgid "Test1"
