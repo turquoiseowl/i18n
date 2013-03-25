@@ -25,6 +25,13 @@ namespace i18n
         {
             if (inputPaths == null || inputPaths.Length == 0) inputPaths = new string[] { outputPath };
 
+            if (!Directory.Exists("gettext"))
+                throw new DirectoryNotFoundException("get text folder is missing, make sure the gettext folder has been added to the application bin folder");
+            if (!File.Exists("gettext\\msgmerge.exe"))
+                throw new FileNotFoundException("gettext\\msgmerge.exe is missing, make sure the gettext folder has been added to the application bin folder");
+            if (!File.Exists("gettext\\xgettext.exe"))
+                throw new FileNotFoundException("gettext\\xgettext.exe is missing, make sure the gettext folder has been added to the application bin folder");
+
             string manifest = null;
             try
             {

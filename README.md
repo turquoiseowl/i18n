@@ -150,6 +150,11 @@ From here, you use any of the widely available PO editing tools (like [POEdit](h
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
 If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
 
+Make sure you have a copy of the gettext folder inside your applications `bin` folder e.g. `i18n\src\i18n.Demo.MVC4\bin`, 
+otherwise postbuild will fail. You can find a copy of the gettext folder under `tools\gettext-{version}`, copy this to 
+`mvc-application\bin\gettext`.
+
+
 #### Automatic routing
 To participate in the automatic routing features of this library, call `I18N.Register()` in your startup code;
 this will register a global filter and route decorator to provide the feature.
