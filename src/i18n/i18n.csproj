@@ -78,6 +78,10 @@
     <Compile Include="LanguageHelpers.cs" />
     <Compile Include="LanguageItem.cs" />
     <Compile Include="LocalizingModule.cs" />
+    <Compile Include="NamedStringFormater\FormatExpression.cs" />
+    <Compile Include="NamedStringFormater\NamedStringFormatter.cs" />
+    <Compile Include="NamedStringFormater\ITextExpression.cs" />
+    <Compile Include="NamedStringFormater\LiteralFormat.cs" />
     <Compile Include="NuggetLocalizer.cs" />
     <Compile Include="ResponseFilter.cs" />
     <Compile Include="ParseHelpers.cs" />
