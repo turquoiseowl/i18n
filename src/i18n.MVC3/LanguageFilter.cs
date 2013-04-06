@@ -129,7 +129,7 @@ namespace i18n
                 UriKind.Relative,
                 langtag.ToString());
             // Redirect user agent to new URL.
-            var result = new RedirectResult(ub.Uri.ToString(), LocalizedApplication.PermanentRedirects); // Go via Uri to avoid port 80 being added.
+			var result = new RedirectResult(ub.Path, LocalizedApplication.PermanentRedirects); //relative path so ports do not become a problem with load balanced systems
             result.ExecuteResult(filterContext);
         }
     }
