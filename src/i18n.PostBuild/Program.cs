@@ -9,8 +9,11 @@ namespace i18n.PostBuild
         static void Main(string[] args)
         {
 			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
-	        Translation translation = rep.GetLanguage("sv");
-			rep.SaveTranslation(translation);
+	      //  Translation translation = rep.GetLanguage("sv");
+			//rep.SaveTranslation(translation);
+
+			NuggetFileParser nugget = new NuggetFileParser(new i18nSettings(new ConfigFileSettingService()));
+	        rep.SaveTemplate(nugget.ParseAll());
 			
 	        
 

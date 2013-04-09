@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
@@ -140,14 +141,14 @@ namespace i18n.Domain.Concrete
 
 					if (hasReferences)
 					{
-						stream.WriteLine("msgid \"" + item.Id + "\"");
-						stream.WriteLine("msgstr \"" + item.Message + "\"");
+						stream.WriteLine("msgid \"" + escape(item.Id) + "\"");
+						stream.WriteLine("msgstr \"" + escape(item.Message) + "\"");
 						stream.WriteLine("");
 					}
 					else
 					{
-						stream.WriteLine("#~ msgid \"" + item.Id + "\"");
-						stream.WriteLine("#~ msgstr \"" + item.Message + "\"");
+						stream.WriteLine("#~ msgid \"" + escape(item.Id) + "\"");
+						stream.WriteLine("#~ msgstr \"" + escape(item.Message) + "\"");
 						stream.WriteLine("");
 					}
 					
@@ -178,9 +179,12 @@ namespace i18n.Domain.Concrete
 			{
 				foreach (var item in items)
 				{
-					foreach (var comment in item.Comments)
+					if (item.Comments != null)
 					{
-						stream.WriteLine("#. " + comment);
+						foreach (var comment in item.Comments)
+						{
+							stream.WriteLine("#. " + comment);
+						}
 					}
 
 					foreach (var reference in item.References)
@@ -188,8 +192,7 @@ namespace i18n.Domain.Concrete
 						stream.WriteLine("#: " + reference);
 					}
 
-					stream.WriteLine("msgid \"" + item.Id + "\"");
-					stream.WriteLine("msgstr \"" + item.Message + "\"");
+					stream.WriteLine("msgid \"" + escape(item.Id) + "\"");
 					stream.WriteLine("");
 				}
 			}
@@ -252,8 +255,8 @@ namespace i18n.Domain.Concrete
 					List<string> references = new List<string>();
 
 					//read all comments, flags and other descriptive items for this string
-
-					if (line.StartsWith("#"))
+					//if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
+					if (line.StartsWith("#") && !line.StartsWith("#~"))
 					{
 						do
 						{
@@ -271,9 +274,6 @@ namespace i18n.Domain.Concrete
 									break;
 								case '|': //msgid previous-untranslated-string - NOT used by us
 									break;
-								case '~': //lines that has been removed from template file, but kept for history reasons
-									//we do nothing here and simply parses it as normal, but it will be missing referenses
-									break;
 								default: //translator comments
 									translatorComments.Add(line.Substring(1).Trim());
 									break;
@@ -287,7 +287,7 @@ namespace i18n.Domain.Concrete
 					item.Flags = flags;
 					item.References = references;
 
-					if (currentlyReadingItem)
+					if (currentlyReadingItem || line.StartsWith("#~"))
 					{
 						ParseBody(fs, line, item);
 						items.Add(item);
@@ -302,6 +302,11 @@ namespace i18n.Domain.Concrete
 
 		private string RemoveCommentIfHistorical(string line)
 		{
+			if (string.IsNullOrWhiteSpace(line))
+			{
+				return null;
+			}
+
 			if (line.StartsWith("#~"))
 			{
 				return line.Replace("#~", "").Trim();
@@ -319,35 +324,159 @@ namespace i18n.Domain.Concrete
 				line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
 				if (line.StartsWith("msgid"))
 				{
-					var msgid = line.Unquote();
+					var msgid = Unquote(line);
 					sb.Append(msgid);
 
-					while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && (msgid = line.Unquote()) != null)
+					while ((line = fs.ReadLine()) != null)
 					{
 						line = RemoveCommentIfHistorical(line);
-						sb.Append(msgid);
+						if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)
+						{
+							sb.Append(msgid);
+						}
+						else
+						{
+							break;
+						}
 					}
 
-					message.Id = sb.ToString().Unescape();
+					message.Id = Unescape(sb.ToString());
 				}
 
 				sb.Clear();
 				line = RemoveCommentIfHistorical(line);
 				if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
 				{
-					var msgstr = line.Unquote();
+					var msgstr = Unquote(line);
 					sb.Append(msgstr);
 
-					while ((line = fs.ReadLine()) != null && (msgstr = line.Unquote()) != null)
+					while ((line = fs.ReadLine()) != null && (msgstr = Unquote(line)) != null)
 					{
 						line = RemoveCommentIfHistorical(line);
 						sb.Append(msgstr);
 					}
 
-					message.Message = sb.ToString().Unescape();
+					message.Message = Unescape(sb.ToString());
 				}
 			}
 		}
+
+		#region quoting and escaping
+
+		//this method removes anything before the first quote and also removes first and last quote
+		private string Unquote(string lhs, string quotechar = "\"")
+		{
+			int begin = lhs.IndexOf(quotechar);
+			if (begin == -1)
+			{
+				return null;
+			}
+			int end = lhs.LastIndexOf(quotechar);
+			if (end <= begin)
+			{
+				return null;
+			}
+			return lhs.Substring(begin + 1, end - begin - 1);
+		}
+
+		private string escape(string s)
+		{
+			return s.Replace("\"", "\\\"");
+		}
+
+		/// <summary>
+		/// Looks up in the subject string standard C escape sequences and converts them
+		/// to their actual character counterparts.
+		/// </summary>
+		/// <seealso href="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
+		private string Unescape(string s)
+		{
+			Regex regex_unescape = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
+
+			StringBuilder sb = new StringBuilder();
+			MatchCollection mc = regex_unescape.Matches(s, 0);
+
+			foreach (Match m in mc)
+			{
+				if (m.Length == 1)
+				{
+					sb.Append(m.Value);
+				}
+				else
+				{
+					if (m.Value[1] >= '0' && m.Value[1] <= '7')
+					{
+						int i = 0;
+
+						for (int j = 1; j < m.Length; j++)
+						{
+							i *= 8;
+							i += m.Value[j] - '0';
+						}
+
+						sb.Append((char)i);
+					}
+					else if (m.Value[1] == 'u')
+					{
+						int i = 0;
+
+						for (int j = 2; j < m.Length; j++)
+						{
+							i *= 16;
+
+							if (m.Value[j] >= '0' && m.Value[j] <= '9')
+							{
+								i += m.Value[j] - '0';
+							}
+							else if (m.Value[j] >= 'A' && m.Value[j] <= 'F')
+							{
+								i += m.Value[j] - 'A' + 10;
+							}
+							else if (m.Value[j] >= 'a' && m.Value[j] <= 'a')
+							{
+								i += m.Value[j] - 'a' + 10;
+							}
+						}
+
+						sb.Append((char)i);
+					}
+					else
+					{
+						switch (m.Value[1])
+						{
+							case 'a':
+								sb.Append('\a');
+								break;
+							case 'b':
+								sb.Append('\b');
+								break;
+							case 'f':
+								sb.Append('\f');
+								break;
+							case 'n':
+								sb.Append('\n');
+								break;
+							case 'r':
+								sb.Append('\r');
+								break;
+							case 't':
+								sb.Append('\t');
+								break;
+							case 'v':
+								sb.Append('\v');
+								break;
+							default:
+								sb.Append(m.Value[1]);
+								break;
+						}
+					}
+				}
+			}
+
+			return sb.ToString();
+		}
+
+		#endregion
 
 		#endregion
 	}

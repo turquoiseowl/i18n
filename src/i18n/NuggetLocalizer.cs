@@ -2,14 +2,13 @@
 using System.Web;
 using System.Text;
 using System.Text.RegularExpressions;
-using i18n.Domain.Concrete;
 
 namespace i18n
 {
     /// <summary>
     /// The i18n default implementaion of the INuggetLocalizer service.
     /// </summary>
-    public class StreamNuggetLocalizer : INuggetLocalizer
+    public class NuggetLocalizer : INuggetLocalizer
     {
 
     #region INuggetLocalizer

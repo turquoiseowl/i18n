@@ -46,6 +46,7 @@
     <Compile Include="Abstract\ITranslationRepository.cs" />
     <Compile Include="Concrete\ConfigFileSettingService.cs" />
     <Compile Include="Concrete\i18nSettings.cs" />
+    <Compile Include="Concrete\NuggetFileParser.cs" />
     <Compile Include="Concrete\TranslationSynchronization.cs" />
     <Compile Include="Entities\Language.cs" />
     <Compile Include="Concrete\POTranslationRepository.cs" />
