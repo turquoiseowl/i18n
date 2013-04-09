@@ -49,7 +49,6 @@
     <Compile Include="Concrete\Extensions.cs" />
     <Compile Include="Concrete\i18nSettings.cs" />
     <Compile Include="Entities\Language.cs" />
-    <Compile Include="Entities\LanguageTag.cs" />
     <Compile Include="Concrete\POTranslationRepository.cs" />
     <Compile Include="Entities\TemplateItem.cs" />
     <Compile Include="Entities\TranslateItem.cs" />

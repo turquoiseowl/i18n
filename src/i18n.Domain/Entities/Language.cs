@@ -8,7 +8,7 @@ namespace i18n.Domain.Entities
 {
 	public class Language
 	{
-		public LanguageTag LanguageShortTag { get; set; }
+		public string LanguageShortTag { get; set; }
 		public string LanguageInEnglish { get; set; }
 		public string LanguageInLocal { get; set; }
 	}

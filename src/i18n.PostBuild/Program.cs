@@ -1,4 +1,6 @@
 ﻿using System;
+using i18n.Domain.Concrete;
+using i18n.Domain.Entities;
 
 namespace i18n.PostBuild
 {
@@ -6,6 +8,12 @@ namespace i18n.PostBuild
     {
         static void Main(string[] args)
         {
+			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
+	        Translation translation = rep.GetLanguage("sv");
+			rep.SaveTranslation(translation);
+			
+	        
+
             if(args.Length == 0)
             {
                 Console.WriteLine("This post build task requires passing in the $(ProjectDirectory) path");
@@ -27,7 +35,9 @@ namespace i18n.PostBuild
                     msgmerge = args[i].Substring(9);
             }
 
-            new PostBuildTask().Execute(path, gettext, msgmerge);
+            //new PostBuildTask().Execute(path, gettext, msgmerge);
+
+
         }
     }
 }

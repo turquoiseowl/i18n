@@ -9,6 +9,9 @@ using System.Configuration;
 
 namespace i18n.Domain.Concrete
 {
+	//todo: We handle both absolute and relative paths so many developers can handle the same project. But right now since config file resides in bin dir that is usually excluded from git/svn each dev still has to config everything. Ideally we would change to allow config file in other location
+
+
 	public class ConfigFileSettingService : ISettingService
 	{
 
@@ -41,8 +44,19 @@ namespace i18n.Domain.Concrete
 			//Create the object
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-			//make changes
-			config.AppSettings.Settings[key].Value = value;
+			if (config.AppSettings.Settings[key] == null)
+			{
+				//create setting
+				config.AppSettings.Settings.Add(key, value);
+			}
+			else
+			{
+				//make changes
+				config.AppSettings.Settings[key].Value = value;	
+			}
+
+			
+			
 
 			//save to apply changes
 			config.Save(ConfigurationSaveMode.Modified);

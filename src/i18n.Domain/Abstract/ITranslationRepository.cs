@@ -8,11 +8,16 @@ using i18n.Domain.Entities;
 
 namespace i18n.Domain.Abstract
 {
-	interface ITranslationRepository
+	public interface ITranslationRepository
 	{
-		IQueryable<TranslateItem> GetLanguage(LanguageTag tag);
-		ConcurrentDictionary<string, TranslateItem> GetLanguageDictionary(LanguageTag tag);
+		IQueryable<TranslateItem> GetLanguageItems(string tag);
+		Translation GetLanguage(string tag);
+		ConcurrentDictionary<string, TranslateItem> GetLanguageDictionary(string tag);
 		IEnumerable<Language> GetAvailableLanguages();
-		bool TranslationExists(LanguageTag tag);
+		bool TranslationExists(string tag);
+		void SaveTranslation(Translation translation);
+		void SaveTemplate(IEnumerable<TemplateItem> items);
+
+		//todo: consider adding function for deleting cache so that if cache is implemented in a concrete it will know when to reload.
 	}
 }

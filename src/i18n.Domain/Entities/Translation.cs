@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace i18n.Domain.Entities
 {
-	class Translation
+	public class Translation
 	{
-		public string LanguageInEnglish { get; set; }
-		public string LanguageInLocal { get; set; }
-		public LanguageTag LanguageShortTag { get; set; }
+		public Language LanguageInformation { get; set; }
 		public virtual IEnumerable<TranslateItem> Items  { get; set; }
 	}
 }

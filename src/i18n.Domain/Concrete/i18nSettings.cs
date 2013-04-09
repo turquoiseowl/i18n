@@ -7,7 +7,7 @@ using i18n.Domain.Abstract;
 
 namespace i18n.Domain.Concrete
 {
-	class i18nSettings
+	public class i18nSettings
 	{
 		private ISettingService _settingService;
 		private const string _prefix = "i18n.";
@@ -24,12 +24,12 @@ namespace i18n.Domain.Concrete
 
 		#region Locale directory
 
-		private const string _localeDirectoryRelativePathDefault = "locale";
-		public virtual string LocaleDirectoryRelativePath
+		private const string _localeDirectoryDefault = "locale";
+		public virtual string LocaleDirectory
 		{
 			get
 			{
-				string prefixedString = GetPrefixedString("LocaleDirectoryRelativePath");
+				string prefixedString = GetPrefixedString("LocaleDirectory");
 				string setting = _settingService.GetSetting(prefixedString);
 				if (setting != null)
 				{
@@ -37,14 +37,14 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _localeDirectoryRelativePathDefault);
-					return _localeDirectoryRelativePathDefault;
+					_settingService.SetSetting(prefixedString, _localeDirectoryDefault);
+					return _localeDirectoryDefault;
 				}
 				
 			}
 			set
 			{
-				string prefixedString = GetPrefixedString("LocaleDirectoryRelativePath");
+				string prefixedString = GetPrefixedString("LocaleDirectory");
 				_settingService.SetSetting(prefixedString, value);
 			}
 		}
@@ -54,7 +54,7 @@ namespace i18n.Domain.Concrete
 
 		#region White list
 
-		private const string _whiteListDefault = "*.cs;*.js";
+		private const string _whiteListDefault = "*.cs;*.cshtml";
 		public virtual IEnumerable<string> WhiteList
 		{
 			get
@@ -163,7 +163,7 @@ namespace i18n.Domain.Concrete
 
 		#region DirectoriesToScan
 
-		private const string _directoriesToScan = "../../";
+		private const string _directoriesToScan = ".";
 		public virtual IEnumerable<string> DirectoriesToScan
 		{
 			get
