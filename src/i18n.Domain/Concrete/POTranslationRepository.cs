@@ -118,25 +118,37 @@ namespace i18n.Domain.Concrete
 				{
 					hasReferences = false;
 
-					foreach (var translatorComment in item.TranslatorComments)
+					if (item.TranslatorComments != null)
 					{
-						stream.WriteLine("# "+translatorComment);
+						foreach (var translatorComment in item.TranslatorComments)
+						{
+							stream.WriteLine("# " + translatorComment);
+						}
 					}
 
-					foreach (var extractedComment in item.ExtractedComments)
+					if (item.ExtractedComments != null)
 					{
-						stream.WriteLine("#. "+extractedComment);
+						foreach (var extractedComment in item.ExtractedComments)
+						{
+							stream.WriteLine("#. " + extractedComment);
+						}
 					}
 
-					foreach (var reference in item.References)
+					if (item.References != null)
 					{
-						hasReferences = true;
-						stream.WriteLine("#: "+reference);
+						foreach (var reference in item.References)
+						{
+							hasReferences = true;
+							stream.WriteLine("#: " + reference);
+						}
 					}
 
-					foreach (var flag in item.Flags)
+					if (item.Flags != null)
 					{
-						stream.WriteLine("#, "+flag);
+						foreach (var flag in item.Flags)
+						{
+							stream.WriteLine("#, " + flag);
+						}
 					}
 
 					if (hasReferences)
@@ -381,6 +393,10 @@ namespace i18n.Domain.Concrete
 
 		private string escape(string s)
 		{
+			if (string.IsNullOrWhiteSpace(s))
+			{
+				return null;
+			}
 			return s.Replace("\"", "\\\"");
 		}
 

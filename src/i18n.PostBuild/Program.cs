@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using i18n.Domain.Concrete;
 using i18n.Domain.Entities;
 
@@ -9,13 +11,16 @@ namespace i18n.PostBuild
         static void Main(string[] args)
         {
 			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
-	      //  Translation translation = rep.GetLanguage("sv");
-			//rep.SaveTranslation(translation);
 
 			NuggetFileParser nugget = new NuggetFileParser(new i18nSettings(new ConfigFileSettingService()));
-	        rep.SaveTemplate(nugget.ParseAll());
-			
-	        
+	        IEnumerable<TemplateItem> items = nugget.ParseAll();
+	        rep.SaveTemplate(items);
+
+			Translation translation = rep.GetLanguage("sv");
+			TranslationSynchronization ts = new TranslationSynchronization(rep);
+	        ts.SynchronizeTranslation(items, translation);
+			//  
+			//rep.SaveTranslation(translation);	        
 
             if(args.Length == 0)
             {
