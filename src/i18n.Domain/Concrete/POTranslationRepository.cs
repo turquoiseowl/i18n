@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
+using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
 {
