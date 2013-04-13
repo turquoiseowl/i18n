@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,8 @@ namespace i18n.Domain.Concrete
 			IEnumerable<string> fileWhiteList = _settings.WhiteList;
 			IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
 
-			List<TemplateItem> templateList = new List<TemplateItem>();
+			var templateItems = new ConcurrentDictionary<string, TemplateItem>();
+                // Collection of template items keyed by their id.
 			string absoluteDirectoryPath;
 
 			foreach (var directoryPath in directoriesToSearchRecursively)
@@ -47,7 +49,7 @@ namespace i18n.Domain.Concrete
 							if (Path.GetExtension(file) == whiteListItem.Substring(1))
 							{
 								//we got a match
-								templateList.AddRange(ParseFile(file));
+								ParseFile(file, ref templateItems);
 								break;
 							}
 						}
@@ -56,7 +58,7 @@ namespace i18n.Domain.Concrete
 							if (Path.GetFileName(file) == whiteListItem)
 							{
 								//we got a match
-								templateList.AddRange(ParseFile(file));
+								ParseFile(file, ref templateItems);
 								break;
 							}
 						}
@@ -66,8 +68,7 @@ namespace i18n.Domain.Concrete
 				}
 			}
 
-
-			return templateList;
+			return templateItems.Values;
 		}
 
 
@@ -75,9 +76,8 @@ namespace i18n.Domain.Concrete
 		//todo: think about being able to escape the different delimiters so they can exist in the text
 		//todo: this function is simple and should probably be refactored, it does not in any way support multiline
 		//todo: could also be an idea to check if the line is a code comment, altho comments looks different in different file types
-		public IEnumerable<TemplateItem> ParseFile(string file)
+		public void ParseFile(string file, ref ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
-			List<TemplateItem> list = new List<TemplateItem>();
 			string startToken = _settings.NuggetBeginToken;
 			string endToken = _settings.NuggetEndToken;
 			string delimiterToken = _settings.NuggetDelimiterToken;
@@ -123,7 +123,7 @@ namespace i18n.Domain.Concrete
 						if (endIndex != -1)
 						{
 							nugget = line.Substring(startedIndex + startToken.Length, endIndex - startedIndex - startToken.Length);
-							AddNewTemplateItem(file, lineNumber, nugget, list);
+							AddNewTemplateItem(file, lineNumber, nugget, ref templateItems);
 						}
 
 						currentCharecterIndex = endIndex;
@@ -141,37 +141,31 @@ namespace i18n.Domain.Concrete
 					}
 				}
 			}
-			
-
-			return list;
 		}
 
-		private void AddNewTemplateItem(string file, int lineNumber, string itemString, List<TemplateItem> existing)
+		private void AddNewTemplateItem(string file, int lineNumber, string itemString, ref ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
 			string reference = file + ":" + lineNumber.ToString();
 			List<string> tmpList;
-
-			foreach (var templateItem in existing)
-			{
-				//this string already exist so we simple add a reference
-				if (templateItem.Id == itemString)
-				{
-					tmpList = templateItem.References.ToList();
+           //
+            templateItems.AddOrUpdate(
+                itemString, 
+                // Add routine.
+                k => {
+			        TemplateItem item = new TemplateItem();
+			        item.Id = itemString;
+			        tmpList = new List<string>();
+			        tmpList.Add(reference);
+			        item.References = tmpList;
+			        return item;
+                },
+                // Update routine.
+                (k, v) => {
+					tmpList = v.References.ToList();
 					tmpList.Add(reference);
-					templateItem.References = tmpList;
-					return;
-				}
-			}
-
-			//if we got this far we simply add the item
-			TemplateItem item = new TemplateItem();
-
-			item.Id = itemString;
-			tmpList = new List<string>();
-			tmpList.Add(reference);
-			item.References = tmpList;
-			existing.Add(item);
-
+					v.References = tmpList;
+                    return v;
+                });
 		}
 	}
 }
