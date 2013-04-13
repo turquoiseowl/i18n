@@ -13,7 +13,7 @@ namespace i18n.PostBuild
 			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
 
 			NuggetFileParser nugget = new NuggetFileParser(new i18nSettings(new ConfigFileSettingService()));
-	        IEnumerable<TemplateItem> items = nugget.ParseAll();
+	        var items = nugget.ParseAll();
 	        rep.SaveTemplate(items);
 
 			Translation translation = rep.GetLanguage("sv");

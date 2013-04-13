@@ -168,7 +168,7 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
-		public void SaveTemplate(IEnumerable<TemplateItem> items)
+		public void SaveTemplate(IDictionary<string, TemplateItem> items)
 		{
 			string filePath = GetAbsoluteLocaleDir() + "/messages.pot";
 			string backupPath = filePath + ".backup";
@@ -189,7 +189,7 @@ namespace i18n.Domain.Concrete
 
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
-				foreach (var item in items)
+				foreach (var item in items.Values)
 				{
 					if (item.Comments != null)
 					{

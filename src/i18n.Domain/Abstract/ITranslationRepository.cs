@@ -16,7 +16,7 @@ namespace i18n.Domain.Abstract
 		IEnumerable<Language> GetAvailableLanguages();
 		bool TranslationExists(string tag);
 		void SaveTranslation(Translation translation);
-		void SaveTemplate(IEnumerable<TemplateItem> items);
+		void SaveTemplate(IDictionary<string, TemplateItem> items);
 
 		//todo: consider adding function for deleting cache so that if cache is implemented in a concrete it will know when to reload.
 	}

@@ -17,7 +17,7 @@ namespace i18n.Domain.Concrete
 			_settings = settings;
 		}
 
-		public IEnumerable<TemplateItem> ParseAll()
+		public IDictionary<string, TemplateItem> ParseAll()
 		{
 			IEnumerable<string> fileWhiteList = _settings.WhiteList;
 			IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
@@ -49,7 +49,7 @@ namespace i18n.Domain.Concrete
 							if (Path.GetExtension(file) == whiteListItem.Substring(1))
 							{
 								//we got a match
-								ParseFile(file, ref templateItems);
+								ParseFile(file, templateItems);
 								break;
 							}
 						}
@@ -58,7 +58,7 @@ namespace i18n.Domain.Concrete
 							if (Path.GetFileName(file) == whiteListItem)
 							{
 								//we got a match
-								ParseFile(file, ref templateItems);
+								ParseFile(file, templateItems);
 								break;
 							}
 						}
@@ -68,7 +68,7 @@ namespace i18n.Domain.Concrete
 				}
 			}
 
-			return templateItems.Values;
+			return templateItems;
 		}
 
 
@@ -76,7 +76,7 @@ namespace i18n.Domain.Concrete
 		//todo: think about being able to escape the different delimiters so they can exist in the text
 		//todo: this function is simple and should probably be refactored, it does not in any way support multiline
 		//todo: could also be an idea to check if the line is a code comment, altho comments looks different in different file types
-		public void ParseFile(string file, ref ConcurrentDictionary<string, TemplateItem> templateItems)
+		public void ParseFile(string file, ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
 			string startToken = _settings.NuggetBeginToken;
 			string endToken = _settings.NuggetEndToken;
@@ -123,7 +123,7 @@ namespace i18n.Domain.Concrete
 						if (endIndex != -1)
 						{
 							nugget = line.Substring(startedIndex + startToken.Length, endIndex - startedIndex - startToken.Length);
-							AddNewTemplateItem(file, lineNumber, nugget, ref templateItems);
+							AddNewTemplateItem(file, lineNumber, nugget, templateItems);
 						}
 
 						currentCharecterIndex = endIndex;
@@ -143,7 +143,7 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
-		private void AddNewTemplateItem(string file, int lineNumber, string itemString, ref ConcurrentDictionary<string, TemplateItem> templateItems)
+		private void AddNewTemplateItem(string file, int lineNumber, string itemString, ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
 			string reference = file + ":" + lineNumber.ToString();
 			List<string> tmpList;

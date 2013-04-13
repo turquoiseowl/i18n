@@ -17,7 +17,7 @@ namespace i18n.Domain.Concrete
 			_repository = repository;
 		}
 
-		public void SynchronizeTranslation(IEnumerable<TemplateItem> items, Translation translation)
+		public void SynchronizeTranslation(IDictionary<string, TemplateItem> items, Translation translation)
 		{
 			//todo: look over desired implementation. Right now it checks for matching id AND matching reference
 			//todo: it would be easy to check if translation is updated thereby not saving the file if not updated and thereby sparing us constant checkins to versioning
@@ -29,11 +29,35 @@ namespace i18n.Domain.Concrete
 			//step 1 find and update files that exist in both template and and translation and remove references from any translation that is no longer in the template
 			foreach (var translationItem in translation.Items)
 			{
+
+                //MC001
+                if (translationItem.Id == "Please fill in this field") {
+                    int a = 10;
+                    a = 10;
+                }
+
+
 				found = false;
-				foreach (var templateItem in items)
+				foreach (var templateItem in items.Values)
 				{
+
+                    //MC001
+                    if (templateItem.Id == "Please fill in this field") {
+                        int a = 10;
+                        a = 10;
+                    }
+
+
 					if (templateItem.Id == translationItem.Id) //we found matching id, now we make sure references match
 					{
+
+                        //MC001
+                        if (templateItem.Id == "Please fill in this field") {
+                            int a = 10;
+                            a = 10;
+                        }
+
+
 						foreach (var translationReference in translationItem.References)
 						{
 							foreach (var templateReference in templateItem.References)
@@ -59,13 +83,38 @@ namespace i18n.Domain.Concrete
 
 
 			//step 2 find out if there are any new items in the template and add them to the translation
-			foreach (var templateItem in items)
+			foreach (var templateItem in items.Values)
 			{
+
+                    //MC001
+                    if (templateItem.Id == "Please fill in this field") {
+                        int a = 10;
+                        a = 10;
+                    }
+
 				found = false;
 				foreach (var translationItem in translation.Items)
 				{
+
+
+                    //MC001
+                    if (translationItem.Id == "Please fill in this field") {
+                        int a = 10;
+                        a = 10;
+                    }
+
+
 					if (templateItem.Id == translationItem.Id) //we found matching id, now we make sure references match
 					{
+
+
+                        //MC001
+                        if (templateItem.Id == "Please fill in this field") {
+                            int a = 10;
+                            a = 10;
+                        }
+
+
 						foreach (var translationReference in translationItem.References)
 						{
 							foreach (var templateReference in templateItem.References)
@@ -109,7 +158,7 @@ namespace i18n.Domain.Concrete
 			_repository.SaveTranslation(translation);
 		}
 
-		public void SynchronizeAllTranslation(IEnumerable<TemplateItem> items)
+		public void SynchronizeAllTranslation(IDictionary<string, TemplateItem> items)
 		{
 			foreach (var language in _repository.GetAvailableLanguages())
 			{
