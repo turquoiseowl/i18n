@@ -11,5 +11,10 @@ namespace i18n.Domain.Entities
 		public string Id;
 		public IEnumerable<string> References { get; set; }
 		public IEnumerable<string> Comments { get; set; }
+
+        public override string ToString()
+        {
+            return Id;
+        }
 	}
 }

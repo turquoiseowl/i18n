@@ -20,5 +20,10 @@ namespace i18n.Domain.Entities
 		public IEnumerable<string> ExtractedComments { get; set; }
 		public IEnumerable<string> TranslatorComments { get; set; }
 		public IEnumerable<string> Flags { get; set; }
+
+        public override string ToString()
+        {
+            return Id;
+        }
 	}
 }
