@@ -22,6 +22,7 @@ namespace i18n.Domain.Concrete
 
 		#region load
 
+/*MC001
 		/// <summary>
 		/// Retrieves a language queryable for use with LINQ.
 		/// This does not take care of thread safety.
@@ -33,12 +34,14 @@ namespace i18n.Domain.Concrete
 			Translation translation = ParseTranslationFile(tag);
 			return translation.Items.AsQueryable();
 		}
+*/
 
 		public Translation GetLanguage(string tag)
 		{
 			return ParseTranslationFile(tag);
 		}
 
+/*MC001
 		public ConcurrentDictionary<string, TranslateItem> GetLanguageDictionary(string tag)
 		{
 			ConcurrentDictionary<string, TranslateItem> messages = new ConcurrentDictionary<string, TranslateItem>();
@@ -64,6 +67,7 @@ namespace i18n.Domain.Concrete
 
 			return messages;
 		}
+*/
 
 		public IEnumerable<Language> GetAvailableLanguages()
 		{
@@ -114,7 +118,7 @@ namespace i18n.Domain.Concrete
 
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
-				foreach (var item in translation.Items)
+				foreach (var item in translation.Items.Values)
 				{
 					hasReferences = false;
 
@@ -245,8 +249,7 @@ namespace i18n.Domain.Concrete
 			Language language = new Language();
 			language.LanguageShortTag = tag;
 			translation.LanguageInformation = language;
-			List<TranslateItem> items = new List<TranslateItem>();
-			TranslateItem item = new TranslateItem();
+			var items = new ConcurrentDictionary<string, TranslateItem>();
 
 			string path = GetPathForLanguage(tag);
 
@@ -258,9 +261,6 @@ namespace i18n.Domain.Concrete
 				bool currentlyReadingItem = false;
 				while ((line = fs.ReadLine()) != null)
 				{
-					item = new TranslateItem();
-
-
 					List<string> extractedComments = new List<string>();
 					List<string> translatorComments = new List<string>();
 					List<string> flags = new List<string>();
@@ -294,15 +294,32 @@ namespace i18n.Domain.Concrete
 						} while ((line = fs.ReadLine()) != null && line.StartsWith("#"));
 					}
 
-					item.TranslatorComments = translatorComments;
-					item.ExtractedComments = extractedComments;
-					item.Flags = flags;
-					item.References = references;
-
 					if (currentlyReadingItem || line.StartsWith("#~"))
 					{
-						ParseBody(fs, line, item);
-						items.Add(item);
+						TranslateItem item = ParseBody(fs, line);
+
+                        if (item != null) {
+                           //
+					        item.TranslatorComments = translatorComments;
+					        item.ExtractedComments = extractedComments;
+					        item.Flags = flags;
+					        item.References = references;
+                           //
+                            items.AddOrUpdate(
+                                item.Id, 
+                                // Add routine.
+                                k => {
+			                        return item;
+                                },
+                                // Update routine.
+                                (k, v) => {
+                                    v.References = v.References.Append(item.References);
+                                    v.ExtractedComments = v.ExtractedComments.Append(item.References);
+                                    v.TranslatorComments = v.TranslatorComments.Append(item.References);
+                                    v.Flags = v.Flags.Append(item.References);
+                                    return v;
+                                });
+                        }
 					}
 
 					currentlyReadingItem = false;
@@ -327,50 +344,52 @@ namespace i18n.Domain.Concrete
 			return line;
 		}
 
-		private void ParseBody(TextReader fs, string line, TranslateItem message)
+		private TranslateItem ParseBody(TextReader fs, string line)
 		{
-			if (!string.IsNullOrEmpty(line))
+			if (string.IsNullOrEmpty(line)) {
+                return null; }
+
+            TranslateItem message = new TranslateItem();
+			StringBuilder sb = new StringBuilder();
+
+			line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
+			if (line.StartsWith("msgid"))
 			{
-				StringBuilder sb = new StringBuilder();
+				var msgid = Unquote(line);
+				sb.Append(msgid);
 
-				line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
-				if (line.StartsWith("msgid"))
+				while ((line = fs.ReadLine()) != null)
 				{
-					var msgid = Unquote(line);
-					sb.Append(msgid);
-
-					while ((line = fs.ReadLine()) != null)
+					line = RemoveCommentIfHistorical(line);
+					if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)
 					{
-						line = RemoveCommentIfHistorical(line);
-						if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)
-						{
-							sb.Append(msgid);
-						}
-						else
-						{
-							break;
-						}
+						sb.Append(msgid);
 					}
-
-					message.Id = Unescape(sb.ToString());
+					else
+					{
+						break;
+					}
 				}
 
-				sb.Clear();
-				line = RemoveCommentIfHistorical(line);
-				if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
-				{
-					var msgstr = Unquote(line);
-					sb.Append(msgstr);
-
-					while ((line = fs.ReadLine()) != null && (msgstr = Unquote(line)) != null)
-					{
-						line = RemoveCommentIfHistorical(line);
-						sb.Append(msgstr);
-					}
-
-					message.Message = Unescape(sb.ToString());
-				}
+				message.Id = Unescape(sb.ToString());
 			}
+
+			sb.Clear();
+			line = RemoveCommentIfHistorical(line);
+			if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
+			{
+				var msgstr = Unquote(line);
+				sb.Append(msgstr);
+
+				while ((line = fs.ReadLine()) != null && (msgstr = Unquote(line)) != null)
+				{
+					line = RemoveCommentIfHistorical(line);
+					sb.Append(msgstr);
+				}
+
+				message.Message = Unescape(sb.ToString());
+			}
+            return message;
 		}
 
 		#region quoting and escaping

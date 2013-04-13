@@ -10,9 +10,9 @@ namespace i18n.Domain.Abstract
 {
 	public interface ITranslationRepository
 	{
-		IQueryable<TranslateItem> GetLanguageItems(string tag);
+		//IQueryable<TranslateItem> GetLanguageItems(string tag); //MC001 TODO: method redundant now that Translation.Items is a dictionary.
 		Translation GetLanguage(string tag);
-		ConcurrentDictionary<string, TranslateItem> GetLanguageDictionary(string tag);
+		//ConcurrentDictionary<string, TranslateItem> GetLanguageDictionary(string tag); //MC001 TODO: method redundant now that Translation.Items is a dictionary.
 		IEnumerable<Language> GetAvailableLanguages();
 		bool TranslationExists(string tag);
 		void SaveTranslation(Translation translation);

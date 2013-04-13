@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using i18n.Domain.Entities;
@@ -24,14 +25,13 @@ namespace i18n.Domain.Concrete
 
 			bool found = false;
 			TranslateItem newItem;
-			List<TranslateItem> itemList = translation.Items.ToList();
 
 			//step 1 find and update files that exist in both template and and translation and remove references from any translation that is no longer in the template
 			foreach (var translationItem in translation.Items)
 			{
 
                 //MC001
-                if (translationItem.Id == "Please fill in this field") {
+                if (translationItem.Value.Id == "Please fill in this field") {
                     int a = 10;
                     a = 10;
                 }
@@ -48,7 +48,7 @@ namespace i18n.Domain.Concrete
                     }
 
 
-					if (templateItem.Id == translationItem.Id) //we found matching id, now we make sure references match
+					if (templateItem.Id == translationItem.Value.Id) //we found matching id, now we make sure references match
 					{
 
                         //MC001
@@ -58,7 +58,7 @@ namespace i18n.Domain.Concrete
                         }
 
 
-						foreach (var translationReference in translationItem.References)
+						foreach (var translationReference in translationItem.Value.References)
 						{
 							foreach (var templateReference in templateItem.References)
 							{
@@ -66,7 +66,7 @@ namespace i18n.Domain.Concrete
 								{
 									found = true;
 									//we overwrite translation files comments for the ones from template
-									translationItem.ExtractedComments = templateItem.Comments; //templates comments comes from code, aka Extracted comments. Translators comments are not in template file
+									translationItem.Value.ExtractedComments = templateItem.Comments; //templates comments comes from code, aka Extracted comments. Translators comments are not in template file
 									
 									//that is all that is overwritten since everything else such as flags, comments from translator and actual message string has nothing to do with template file
 								}
@@ -77,7 +77,7 @@ namespace i18n.Domain.Concrete
 	
 				if (!found) //the item no longer exists in the template so we remove the references thus making it log only
 				{
-					translationItem.References = Enumerable.Empty<string>();
+					translationItem.Value.References = Enumerable.Empty<string>();
 				}
 			}
 
@@ -98,13 +98,13 @@ namespace i18n.Domain.Concrete
 
 
                     //MC001
-                    if (translationItem.Id == "Please fill in this field") {
+                    if (translationItem.Value.Id == "Please fill in this field") {
                         int a = 10;
                         a = 10;
                     }
 
 
-					if (templateItem.Id == translationItem.Id) //we found matching id, now we make sure references match
+					if (templateItem.Id == translationItem.Value.Id) //we found matching id, now we make sure references match
 					{
 
 
@@ -115,7 +115,7 @@ namespace i18n.Domain.Concrete
                         }
 
 
-						foreach (var translationReference in translationItem.References)
+						foreach (var translationReference in translationItem.Value.References)
 						{
 							foreach (var templateReference in templateItem.References)
 							{
@@ -150,11 +150,10 @@ namespace i18n.Domain.Concrete
 					newItem.References = templateItem.References;
 					newItem.ExtractedComments = templateItem.Comments;
 
-					itemList.Add(newItem);
+					translation.Items[templateItem.Id] = newItem;
 				}
 			}
 
-			translation.Items = itemList;
 			_repository.SaveTranslation(translation);
 		}
 
