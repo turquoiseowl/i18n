@@ -118,7 +118,14 @@ namespace i18n.Domain.Concrete
 
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
-				foreach (var item in translation.Items.Values)
+               // Establish ordering of items in PO file.
+                var orderedItems = translation.Items.Values
+                    .OrderBy(x => x.References == null || x.References.Count() == 0)
+                        // Non-orphan items before orphan items.
+                    .ThenBy(x => x.Id);
+                        // Then order alphanumerically.
+               //
+				foreach (var item in orderedItems)
 				{
 					hasReferences = false;
 
