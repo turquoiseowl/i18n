@@ -51,35 +51,11 @@ namespace i18n.Domain.Concrete
 			//step 1 find and update files that exist in both template and and translation and remove references from any translation that is no longer in the template
 			foreach (var translationItem in translation.Items)
 			{
-
-                //MC001
-                if (translationItem.Value.Id == "Please fill in this field") {
-                    int a = 10;
-                    a = 10;
-                }
-
-
 				found = false;
 				foreach (var srcItem in items.Values)
 				{
-
-                    //MC001
-                    if (srcItem.Id == "Please fill in this field") {
-                        int a = 10;
-                        a = 10;
-                    }
-
-
 					if (srcItem.Id == translationItem.Value.Id) //we found matching id, now we make sure references match
 					{
-
-                        //MC001
-                        if (srcItem.Id == "Please fill in this field") {
-                            int a = 10;
-                            a = 10;
-                        }
-
-
 						foreach (var translationReference in translationItem.Value.References)
 						{
 							foreach (var templateReference in srcItem.References)
@@ -107,35 +83,12 @@ namespace i18n.Domain.Concrete
 			//step 2 find out if there are any new items in the template and add them to the translation
 			foreach (var srcItem in items.Values)
 			{
-
-                    //MC001
-                    if (srcItem.Id == "Please fill in this field") {
-                        int a = 10;
-                        a = 10;
-                    }
-
 				found = false;
 				foreach (var translationItem in translation.Items)
 				{
 
-
-                    //MC001
-                    if (translationItem.Value.Id == "Please fill in this field") {
-                        int a = 10;
-                        a = 10;
-                    }
-
-
 					if (srcItem.Id == translationItem.Value.Id) //we found matching id, now we make sure references match
 					{
-
-
-                        //MC001
-                        if (srcItem.Id == "Please fill in this field") {
-                            int a = 10;
-                            a = 10;
-                        }
-
 
 						foreach (var translationReference in translationItem.Value.References)
 						{
