@@ -87,7 +87,7 @@ namespace i18n.Domain.Concrete
 			int endIndex = -1;
 			string nugget = "";
 			string line;
-			bool haveOpened = false;
+			//bool haveOpened = false;
 			int lineNumber = 0;
 
 			int delimiterIndex;
@@ -104,7 +104,7 @@ namespace i18n.Domain.Concrete
 					//will find all starts of nuggets, inside we need to make sure to forward the index if we find an end
 					while ((currentCharecterIndex = line.IndexOf(startToken, currentCharecterIndex)) != -1)
 					{
-						haveOpened = true;
+						//haveOpened = true;
 						startedIndex = currentCharecterIndex;
 
 						delimiterIndex = line.IndexOf(delimiterToken, currentCharecterIndex);
@@ -127,7 +127,7 @@ namespace i18n.Domain.Concrete
 						}
 
 						currentCharecterIndex = endIndex;
-						haveOpened = false;
+						//haveOpened = false;
 						startedIndex = -1;
 						endIndex = -1;
 						nugget = "";
