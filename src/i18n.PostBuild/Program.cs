@@ -12,7 +12,7 @@ namespace i18n.PostBuild
         {
 			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
 
-			NuggetFileParser nugget = new NuggetFileParser(new i18nSettings(new ConfigFileSettingService()));
+			NuggetFileFinder nugget = new NuggetFileFinder(new i18nSettings(new ConfigFileSettingService()));
 	        var items = nugget.ParseAll();
 	        rep.SaveTemplate(items);
 

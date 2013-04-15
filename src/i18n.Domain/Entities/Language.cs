@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace i18n.Domain.Entities
 {
+	/// <summary>
+	/// Keeps all information about a language that can be handy when listing languages.
+	/// </summary>
 	public class Language
 	{
 		public string LanguageShortTag { get; set; }

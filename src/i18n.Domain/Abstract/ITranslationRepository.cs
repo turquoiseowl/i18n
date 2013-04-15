@@ -8,6 +8,9 @@ using i18n.Domain.Entities;
 
 namespace i18n.Domain.Abstract
 {
+	/// <summary>
+	/// For managing a translation repository for reading, writing and searching. As long as you implement this you can store your translation wherever you want.
+	/// </summary>
 	public interface ITranslationRepository
 	{
 		//IQueryable<TranslateItem> GetLanguageItems(string tag); //MC001 TODO: method redundant now that Translation.Items is a dictionary.
