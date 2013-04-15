@@ -13,9 +13,16 @@ namespace i18n.Domain.Concrete
 	{
 		private i18nSettings _settings;
 
+        private NuggetParser _nuggetParser;
+
 		public NuggetFileParser(i18nSettings settings)
 		{
 			_settings = settings;
+            _nuggetParser = new NuggetParser(new NuggetTokens(
+			    _settings.NuggetBeginToken,
+			    _settings.NuggetEndToken,
+			    _settings.NuggetDelimiterToken,
+			    _settings.NuggetCommentToken));
 		}
 
 		public IDictionary<string, TemplateItem> ParseAll()
@@ -74,17 +81,10 @@ namespace i18n.Domain.Concrete
 
 		public void ParseFile(string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
         {
-           // Lookup any/all msgid nuggets in the entity and replace with any translated message.
-            NuggetTokens nuggetTokens = new NuggetTokens(
-			    _settings.NuggetBeginToken,
-			    _settings.NuggetEndToken,
-			    _settings.NuggetDelimiterToken,
-			    _settings.NuggetCommentToken);
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
-           //
+           // Lookup any/all nuggets in the file and for each add a new template item.
 			using (var fs = File.OpenText(filePath))
 			{
-                nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
+                _nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
                 {
 				    AddNewTemplateItem(
                         filePath, 
