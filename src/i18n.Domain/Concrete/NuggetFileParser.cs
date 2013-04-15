@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using i18n.Domain.Entities;
+using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
 {
@@ -38,27 +39,27 @@ namespace i18n.Domain.Concrete
 				}
 
 
-				foreach (string file in Directory.EnumerateFiles(absoluteDirectoryPath, "*.*", SearchOption.AllDirectories))
+				foreach (string filePath in Directory.EnumerateFiles(absoluteDirectoryPath, "*.*", SearchOption.AllDirectories))
 				{
-					//we check every file against our white list. if it's on there in at least one form we check it.
+					//we check every filePath against our white list. if it's on there in at least one form we check it.
 					foreach (var whiteListItem in fileWhiteList)
 					{
 						//We have a catch all for a filetype
 						if (whiteListItem.StartsWith("*."))
 						{
-							if (Path.GetExtension(file) == whiteListItem.Substring(1))
+							if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
 							{
 								//we got a match
-								ParseFile(file, templateItems);
+								ParseFile(filePath, templateItems);
 								break;
 							}
 						}
 						else //a file, like myfile.js
 						{
-							if (Path.GetFileName(file) == whiteListItem)
+							if (Path.GetFileName(filePath) == whiteListItem)
 							{
 								//we got a match
-								ParseFile(file, templateItems);
+								ParseFile(filePath, templateItems);
 								break;
 							}
 						}
@@ -71,99 +72,72 @@ namespace i18n.Domain.Concrete
 			return templateItems;
 		}
 
-
-		//todo: see comment in TranslateItem.cs about how line breaks should be handled, this searcher also needs to be updated.
-		//todo: think about being able to escape the different delimiters so they can exist in the text
-		//todo: this function is simple and should probably be refactored, it does not in any way support multiline
-		//todo: could also be an idea to check if the line is a code comment, altho comments looks different in different file types
-		public void ParseFile(string file, ConcurrentDictionary<string, TemplateItem> templateItems)
-		{
-			string startToken = _settings.NuggetBeginToken;
-			string endToken = _settings.NuggetEndToken;
-			string delimiterToken = _settings.NuggetDelimiterToken;
-
-			int currentCharecterIndex = 0;
-			int startedIndex = -1;
-			int endIndex = -1;
-			string nugget = "";
-			string line;
-			//bool haveOpened = false;
-			int lineNumber = 0;
-
-			int delimiterIndex;
-			int endTokenIndex;
-
-			using (var fs = File.OpenText(file))
+		public void ParseFile(string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
+        {
+           // Lookup any/all msgid nuggets in the entity and replace with any translated message.
+            NuggetTokens nuggetTokens = new NuggetTokens(
+			    _settings.NuggetBeginToken,
+			    _settings.NuggetEndToken,
+			    _settings.NuggetDelimiterToken,
+			    _settings.NuggetCommentToken);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+           //
+			using (var fs = File.OpenText(filePath))
 			{
-				while ((line = fs.ReadLine()) != null)
-				{
-					currentCharecterIndex = 0;
-					
-					lineNumber++;
+                nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
+                {
+				    AddNewTemplateItem(
+                        filePath, 
+                        i_entity.LineFromPos(pos), 
+                        nugget, 
+                        templateItems);
+                   // Done.
+                    return null; // null means we are not modifying the entity.
+                });
+            }
+        }
 
-					//will find all starts of nuggets, inside we need to make sure to forward the index if we find an end
-					while ((currentCharecterIndex = line.IndexOf(startToken, currentCharecterIndex)) != -1)
-					{
-						//haveOpened = true;
-						startedIndex = currentCharecterIndex;
-
-						delimiterIndex = line.IndexOf(delimiterToken, currentCharecterIndex);
-						endTokenIndex = line.IndexOf(endToken, currentCharecterIndex);
-
-						//this means we found an end to the nugget itself, parameters follow but we are not interessted
-						if (delimiterIndex != -1 && delimiterIndex < endTokenIndex)
-						{
-							endIndex = delimiterIndex;
-						}
-						else if (endTokenIndex != -1)
-						{
-							endIndex = endTokenIndex;
-						}
-
-						if (endIndex != -1)
-						{
-							nugget = line.Substring(startedIndex + startToken.Length, endIndex - startedIndex - startToken.Length);
-							AddNewTemplateItem(file, lineNumber, nugget, templateItems);
-						}
-
-						currentCharecterIndex = endIndex;
-						//haveOpened = false;
-						startedIndex = -1;
-						endIndex = -1;
-						nugget = "";
-
-						//we never found an end to our nugget, so we break out of this line to go to next
-						if (currentCharecterIndex == -1)
-						{
-							break;
-						}
-
-					}
-				}
-			}
-		}
-
-		private void AddNewTemplateItem(string file, int lineNumber, string itemString, ConcurrentDictionary<string, TemplateItem> templateItems)
+		private void AddNewTemplateItem(
+            string filePath, 
+            int lineNumber, 
+            Nugget nugget, 
+            ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
-			string reference = file + ":" + lineNumber.ToString();
+			string reference = filePath + ":" + lineNumber.ToString();
 			List<string> tmpList;
            //
             templateItems.AddOrUpdate(
-                itemString, 
+                nugget.MsgId, 
                 // Add routine.
                 k => {
 			        TemplateItem item = new TemplateItem();
-			        item.Id = itemString;
+			        item.Id = nugget.MsgId;
+
 			        tmpList = new List<string>();
 			        tmpList.Add(reference);
 			        item.References = tmpList;
+
+			        if (nugget.Comment.IsSet()) {
+                        tmpList = new List<string>();
+                        tmpList.Add(nugget.Comment);
+                        item.Comments = tmpList;
+                    }
+
 			        return item;
                 },
                 // Update routine.
                 (k, v) => {
+
 					tmpList = v.References.ToList();
 					tmpList.Add(reference);
 					v.References = tmpList;
+
+			        if (nugget.Comment.IsSet()) {
+					    tmpList = v.Comments != null ? v.Comments.ToList() : new List<string>();
+					    tmpList.Add(nugget.Comment);
+					    v.Comments = tmpList;
+                    }
+
                     return v;
                 });
 		}
