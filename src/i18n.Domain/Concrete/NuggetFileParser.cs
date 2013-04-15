@@ -104,14 +104,16 @@ namespace i18n.Domain.Concrete
             ConcurrentDictionary<string, TemplateItem> templateItems)
 		{
 			string reference = filePath + ":" + lineNumber.ToString();
+            string msgid = nugget.MsgId.Replace("\r\n", "\n").Replace("\r", "\\n");
+                // NB: In memory msgids are normalized so that LFs are converted to "\n" char sequence.
 			List<string> tmpList;
            //
             templateItems.AddOrUpdate(
-                nugget.MsgId, 
+                msgid, 
                 // Add routine.
                 k => {
 			        TemplateItem item = new TemplateItem();
-			        item.Id = nugget.MsgId;
+			        item.Id = msgid;
 
 			        tmpList = new List<string>();
 			        tmpList.Add(reference);
