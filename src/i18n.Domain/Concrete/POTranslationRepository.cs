@@ -163,19 +163,11 @@ namespace i18n.Domain.Concrete
 						}
 					}
 
-					if (hasReferences)
-					{
-						stream.WriteLine("msgid \"" + escape(item.Id) + "\"");
-						stream.WriteLine("msgstr \"" + escape(item.Message) + "\"");
-						stream.WriteLine("");
-					}
-					else
-					{
-						stream.WriteLine("#~ msgid \"" + escape(item.Id) + "\"");
-						stream.WriteLine("#~ msgstr \"" + escape(item.Message) + "\"");
-						stream.WriteLine("");
-					}
-					
+					string prefix = hasReferences ? "" : prefix = "#~ ";
+
+                    WriteString(stream, hasReferences, "msgid", item.Id);
+                    WriteString(stream, hasReferences, "msgstr", escape(item.Message));
+                    stream.WriteLine("");
 				}
 			}
 		}
@@ -266,7 +258,7 @@ namespace i18n.Domain.Concrete
 				// http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
 
 				string line;
-				bool currentlyReadingItem = false;
+				bool itemStarted = false;
 				while ((line = fs.ReadLine()) != null)
 				{
 					List<string> extractedComments = new List<string>();
@@ -280,7 +272,7 @@ namespace i18n.Domain.Concrete
 					{
 						do
 						{
-							currentlyReadingItem = true;
+							itemStarted = true;
 							switch (line[1])
 							{
 								case '.': //Extracted comments
@@ -302,7 +294,7 @@ namespace i18n.Domain.Concrete
 						} while ((line = fs.ReadLine()) != null && line.StartsWith("#"));
 					}
 
-					if (currentlyReadingItem || line.StartsWith("#~"))
+					if (itemStarted || line.StartsWith("#~"))
 					{
 						TranslateItem item = ParseBody(fs, line);
 
@@ -330,7 +322,7 @@ namespace i18n.Domain.Concrete
                         }
 					}
 
-					currentlyReadingItem = false;
+					itemStarted = false;
 				}
 			}
 			translation.Items = items;
@@ -357,7 +349,7 @@ namespace i18n.Domain.Concrete
 			if (string.IsNullOrEmpty(line)) {
                 return null; }
 
-            TranslateItem message = new TranslateItem();
+            TranslateItem message = new TranslateItem { Id = "" };
 			StringBuilder sb = new StringBuilder();
 
 			line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
@@ -400,6 +392,44 @@ namespace i18n.Domain.Concrete
             return message;
 		}
 
+        /// <summary>
+        /// Helper for writing either a msgid or msgstr to the po file.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="hasReferences"></param>
+        /// <param name="type">"msgid" or "msgstr"</param>
+        /// <param name="value"></param>
+        private static void WriteString(StreamWriter stream, bool hasReferences, string type, string value)
+        {
+        // Logic for outputting multi-line msgid.
+        //
+        // IN : a<LF>b
+        // OUT: msgid "a\n"
+        //      msgid "b"
+        //
+        // IN : a<LF>b<LF>
+        // OUT: msgid "a\n"
+        //      msgid "b\n"
+        //
+			string prefix = hasReferences ? "" : prefix = "#~ ";
+			value = value ?? "";
+            value = value.Replace("\r\n", "\n");
+            string[] lines = value.Split('\n');
+            if (lines.Length > 1) {
+                stream.WriteLine(string.Format("{0}{1} \"\"", prefix, type));
+                for (int i = 0; i < lines.Length; ++i) {
+                    string m = lines[i];
+                    bool last = i == lines.Length -1;
+                    if (m.Length != 0) {
+                        stream.WriteLine(string.Format("\"{0}{1}\"", m, last ? "" : "\\n"));
+                    }
+                }
+            }
+            else {
+                stream.WriteLine(string.Format("{0}{1} \"{2}\"", prefix, type, value));
+            }
+        }
+
 		#region quoting and escaping
 
 		//this method removes anything before the first quote and also removes first and last quote
@@ -434,7 +464,7 @@ namespace i18n.Domain.Concrete
 		/// <seealso href="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
 		private string Unescape(string s)
 		{
-			Regex regex_unescape = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
+			Regex regex_unescape = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.", RegexOptions.Singleline);
 
 			StringBuilder sb = new StringBuilder();
 			MatchCollection mc = regex_unescape.Matches(s, 0);
