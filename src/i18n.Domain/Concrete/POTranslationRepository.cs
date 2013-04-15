@@ -70,6 +70,10 @@ namespace i18n.Domain.Concrete
 		}
 */
 
+		/// <summary>
+		/// PO file implementation simply checks for available directories in the locale directory and each directory is deemed to be a translation. No checks are done for correct language tag, actual translation file inside or valid translation file inside
+		/// </summary>
+		/// <returns>List of available languages</returns>
 		public IEnumerable<Language> GetAvailableLanguages()
 		{
 			//todo: ideally we want to fill the other data in the Language object so this is usable by project incorporating i18n that they can simply lookup available languages. Maybe we even add a country property so that it's easier for projects to add corresponding flags.
@@ -87,6 +91,11 @@ namespace i18n.Domain.Concrete
 			return dirList;
 		}
 
+		/// <summary>
+		/// Checks if there is a translation file for the desired language. No validity checks performed.
+		/// </summary>
+		/// <param name="tag">The tag for which you want to check if support exists. For instance "sv-SE"</param>
+		/// <returns>True if language file exists, otherwise false</returns>
 		public bool TranslationExists(string tag)
 		{
 			return File.Exists(GetPathForLanguage(tag));
@@ -96,6 +105,11 @@ namespace i18n.Domain.Concrete
 
 		#region save
 
+		/// <summary>
+		/// Saves a translation into file with standard pattern locale/tag/message.po
+		/// Also saves a backup of previous version
+		/// </summary>
+		/// <param name="translation">The translation you wish to save. Must have Language shortag filled out.</param>
 		public void SaveTranslation(Translation translation)
 		{
 			string filePath = GetPathForLanguage(translation.LanguageInformation.LanguageShortTag);
@@ -172,6 +186,10 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+		/// <summary>
+		/// Saves a template file which is a all strings (needing translation) used in the entire project. Not language dependent
+		/// </summary>
+		/// <param name="items">A list of template items to save. The list should be all template items for the entire project.</param>
 		public void SaveTemplate(IDictionary<string, TemplateItem> items)
 		{
 			string filePath = GetAbsoluteLocaleDir() + "/messages.pot";
@@ -218,6 +236,10 @@ namespace i18n.Domain.Concrete
 
 		#region helpers
 
+		/// <summary>
+		/// Gets the locale directory from settings and makes sure it is translated into absolut path
+		/// </summary>
+		/// <returns>the locale directory in absolute path</returns>
 		private string GetAbsoluteLocaleDir()
 		{
 			string localeDir = _settings.LocaleDirectory;
@@ -241,6 +263,11 @@ namespace i18n.Domain.Concrete
 			return path + "/" + tag + "/messages.po";
 		}
 
+		/// <summary>
+		/// Parses a PO file into a Language object
+		/// </summary>
+		/// <param name="tag">The language (tag) you wish to load into Translation object</param>
+		/// <returns>A complete translation object with all all translations and language values set.</returns>
 		private Translation ParseTranslationFile(string tag)
 		{
 			//todo: consider that lines we don't understand like headers from poedit and #| should be preserved and outputted again.
@@ -329,6 +356,11 @@ namespace i18n.Domain.Concrete
 			return translation;
 		}
 
+		/// <summary>
+		/// Removes the preceding characters in a file showing that an item is historical/log. That is to say it has been removed from the project. We don't need care about the character as the fact that it lacks references is what tells us it's a log item
+		/// </summary>
+		/// <param name="line"></param>
+		/// <returns></returns>
 		private string RemoveCommentIfHistorical(string line)
 		{
 			if (string.IsNullOrWhiteSpace(line))
@@ -344,6 +376,13 @@ namespace i18n.Domain.Concrete
 			return line;
 		}
 
+		/// <summary>
+		/// Parses the body of a PO file item. That is to say the message id and the message itself.
+		/// Reason for why it must be on second line (textreader) is so that you can read until you have read to far without peek previously for meta data.
+		/// </summary>
+		/// <param name="fs">A textreader that must be on the second line of a Message id</param>
+		/// <param name="line">The first line of the message id.</param>
+		/// <returns>Returns a TranslationITem with only id and message set</returns>
 		private TranslateItem ParseBody(TextReader fs, string line)
 		{
 			if (string.IsNullOrEmpty(line)) {

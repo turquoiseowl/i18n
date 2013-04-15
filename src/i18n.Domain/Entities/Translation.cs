@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace i18n.Domain.Entities
 {
+	/// <summary>
+	/// Holds a complete translation in any one language. The template (TemplateItems) will have told the language which id's/strings that needs translation.
+	/// </summary>
 	public class Translation
 	{
 		public Language LanguageInformation { get; set; }

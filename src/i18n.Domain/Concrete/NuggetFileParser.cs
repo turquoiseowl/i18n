@@ -25,6 +25,10 @@ namespace i18n.Domain.Concrete
 			    _settings.NuggetCommentToken));
 		}
 
+		/// <summary>
+		/// Goes through the Directories to scan recursively and starts a scan of each while that matches the whitelist. (both from settings)
+		/// </summary>
+		/// <returns>All found nuggets.</returns>
 		public IDictionary<string, TemplateItem> ParseAll()
 		{
 			IEnumerable<string> fileWhiteList = _settings.WhiteList;

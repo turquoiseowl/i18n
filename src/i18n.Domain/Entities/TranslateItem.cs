@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace i18n.Domain.Entities
 {
+	/// <summary>
+	/// All the data that one translation one item can contain. Apart from Id (which is the string to translate) and Message (which is the translation) it contains some meta data. This is linked from Translation that ties many of these items together for a complete language
+	/// </summary>
 	public class TranslateItem
 	{
 		//todo: The po specification actually says that if you want to multiline the message (and possibly the id) it should looks like this
