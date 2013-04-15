@@ -37,7 +37,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _localeDirectoryDefault);
+					//_settingService.SetSetting(prefixedString, _localeDirectoryDefault);
 					return _localeDirectoryDefault;
 				}
 				
@@ -67,7 +67,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _whiteListDefault);
+					//_settingService.SetSetting(prefixedString, _whiteListDefault);
 					return _whiteListDefault.Split(';').ToList();
 				}
 			}
@@ -96,7 +96,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _nuggetBeginTokenDefault);
+					//_settingService.SetSetting(prefixedString, _nuggetBeginTokenDefault);
 					return _nuggetBeginTokenDefault;
 				}
 
@@ -121,7 +121,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _nuggetEndTokenDefault);
+					//_settingService.SetSetting(prefixedString, _nuggetEndTokenDefault);
 					return _nuggetEndTokenDefault;
 				}
 
@@ -146,7 +146,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _nuggetDelimiterTokenDefault);
+					//_settingService.SetSetting(prefixedString, _nuggetDelimiterTokenDefault);
 					return _nuggetDelimiterTokenDefault;
 				}
 
@@ -171,7 +171,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _nuggetCommentTokenDefault);
+					//_settingService.SetSetting(prefixedString, _nuggetCommentTokenDefault);
 					return _nuggetCommentTokenDefault;
 				}
 
@@ -201,7 +201,7 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					_settingService.SetSetting(prefixedString, _directoriesToScan);
+					//_settingService.SetSetting(prefixedString, _directoriesToScan);
 					return _directoriesToScan.Split(';').ToList();
 				}
 			}
