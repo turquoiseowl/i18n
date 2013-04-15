@@ -2,6 +2,7 @@
 using System.Web;
 using System.Text;
 using System.Text.RegularExpressions;
+using i18n.Helpers;
 
 namespace i18n
 {
@@ -15,65 +16,52 @@ namespace i18n
 
         public string ProcessNuggets(string entity, ITextLocalizer textLocalizer, LanguageItem[] languages)
         {
-            // Lookup any/all msgid nuggets in the entity and replace with any translated message.
-            return m_regexNugget.Replace(entity, delegate(Match match)
-	        {
+           // Lookup any/all msgid nuggets in the entity and replace with any translated message.
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            string entityOut = nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
+            {
+            // Formatted nuggets:
+            //
+            // A formatted nugget will be encountered here like this, say:
+            //
+            //    [[[Enter between %0 and %1 characters|||100|||6]]]
+            //
+            // while the original string in the code for this may have been:
+            //
+            //    [[[Enter between %0 and %1 characters|||{1}|||{2}]]]
+            //
+            // The canonical msgid part is that between the opening [[[ and the first |||:
+            //
+            //    Enter between %0 and %1 characters
+            //
+            // We use that for the lookup.
+            //
                 LanguageTag lt;
                 string message;
-                string tail;
+               // Check for unit-test caller.
                 if (textLocalizer == null) {
                     return "test.message"; }
-	            string msgid = match.Groups[1].Value;
-
-                // Formatted nuggets:
-                //
-                // The msgid for a formatted nugget will be encountered here like this, say:
-                //
-                //    Enter between %0 and %1 characters|||100|||6
-                //
-                // while the original string in the code for this may have been:
-                //
-                //    [[[Enter between %0 and %1 characters|||{1}|||{2}]]]
-                //
-                // The canonical msgid part is that between the opening [[[ and the first |||:
-                //
-                //    Enter between %0 and %1 characters
-                //
-                // Thus we use that for the lookup.
-
-                // If nugget is Formatted
-                if (IsNuggetFormatted(msgid))
-                {
-                    // Extract canonical msgid part.
-                    string msgid_canonical = GetCanonicalMsgIdFromNugget(msgid, out tail);
-
-                    // Lookup resource using canonical msgid.
-                    message = textLocalizer.GetText(msgid_canonical, languages, out lt);
-
-                    // If not found...leave be.
-                    if (message == null) {
-                        return HttpUtility.HtmlDecode(msgid); }
-
-                    // Extract values from tail of formatted nugget.
-                    string[] tokens = tail.Split(s_internalDelimiter, StringSplitOptions.None);
-
-                    // Format the message.
+               // Lookup resource using canonical msgid.
+                message = textLocalizer.GetText(nugget.MsgId, languages, out lt);
+               //
+                if (nugget.IsFormatted) {
+                   // Convert any identifies in a formatted nugget: %0 -> {0}
+                    message = ConvertIdentifiersInMsgId(message);
+                   // Format the message.
                     try {
-                        message = string.Format(message, tokens); }
-                    catch (FormatException e) {
-                        message += string.Format(" [FORMAT EXCEPTION: {0}]", e.Message);
-                        //message += "[FORMAT EXCEPTION]";
+                        message = string.Format(message, nugget.FormatItems); }
+                    catch (FormatException /*e*/) {
+                        //message += string.Format(" [FORMAT EXCEPTION: {0}]", e.Message);
+                        message += "[FORMAT EXCEPTION]";
                     }
                 }
-                // For unformatted nugget
-                else {
-                    // Lookup resource.
-                    message = textLocalizer.GetText(msgid, languages, out lt) ?? msgid;
-                }
-
-                DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", msgid, message);
+               // Output modified message (to be subsituted for original in the source entity).
+                DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", nugget.MsgId, message);
                 return HttpUtility.HtmlDecode(message);
-	        });
+            });
+           // Return modified entity.
+            return entityOut;
         }
 
     #endregion
@@ -91,35 +79,25 @@ namespace i18n
         }
 
         /// <summary>
-        /// Helper for extracting and generating a canonical msgid from a formatted nugget.
+        /// Helper for converting the C printf-style %0, %1 ... style identifiers in a formatted nugget msgid string
+        /// to the .NET-style format items: {0}, {1} ...
         /// </summary>
-        /// <param name="nugget"></param>
-        /// <returns></returns>
         /// <remarks>
         /// A formatted msgid may be in the form:
         /// <para>
-        /// Enter between %1 and %0 characters|||6|||100
+        /// Enter between %1 and %0 characters
         /// </para>
         /// <para>
-        /// The canonical form of which would be:
+        /// For which we return:
         /// </para>
         /// <para>
         /// Enter between {1} and {0} characters
         /// </para>
         /// </remarks>
-        public static string GetCanonicalMsgIdFromNugget(string nugget, out string tail)
+        public static string ConvertIdentifiersInMsgId(string msgid)
         {
-            // Truncate after any first ||| sequence.
-            int pos = nugget.IndexOf(s_internalDelimiter[0]);
-            if (-1 != pos) {
-                tail = nugget.Substring(pos +s_internalDelimiter[0].Length);
-                nugget = nugget.Substring(0, pos);
-            }
-            else {
-                tail = string.Empty; }
-
             // Convert %n style identifiers to {n} style.
-            return m_regexCanonicalNugget.Replace(nugget, delegate(Match match)
+            return m_regexPrintfIdentifiers.Replace(msgid, delegate(Match match)
 	        {
 	            string s = match.Groups[1].Value;
                 double id;
@@ -132,22 +110,9 @@ namespace i18n
     // Implementation
 
         /// <summary>
-        /// Regex for finding and replacing msgid nuggets.
-        /// </summary>
-        public static Regex m_regexNugget = new Regex(
-            @"\[\[\[(.+?)\]\]\]", 
-            RegexOptions.CultureInvariant);
-            // [[[
-            //      Match opening sequence.
-            // .+?
-            //      Lazily match chars up to
-            // ]]]
-            //      ... closing sequence
-
-        /// <summary>
         /// Regex for helping replace %0 style identifiers with {0} style ones.
         /// </summary>
-        protected static Regex m_regexCanonicalNugget = new Regex(
+        protected static Regex m_regexPrintfIdentifiers = new Regex(
             @"(%\d+)", 
             RegexOptions.CultureInvariant);
 

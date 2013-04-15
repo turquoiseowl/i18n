@@ -68,6 +68,15 @@ namespace i18n.Helpers
         public string[] FormatItems { get; set; }
         public string Comment { get; set; }
 
+    // Helpers
+
+        public bool IsFormatted
+        {
+            get {
+                return FormatItems != null && FormatItems.Length != 0;
+            }
+        }
+
         public override string ToString()
         {
             return MsgId;
