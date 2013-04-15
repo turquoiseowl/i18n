@@ -158,6 +158,31 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+		private const string _nuggetCommentTokenDefault = "///";
+		public virtual string NuggetCommentToken
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("NuggetCommentToken");
+				string setting = _settingService.GetSetting(prefixedString);
+				if (setting != null)
+				{
+					return setting;
+				}
+				else
+				{
+					_settingService.SetSetting(prefixedString, _nuggetCommentTokenDefault);
+					return _nuggetCommentTokenDefault;
+				}
+
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("NuggetCommentToken");
+				_settingService.SetSetting(prefixedString, value);
+			}
+		}
+
 		#endregion
 
 
