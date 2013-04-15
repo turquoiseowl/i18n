@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace i18n.Tests
 {
-    [TestFixture]
+    [TestClass]
     public class ResponseFilterTests
     {
-        [Test]
+        [TestMethod]
         public void ResponseFilter_can_process_nuggets()
         {
             i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer();
@@ -24,7 +24,7 @@ namespace i18n.Tests
             //#37 TODO -- more tests.
         }
 
-        [Test]
+        [TestMethod]
         public void ResponseFilter_can_patch_html_urls()
         {
             // One attribute.
