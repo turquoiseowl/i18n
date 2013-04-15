@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using i18n.Domain.Concrete;
+using i18n.Domain.Entities;
 
 namespace i18n.PostBuild
 {
@@ -6,28 +10,17 @@ namespace i18n.PostBuild
     {
         static void Main(string[] args)
         {
-            if(args.Length == 0)
-            {
-                Console.WriteLine("This post build task requires passing in the $(ProjectDirectory) path");
-                return;
-            }
+			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
 
-            var path = args[0];
-            path = path.Trim(new[] {'\"'});
+			NuggetFileParser nugget = new NuggetFileParser(new i18nSettings(new ConfigFileSettingService()));
+	        var items = nugget.ParseAll();
+	        rep.SaveTemplate(items);
 
-            string gettext = null;
-            string msgmerge = null;
+			Translation translation = rep.GetLanguage("fr");
+			TranslationSynchronization ts = new TranslationSynchronization(rep);
+	        ts.SynchronizeTranslation(items, translation);
 
-            for (int i = 1; i < args.Length; i++)
-            {
-                if (args[i].StartsWith("gettext:", StringComparison.InvariantCultureIgnoreCase))
-                    gettext = args[i].Substring(8);
-
-                if (args[i].StartsWith("msgmerge:", StringComparison.InvariantCultureIgnoreCase))
-                    msgmerge = args[i].Substring(9);
-            }
-
-            new PostBuildTask().Execute(path, gettext, msgmerge);
+            Console.WriteLine("i18n.PostBuild completed successfully.");
         }
     }
 }

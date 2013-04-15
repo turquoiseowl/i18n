@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace i18n.Tests
 {
-    [TestFixture]
+    [TestClass]
     public class LanguageTag
     {
         private void ExtractLangTagFromUrlHelper(string url, string expectedLangTag, string expectedUrlPatched)
@@ -27,7 +27,7 @@ namespace i18n.Tests
             ExtractLangTagFromUrlHelper(url, expectedLangTag, url);
         }
 
-        [Test]
+        [TestMethod]
         public void ExtractLangTagFromUrl()
         {
             ExtractLangTagFromUrlHelper("/zh"         , "zh"         , "/");
