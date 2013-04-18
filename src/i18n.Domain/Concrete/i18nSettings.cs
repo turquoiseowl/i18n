@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +10,10 @@ namespace i18n.Domain.Concrete
 {
 	public class i18nSettings
 	{
-		private ISettingService _settingService;
+		private AbstractSettingService _settingService;
 		private const string _prefix = "i18n.";
 
-		public i18nSettings(ISettingService settings)
+		public i18nSettings(AbstractSettingService settings)
 		{
 			_settingService = settings;
 		}
@@ -21,6 +22,21 @@ namespace i18n.Domain.Concrete
 		{
 			return _prefix + key;
 		}
+
+
+		private string MakePathAbsoluteAndFromConfigFile(string path)
+		{
+			if (Path.IsPathRooted(path))
+			{
+				return path;
+			}
+			else
+			{
+				var startPath = Path.GetDirectoryName(_settingService.GetConfigFileLocation());
+				return Path.GetFullPath(Path.Combine(startPath, path));
+			}
+		}
+
 
 		#region Locale directory
 
@@ -31,16 +47,17 @@ namespace i18n.Domain.Concrete
 			{
 				string prefixedString = GetPrefixedString("LocaleDirectory");
 				string setting = _settingService.GetSetting(prefixedString);
+				string path;
 				if (setting != null)
 				{
-					return setting;	
+					path = setting;	
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _localeDirectoryDefault);
-					return _localeDirectoryDefault;
+					path = _localeDirectoryDefault;
 				}
-				
+
+				return MakePathAbsoluteAndFromConfigFile(path);
 			}
 			set
 			{
@@ -67,7 +84,6 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _whiteListDefault);
 					return _whiteListDefault.Split(';').ToList();
 				}
 			}
@@ -96,7 +112,6 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _nuggetBeginTokenDefault);
 					return _nuggetBeginTokenDefault;
 				}
 
@@ -121,7 +136,6 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _nuggetEndTokenDefault);
 					return _nuggetEndTokenDefault;
 				}
 
@@ -146,7 +160,6 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _nuggetDelimiterTokenDefault);
 					return _nuggetDelimiterTokenDefault;
 				}
 
@@ -171,7 +184,6 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _nuggetCommentTokenDefault);
 					return _nuggetCommentTokenDefault;
 				}
 
@@ -195,15 +207,23 @@ namespace i18n.Domain.Concrete
 			{
 				string prefixedString = GetPrefixedString("DirectoriesToScan");
 				string setting = _settingService.GetSetting(prefixedString);
+				List<string> list;
 				if (setting != null)
 				{
-					return setting.Split(';').ToList();
+					list = setting.Split(';').ToList();
 				}
 				else
 				{
-					//_settingService.SetSetting(prefixedString, _directoriesToScan);
-					return _directoriesToScan.Split(';').ToList();
+					list = _directoriesToScan.Split(';').ToList();
 				}
+
+				List<string> returnList = new List<string>();
+				foreach (var path in list)
+				{
+					returnList.Add(MakePathAbsoluteAndFromConfigFile(path));
+				}
+
+				return returnList;
 			}
 			set
 			{
@@ -213,5 +233,36 @@ namespace i18n.Domain.Concrete
 		}
 
 		#endregion
+
+
+		#region Available Languages
+
+		//If empty string is returned the repository can if it choses enumerate languages in a different way (like enumerating directories in the case of PO files)
+		//empty string is returned as an IEnumerable with one empty element
+		private const string _availableLanguages = "";
+		public virtual IEnumerable<string> AvailableLanguages
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("AvailableLanguages");
+				string setting = _settingService.GetSetting(prefixedString);
+				if (setting != null)
+				{
+					return setting.Split(';').ToList();
+				}
+				else
+				{
+					return _availableLanguages.Split(';').ToList();
+				}
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("AvailableLanguages");
+				_settingService.SetSetting(prefixedString, string.Join(";", value));
+			}
+		}
+
+		#endregion
+
 	}
 }

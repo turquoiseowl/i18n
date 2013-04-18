@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Caching;
+using System.Web.Hosting;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 using i18n.Helpers;
@@ -21,7 +24,7 @@ namespace i18n.Domain.Concrete
 			_settings = settings;
 		}
 
-		#region load
+		#region load and getters
 
 		public Translation GetLanguage(string tag)
 		{
@@ -30,34 +33,86 @@ namespace i18n.Domain.Concrete
 
 
 		/// <summary>
-		/// PO file implementation simply checks for available directories in the locale directory and each directory is deemed to be a translation. No checks are done for correct language tag, actual translation file inside or valid translation file inside
+		/// Checks in first hand settings file, if not found there it checks file structure
 		/// </summary>
 		/// <returns>List of available languages</returns>
 		public IEnumerable<Language> GetAvailableLanguages()
 		{
 			//todo: ideally we want to fill the other data in the Language object so this is usable by project incorporating i18n that they can simply lookup available languages. Maybe we even add a country property so that it's easier for projects to add corresponding flags.
 
-			DirectoryInfo di = new DirectoryInfo(GetAbsoluteLocaleDir());
+			List<string> languages = _settings.AvailableLanguages.ToList();
+			Language lang;
 			List<Language> dirList = new List<Language>();
-			Language language;
 
-			foreach (var dir in di.EnumerateDirectories().Select(x => x.Name))
+
+			//This means there was no languages from settings
+			if (languages.Count == 1 && languages[0] == "")
 			{
-				language = new Language();
-				language.LanguageShortTag = dir;
-				dirList.Add(language);
+				//We instead check for file structure
+				DirectoryInfo di = new DirectoryInfo(GetAbsoluteLocaleDir());
+				
+				foreach (var dir in di.EnumerateDirectories().Select(x => x.Name))
+				{
+					lang = new Language();
+					lang.LanguageShortTag = dir;
+					dirList.Add(lang);
+				}
 			}
+			else
+			{
+				//see if the desired language was one of the returned from settings
+				foreach (var language in languages)
+				{
+					lang = new Language();
+					lang.LanguageShortTag = language;
+					dirList.Add(lang);
+				}
+			}
+
 			return dirList;
+
 		}
 
 		/// <summary>
-		/// Checks if there is a translation file for the desired language. No validity checks performed.
+		/// Checks if the language is set as supported in config file
+		/// If not it checks if the PO file is available
 		/// </summary>
 		/// <param name="tag">The tag for which you want to check if support exists. For instance "sv-SE"</param>
-		/// <returns>True if language file exists, otherwise false</returns>
+		/// <returns>True if language exists, otherwise false</returns>
 		public bool TranslationExists(string tag)
 		{
-			return File.Exists(GetPathForLanguage(tag));
+			List<string> languages = _settings.AvailableLanguages.ToList();
+
+			//This means there was no languages from settings
+			if (languages.Count == 1 && languages[0] == "")
+			{
+				//We instead check if the file exists
+				return File.Exists(GetPathForLanguage(tag));
+			}
+			else
+			{
+				//see if the desired language was one of the returned from settings
+				foreach (var language in languages)
+				{
+					if (language == tag)
+					{
+						return true;
+					}
+				}
+			}
+
+			//did not exist in settings nor as file, we return false
+			return false;
+		}
+
+		public CacheDependency GetCacheDependencyLanguage(string tag)
+		{
+			return new CacheDependency(GetPathForLanguage(tag));
+		}
+
+		public CacheDependency GetCacheDependencyAllLanguages()
+		{
+			return new FsCacheDependency(GetAbsoluteLocaleDir());
 		}
 
 		#endregion
@@ -201,19 +256,7 @@ namespace i18n.Domain.Concrete
 		/// <returns>the locale directory in absolute path</returns>
 		private string GetAbsoluteLocaleDir()
 		{
-			string localeDir = _settings.LocaleDirectory;
-			String path;
-
-			if (Path.IsPathRooted(localeDir))
-			{
-				path = localeDir;
-			}
-			else
-			{
-				path = Path.GetFullPath(localeDir);
-			}
-
-			return path;
+			return _settings.LocaleDirectory;
 		}
 
 		private string GetPathForLanguage(string tag)

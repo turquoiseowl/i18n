@@ -43,12 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\INuggetFinder.cs" />
-    <Compile Include="Abstract\ISettingService.cs" />
+    <Compile Include="Abstract\AbstractSettingService.cs" />
     <Compile Include="Abstract\ITranslationRepository.cs" />
-    <Compile Include="Concrete\ConfigFileSettingService.cs" />
+    <Compile Include="Concrete\CacheHandler.cs" />
+    <Compile Include="Concrete\FsCacheDependency.cs" />
     <Compile Include="Concrete\i18nSettings.cs" />
     <Compile Include="Concrete\NuggetFileFinder.cs" />
     <Compile Include="Concrete\TranslationSynchronization.cs" />
+    <Compile Include="Concrete\WebConfigSettingService.cs" />
     <Compile Include="Entities\Language.cs" />
     <Compile Include="Concrete\POTranslationRepository.cs" />
     <Compile Include="Entities\TemplateItem.cs" />

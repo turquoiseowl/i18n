@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
+using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 
 namespace i18n
@@ -17,8 +18,15 @@ namespace i18n
     /// </summary>
     public class TextLocalizer : ITextLocalizer
     {
+	    private ITranslationRepository _translationRepository;
 
-    #region [ITextLocalizer]
+	    public TextLocalizer(ITranslationRepository translationRepository)
+	    {
+		    _translationRepository = translationRepository;
+	    }
+
+
+	    #region [ITextLocalizer]
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
@@ -36,18 +44,16 @@ namespace i18n
                // NB: we do this before actually populating the collection. This is so that any changes to the
                // folders before we finish populating the collection will cause the cache item to be invalidated
                // and hence reloaded on next request, and so will not be missed.
-                string directory;
-                string path;
-                GetDirectoryAndPath(null, out directory, out path);
-                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, new FsCacheDependency(directory));
+                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyAllLanguages());
 
                // Populate the collection.
-                List<string> dirs = new List<string>(Directory.EnumerateDirectories(directory));
-                foreach (var dir in dirs)
+	            List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
+                foreach (var langtag in languages)
                 {
-                    string langtag = Path.GetFileName(dir);
-                    if (IsLanguageValid(langtag)) {
-                        AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); }
+					if (IsLanguageValid(langtag))
+					{
+                        AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); 
+					}
                 }
 
                // Done.
@@ -97,29 +103,19 @@ namespace i18n
         /// localized messages exists for the language.
         /// </summary>
         /// <returns>true if one or more localized messages exist for the language; otherwise false.</returns>
-        private static bool IsLanguageValid(string langtag)
+        private bool IsLanguageValid(string langtag)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            ConcurrentDictionary<string, PoMessage> messages = (ConcurrentDictionary<string, PoMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
+			ConcurrentDictionary<string, TranslateItem> messages = (ConcurrentDictionary<string, TranslateItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
             {
-                // Attempt to load messages, and if failed (because PO file doesn't exist)
-                if (!LoadMessages(langtag))
-                {
-                    // Avoid shredding the disk looking for non-existing files
-                    CreateEmptyMessages(langtag);
-                    return false;
-                }
-
-                // Address messages just loaded.
-                messages = (ConcurrentDictionary<string, PoMessage>)HttpRuntime.Cache[GetCacheKey(langtag)];
+	            return _translationRepository.TranslationExists(langtag);
             }
 
-            // The language is considered to be available if one or more message strings exist.
-            return messages.Count > 0;
+	        return true;
         }
 
         /// <summary>
@@ -138,7 +134,7 @@ namespace i18n
         /// to indciate that one or more messages exist for the langtag.
         /// On failure, returns null.
         /// </returns>
-        private static string TryGetTextFor(string langtag, string key)
+        private string TryGetTextFor(string langtag, string key)
         {
             // If no messages loaded for language...fail.
             if (!IsLanguageValid(langtag)) {
@@ -163,178 +159,41 @@ namespace i18n
             return null;
         }
 
-        private static void CreateEmptyMessages(string langtag)
+        private bool LoadMessagesIntoCache(string langtag)
         {
-            lock (Sync)
-            {
-                string directory;
-                string path;
-                GetDirectoryAndPath(langtag, out directory, out path);
+			lock (Sync)
+			{
+				// It is possible for multiple threads to race to this method. The first to
+				// enter the above lock will insert the messages into the cache.
+				// If we lost the race...no need to duplicate the work of the winning thread.
+				if (HttpRuntime.Cache[GetCacheKey(langtag)] != null)
+				{
+					return true;
+				}
 
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+				Translation t = _translationRepository.GetLanguage(langtag);
 
-                using(var fs = File.CreateText(path))
-                {
-                    fs.Flush();
-                }
-
-                // Cache messages.
-                // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                HttpRuntime.Cache.Insert(GetCacheKey(langtag), new ConcurrentDictionary<string, PoMessage>(), new CacheDependency(path));
-            }
-        }
-
-        private static bool LoadMessages(string langtag)
-        {
-            string directory;
-            string path;
-            GetDirectoryAndPath(langtag, out directory, out path);
-
-            if (!File.Exists(path))
-            {
-                return false;
-            }
-
-            LoadFromDiskAndCache(langtag, path);
+				// Cache messages.
+				// NB: if the file changes we want to be able to rebuild the index without recompiling.
+				HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, _translationRepository.GetCacheDependencyLanguage(langtag));
+			}
             return true;
         }
 
-        /// <param name="langtag">
-        /// Null to get path of local directory only.
-        /// </param>
-        /// <param name="directory"></param>
-        /// <param name="path"></param>
-        private static void GetDirectoryAndPath(string langtag, out string directory, out string path)
-        {
-            if (langtag == null) {
-                directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
-                path = "";
-            }
-            else {
-                directory = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "locale");
-                directory = Path.Combine(directory, langtag);
-                path = Path.Combine(directory, "messages.po");
-            }
-        }
-
-        private static void LoadFromDiskAndCache(string langtag, string path)
-        {
-            lock (Sync)
-            {
-                // It is possible for multiple threads to race to this method. The first to
-                // enter the above lock will insert the messages into the cache.
-                // If we lost the race...no need to duplicate the work of the winning thread.
-                if (HttpRuntime.Cache[GetCacheKey(langtag)] != null) {
-                    return; }
-
-                using (var fs = File.OpenText(path))
-                {
-                    // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
-
-                    var messages = new ConcurrentDictionary<string, PoMessage>();
-                    string line;
-                    while ((line = fs.ReadLine()) != null)
-                    {
-                        if (line.StartsWith("#~"))
-                        {
-                            continue;
-                        }
-
-                        var message = new PoMessage();
-                        var sb = new StringBuilder();
-
-                        if (line.StartsWith("#"))
-                        {
-                            sb.Append(CleanCommentLine(line));
-                            while((line = fs.ReadLine()) != null && line.StartsWith("#"))
-                            {
-                                sb.Append(CleanCommentLine(line));
-                            }
-                            message.Comment = sb.ToString();
-
-                            sb.Clear();
-                            ParseBody(fs, line, sb, message);
-
-                            // Only if a msgstr (translation) is provided for this entry do we add an entry to the cache.
-                            // This conditions facilitates more useful operation of the IsLanguageValid method,
-                            // which prior to this condition was indicating a language was available when in fact there
-                            // were zero translation in the PO file (it having been autogenerated during gettext merge).
-                            if (!string.IsNullOrWhiteSpace(message.MsgStr))
-                            {
-                                if (!messages.ContainsKey(message.MsgId))
-                                {
-                                    messages[message.MsgId] = message;
-                                }
-                            }
-                        }
-                        else if (line.StartsWith("msgid"))
-                        {
-                            ParseBody(fs, line, sb, message);
-                        }
-                    }
-
-                    // Cache messages.
-                    // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                    HttpRuntime.Cache.Insert(GetCacheKey(langtag), messages, new CacheDependency(path));
-                }
-            }
-        }
-
-        private static void ParseBody(TextReader fs, string line, StringBuilder sb, PoMessage message)
-        {
-            if (!string.IsNullOrEmpty(line))
-            {
-                if (line.StartsWith("msgid"))
-                {
-                    var msgid = line.Unquote();
-                    sb.Append(msgid);
-
-                    while ((line = fs.ReadLine()) != null && !line.StartsWith("msgstr") && (msgid = line.Unquote()) != null)
-                    {
-                        sb.Append(msgid);
-                    }
-
-                    message.MsgId = sb.ToString().Unescape();
-                }
-
-                sb.Clear();
-                if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
-                {
-                    var msgstr = line.Unquote();
-                    sb.Append(msgstr);
-
-                    while ((line = fs.ReadLine()) != null && (msgstr = line.Unquote()) != null)
-                    {
-                        sb.Append(msgstr);
-                    }
-
-                    message.MsgStr = sb.ToString().Unescape();
-                }
-            }
-        }
-
-        private static string CleanCommentLine(string line)
-        {
-            return line.Replace("# ", "").Replace("#. ", "").Replace("#: ", "").Replace("#, ", "").Replace("#| ", "");
-        }
-
-        /// <returns>null if not found.</returns>
+       /// <returns>null if not found.</returns>
         private static string LookupText(string langtag, string key)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            var messages = (ConcurrentDictionary<string, PoMessage>) HttpRuntime.Cache[GetCacheKey(langtag)];
-            PoMessage message = null;
+            var messages = (ConcurrentDictionary<string, TranslateItem>) HttpRuntime.Cache[GetCacheKey(langtag)];
+            TranslateItem message = null;
 
             if (messages == null || !messages.TryGetValue(key, out message))
             {
                 return null;
             }
 
-            return message.MsgStr;
+            return message.Message;
                 // We check this for null/empty before adding to collection.
         }
 

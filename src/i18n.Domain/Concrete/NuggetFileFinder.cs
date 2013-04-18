@@ -37,21 +37,10 @@ namespace i18n.Domain.Concrete
 
 			var templateItems = new ConcurrentDictionary<string, TemplateItem>();
                 // Collection of template items keyed by their id.
-			string absoluteDirectoryPath;
 
 			foreach (var directoryPath in directoriesToSearchRecursively)
 			{
-				if (Path.IsPathRooted(directoryPath))
-				{
-					absoluteDirectoryPath = directoryPath;
-				}
-				else
-				{
-					absoluteDirectoryPath = Path.GetFullPath(directoryPath);
-				}
-
-
-				foreach (string filePath in Directory.EnumerateFiles(absoluteDirectoryPath, "*.*", SearchOption.AllDirectories))
+				foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
 				{
 					//we check every filePath against our white list. if it's on there in at least one form we check it.
 					foreach (var whiteListItem in fileWhiteList)

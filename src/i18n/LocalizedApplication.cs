@@ -3,6 +3,7 @@ using System.Threading;
 using System.Web;
 using System.Text.RegularExpressions;
 using container;
+using i18n.Domain.Concrete;
 
 namespace i18n
 {
@@ -81,7 +82,9 @@ namespace i18n
             DefaultLanguage = ("en");
             PermanentRedirects = false;
             Container = new Container();
-            Container.Register<ITextLocalizer>(r => new TextLocalizer());
+
+			//todo: This now only works with PO files, but to work with for instance database we need to have this come from somewhere else (like the client)
+            Container.Register<ITextLocalizer>(r => new TextLocalizer(new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null))))); 
             Container.Register<INuggetLocalizer>(r => new NuggetLocalizer());
             Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer());
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());

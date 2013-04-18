@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using i18n.Domain.Concrete;
 using i18n.Domain.Entities;
 
@@ -10,15 +11,44 @@ namespace i18n.PostBuild
     {
         static void Main(string[] args)
         {
-			POTranslationRepository rep = new POTranslationRepository(new i18nSettings(new ConfigFileSettingService()));
+			//TestCode
+	        args = new string[] {@"C:\viducate2\Viducate\Viducate.WebUI\Web.config"};
+			 
 
-			NuggetFileFinder nugget = new NuggetFileFinder(new i18nSettings(new ConfigFileSettingService()));
+
+
+			string configPath;
+			if (args.Length == 0)
+			{
+				System.Console.WriteLine("You have to specify path to web.config.");
+				return;
+			}
+
+	        try
+	        {
+		        configPath = args[0];
+				using (FileStream fs = File.Open(configPath, FileMode.Open))
+		        {
+			        
+		        }
+	        }
+	        catch (Exception)
+	        {
+				System.Console.WriteLine("Failed to open config file at path.");
+				return;
+	        }
+
+			//todo: this assumes PO files, if not using po files then other solution needed.
+			i18nSettings settings = new i18nSettings(new WebConfigSettingService(configPath));
+			POTranslationRepository rep = new POTranslationRepository(settings);
+
+			NuggetFileFinder nugget = new NuggetFileFinder(settings);
 	        var items = nugget.ParseAll();
 	        rep.SaveTemplate(items);
 
-			Translation translation = rep.GetLanguage("fr");
 			TranslationSynchronization ts = new TranslationSynchronization(rep);
-	        ts.SynchronizeTranslation(items, translation);
+			ts.SynchronizeAllTranslation(items);
+			
 
             Console.WriteLine("i18n.PostBuild completed successfully.");
         }
