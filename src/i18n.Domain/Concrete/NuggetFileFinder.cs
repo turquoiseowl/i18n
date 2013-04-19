@@ -35,6 +35,9 @@ namespace i18n.Domain.Concrete
 			IEnumerable<string> fileWhiteList = _settings.WhiteList;
 			IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
 
+			string currentFullPath;
+			bool blacklistFound = false;
+
 			var templateItems = new ConcurrentDictionary<string, TemplateItem>();
                 // Collection of template items keyed by their id.
 
@@ -42,31 +45,47 @@ namespace i18n.Domain.Concrete
 			{
 				foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
 				{
-					//we check every filePath against our white list. if it's on there in at least one form we check it.
-					foreach (var whiteListItem in fileWhiteList)
+					blacklistFound = false;
+					currentFullPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
+					foreach (var blackItem in _settings.BlackList)
 					{
-						//We have a catch all for a filetype
-						if (whiteListItem.StartsWith("*."))
+						if (currentFullPath == null || currentFullPath.StartsWith(blackItem))
 						{
-							if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
-							{
-								//we got a match
-								ParseFile(filePath, templateItems);
-								break;
-							}
-						}
-						else //a file, like myfile.js
-						{
-							if (Path.GetFileName(filePath) == whiteListItem)
-							{
-								//we got a match
-								ParseFile(filePath, templateItems);
-								break;
-							}
+							//this is a file that is under a blacklisted directory so we do not parse it.
+							blacklistFound = true;
+							break;
 						}
 					}
-					
-						
+					if (!blacklistFound)
+					{
+
+
+						//we check every filePath against our white list. if it's on there in at least one form we check it.
+						foreach (var whiteListItem in fileWhiteList)
+						{
+							//We have a catch all for a filetype
+							if (whiteListItem.StartsWith("*."))
+							{
+								if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
+								{
+									//we got a match
+									ParseFile(filePath, templateItems);
+									break;
+								}
+							}
+							else //a file, like myfile.js
+							{
+								if (Path.GetFileName(filePath) == whiteListItem)
+								{
+									//we got a match
+									ParseFile(filePath, templateItems);
+									break;
+								}
+							}
+						}
+
+					}
+
 				}
 			}
 

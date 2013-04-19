@@ -96,6 +96,41 @@ namespace i18n.Domain.Concrete
 
 		#endregion
 
+		#region Black list
+
+		private const string _blackListDefault = "";
+		public virtual IEnumerable<string> BlackList
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("BlackList");
+				string setting = _settingService.GetSetting(prefixedString);
+				List<string> list;
+				if (setting != null)
+				{
+					list = setting.Split(';').ToList();
+				}
+				else
+				{
+					list = _blackListDefault.Split(';').ToList();
+				}
+
+				List<string> returnList = new List<string>();
+				foreach (var path in list)
+				{
+					returnList.Add(MakePathAbsoluteAndFromConfigFile(path));
+				}
+
+				return returnList;
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("BlackList");
+				_settingService.SetSetting(prefixedString, string.Join(";", value));
+			}
+		}
+
+		#endregion
 
 		#region Nugget tokens
 

@@ -12,10 +12,7 @@ namespace i18n.PostBuild
         static void Main(string[] args)
         {
 			//TestCode
-	        args = new string[] {@"C:\viducate2\Viducate\Viducate.WebUI\Web.config"};
-			 
-
-
+	        //args = new string[] {@"C:\viducate2\Viducate\Viducate.WebUI\Web.config"};
 
 			string configPath;
 			if (args.Length == 0)

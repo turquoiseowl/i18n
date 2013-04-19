@@ -181,12 +181,19 @@ namespace i18n
         }
 
        /// <returns>null if not found.</returns>
-        private static string LookupText(string langtag, string key)
+        private string LookupText(string langtag, string key)
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
             var messages = (ConcurrentDictionary<string, TranslateItem>) HttpRuntime.Cache[GetCacheKey(langtag)];
             TranslateItem message = null;
+
+			//we need to populate the cache
+			if (messages == null)
+			{
+				LoadMessagesIntoCache(langtag);
+			}
+
 
             if (messages == null || !messages.TryGetValue(key, out message))
             {

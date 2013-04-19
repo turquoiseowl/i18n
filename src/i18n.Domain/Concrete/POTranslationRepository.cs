@@ -154,6 +154,7 @@ namespace i18n.Domain.Concrete
                     .ThenBy(x => x.Id);
                         // Then order alphanumerically.
                //
+
 				foreach (var item in orderedItems)
 				{
 					hasReferences = false;
@@ -261,7 +262,7 @@ namespace i18n.Domain.Concrete
 
 		private string GetPathForLanguage(string tag)
 		{
-			return Path.Combine(GetAbsoluteLocaleDir(), "/", tag, "/messages.po");
+			return Path.Combine(GetAbsoluteLocaleDir(), tag, "messages.po");
 		}
 
 		/// <summary>
