@@ -34,20 +34,15 @@ namespace i18n
     /// </remarks>
     public class LocalizingModule : IHttpModule
     {
-        private IEarlyUrlLocalizer m_earlyUrlLocalizer;
-        private INuggetLocalizer m_nuggetLocalizer;
+        private IRootServices m_rootServices;
 
         public LocalizingModule()
-        :   this(
-                LocalizedApplication.Current.EarlyUrlLocalizerForApp, 
-                LocalizedApplication.Current.NuggetLocalizerForApp)
+        :   this(LocalizedApplication.Current)
         {}
         public LocalizingModule(
-            IEarlyUrlLocalizer earlyUrlLocalizer,
-            INuggetLocalizer nuggetLocalizer)
+            IRootServices rootServices)
         {
-            m_earlyUrlLocalizer = earlyUrlLocalizer;
-            m_nuggetLocalizer = nuggetLocalizer;
+            m_rootServices = rootServices;
         }
 
     #region [IHttpModule]
@@ -57,7 +52,7 @@ namespace i18n
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
             
             // Wire up our event handlers into the ASP.NET pipeline.
-            if (m_earlyUrlLocalizer != null) {
+            if (m_rootServices.EarlyUrlLocalizerForApp != null) {
                 application.BeginRequest += OnBeginRequest; }
             application.ReleaseRequestState += OnReleaseRequestState;
         }
@@ -78,9 +73,9 @@ namespace i18n
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            if (m_earlyUrlLocalizer != null)
+            if (m_rootServices.EarlyUrlLocalizerForApp != null)
             {
-                m_earlyUrlLocalizer.ProcessIncoming(context);
+                m_rootServices.EarlyUrlLocalizerForApp.ProcessIncoming(context);
             }
         }
 
@@ -104,8 +99,8 @@ namespace i18n
                 context.Response.Filter = new ResponseFilter(
                     context, 
                     context.Response.Filter,
-                    m_earlyUrlLocalizer,
-                    m_nuggetLocalizer);
+                    m_rootServices.EarlyUrlLocalizerForApp,
+                    m_rootServices.NuggetLocalizerForApp);
             }
         }
     }
