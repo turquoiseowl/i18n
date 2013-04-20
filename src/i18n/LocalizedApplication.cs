@@ -26,7 +26,7 @@ namespace i18n
         public IEarlyUrlLocalizer EarlyUrlLocalizerForApp
         {
             get {
-                return m_cached_urlLocalizer.Get(() => EarlyUrlLocalizerService);
+                return m_cached_earlyUrlLocalizer.Get(() => EarlyUrlLocalizerService);
             }
         }
         public INuggetLocalizer NuggetLocalizerForApp
@@ -143,7 +143,7 @@ namespace i18n
         
         private Container Container { get; set; }
         private LockFreeProperty<ITextLocalizer> m_cached_textLocalizer = new LockFreeProperty<ITextLocalizer>();
-        private LockFreeProperty<IEarlyUrlLocalizer> m_cached_urlLocalizer = new LockFreeProperty<IEarlyUrlLocalizer>();
+        private LockFreeProperty<IEarlyUrlLocalizer> m_cached_earlyUrlLocalizer = new LockFreeProperty<IEarlyUrlLocalizer>();
         private LockFreeProperty<INuggetLocalizer> m_cached_nuggetLocalizer = new LockFreeProperty<INuggetLocalizer>();
 
         /// <summary>
@@ -152,9 +152,9 @@ namespace i18n
         /// </summary>
         private void ResetCachedServices()
         {
-            m_cached_textLocalizer = null;
-            m_cached_urlLocalizer = null;
-            m_cached_nuggetLocalizer = null;
+            m_cached_textLocalizer.Reset();
+            m_cached_earlyUrlLocalizer.Reset();
+            m_cached_nuggetLocalizer.Reset();
         }
 
         /// <summary>
