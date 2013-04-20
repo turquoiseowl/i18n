@@ -48,7 +48,7 @@
     <Compile Include="Concrete\CacheHandler.cs" />
     <Compile Include="Concrete\FsCacheDependency.cs" />
     <Compile Include="Concrete\i18nSettings.cs" />
-    <Compile Include="Concrete\NuggetFileFinder.cs" />
+    <Compile Include="Concrete\FileNuggetFinder.cs" />
     <Compile Include="Concrete\TranslationSynchronization.cs" />
     <Compile Include="Concrete\WebConfigSettingService.cs" />
     <Compile Include="Entities\Language.cs" />
@@ -57,6 +57,7 @@
     <Compile Include="Entities\TranslateItem.cs" />
     <Compile Include="Entities\Translation.cs" />
     <Compile Include="Helpers\CollectionExtensions.cs" />
+    <Compile Include="Helpers\DebugHelpers.cs" />
     <Compile Include="Helpers\HashHelper.cs" />
     <Compile Include="Helpers\LockFreeProperty.cs" />
     <Compile Include="Helpers\NuggetParser.cs" />

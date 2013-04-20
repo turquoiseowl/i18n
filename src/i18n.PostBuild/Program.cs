@@ -39,7 +39,7 @@ namespace i18n.PostBuild
 			i18nSettings settings = new i18nSettings(new WebConfigSettingService(configPath));
 			POTranslationRepository rep = new POTranslationRepository(settings);
 
-			NuggetFileFinder nugget = new NuggetFileFinder(settings);
+			FileNuggetFinder nugget = new FileNuggetFinder(settings);
 	        var items = nugget.ParseAll();
 	        rep.SaveTemplate(items);
 

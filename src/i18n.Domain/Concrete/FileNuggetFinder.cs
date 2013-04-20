@@ -10,13 +10,13 @@ using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
 {
-	public class NuggetFileFinder : INuggetFinder
+	public class FileNuggetFinder : INuggetFinder
 	{
 		private i18nSettings _settings;
 
         private NuggetParser _nuggetParser;
 
-		public NuggetFileFinder(i18nSettings settings)
+		public FileNuggetFinder(i18nSettings settings)
 		{
 			_settings = settings;
             _nuggetParser = new NuggetParser(new NuggetTokens(
@@ -94,6 +94,7 @@ namespace i18n.Domain.Concrete
 
 		private void ParseFile(string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
         {
+            DebugHelpers.WriteLine("FileNuggetFinder.ParseFile -- {0}", filePath);
            // Lookup any/all nuggets in the file and for each add a new template item.
 			using (var fs = File.OpenText(filePath))
 			{
