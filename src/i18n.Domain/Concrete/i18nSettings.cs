@@ -96,6 +96,7 @@ namespace i18n.Domain.Concrete
 
 		#endregion
 
+
 		#region Black list
 
 		private const string _blackListDefault = "";
@@ -131,6 +132,7 @@ namespace i18n.Domain.Concrete
 		}
 
 		#endregion
+
 
 		#region Nugget tokens
 
