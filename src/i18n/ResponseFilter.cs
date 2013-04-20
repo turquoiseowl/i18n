@@ -17,17 +17,15 @@ namespace i18n
         private IEarlyUrlLocalizer m_earlyUrlLocalizer;
         private INuggetLocalizer m_nuggetLocalizer;
 
-        public ResponseFilter(
-            HttpContextBase httpContext, 
-            Stream outputStream,
-            IEarlyUrlLocalizer earlyUrlLocalizer,
-            INuggetLocalizer nuggetLocalizer)
-        {
-            m_httpContext = httpContext;
-            m_outputStream = outputStream;
-            m_earlyUrlLocalizer = earlyUrlLocalizer;
-            m_nuggetLocalizer = nuggetLocalizer;
-        }
+        /// <remarks>
+        /// We need to accumulate all written blocks into a staging buffer so that
+        /// any nuggets which straddle the break between two blocks are picked up
+        /// correctly. This approach is not perfect in that we need to allocate a block
+        /// of memory for the entire response, which could be large, but the only way
+        /// around would involve parsing for nuggest where we track start and end
+        /// tokens (that is, don't use regex).
+        /// </remarks>
+        private MemoryStream m_stagingBuffer = new MemoryStream();
 
         /// <summary>
         /// The stream onto which we pass data once processed. This will typically be set 
@@ -40,15 +38,38 @@ namespace i18n
         /// </summary>
         protected HttpContextBase m_httpContext;
 
+        public ResponseFilter(
+            HttpContextBase httpContext, 
+            Stream outputStream,
+            IEarlyUrlLocalizer earlyUrlLocalizer,
+            INuggetLocalizer nuggetLocalizer)
+        {
+            m_httpContext = httpContext;
+            m_outputStream = outputStream;
+            m_earlyUrlLocalizer = earlyUrlLocalizer;
+            m_nuggetLocalizer = nuggetLocalizer;
+        }
+
     #region [Stream]
 
         public override void Write(byte[] buffer, int offset, int count)
         {
             DebugHelpers.WriteLine("ResponseFilter::Write -- count: {0}", count);
 
+            m_stagingBuffer.Write(buffer, offset, count);
+        }
+
+        public override void Flush()
+        {
+            DebugHelpers.WriteLine("ResponseFilter::Flush");
+
             // Convert byte array into string.
             Encoding enc = m_httpContext.Response.ContentEncoding;
-            string entity = enc.GetString(buffer, offset, count);
+            string entity = enc.GetString(m_stagingBuffer.GetBuffer(), 0, (int)m_stagingBuffer.Length);
+
+            // Buffer no longer required so release memory.
+            m_stagingBuffer.Dispose();
+            m_stagingBuffer = null;
 
             // Translate any embedded messages aka 'nuggets'.
             if (m_nuggetLocalizer != null)
@@ -81,11 +102,15 @@ namespace i18n
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
             // Render the string back to an array of bytes.
-            buffer = enc.GetBytes(entity);
-            count = buffer.Length;
+            byte[] buffer = enc.GetBytes(entity);
+            enc = null; // release memory asap.
+            int count = buffer.Length;
 
             // Forward data on to the original response stream.
             m_outputStream.Write(buffer, 0, count);
+
+            // Complete the write.
+            m_outputStream.Flush();
         }
 
         // The following overrides may be unnecessary. Instead we could have derived this class
@@ -99,7 +124,6 @@ namespace i18n
         public override bool CanWrite { get { DebugHelpers.WriteLine("ResponseFilter::CanWrite::get"); return m_outputStream.CanWrite; } }
         public override long Length   { get { DebugHelpers.WriteLine("ResponseFilter::Length::get"); return m_outputStream.Length; } }
         public override long Position { get { DebugHelpers.WriteLine("ResponseFilter::Position::get"); return m_outputStream.Position; } set { DebugHelpers.WriteLine("ResponseFilter::Position::set"); m_outputStream.Position = value; } }
-        public override void Flush()  { DebugHelpers.WriteLine("ResponseFilter::Flush"); m_outputStream.Flush(); }
         public override long Seek(long offset, SeekOrigin origin) { DebugHelpers.WriteLine("ResponseFilter::Seek"); return m_outputStream.Seek(offset, origin); }
         public override void SetLength(long value) { DebugHelpers.WriteLine("ResponseFilter::SetLength"); m_outputStream.SetLength(value); }
         public override int Read(byte[] buffer, int offset, int count) { DebugHelpers.WriteLine("ResponseFilter::Read"); return m_outputStream.Read(buffer, offset, count); }
