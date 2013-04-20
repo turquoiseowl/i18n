@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using i18n.Domain.Abstract;
+using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
 {
@@ -84,6 +85,9 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
+                    if (!prefixedString.IsSet()) {
+                        return new List<string>(); }
+
 					return _whiteListDefault.Split(';').ToList();
 				}
 			}
@@ -112,6 +116,9 @@ namespace i18n.Domain.Concrete
 				}
 				else
 				{
+                    if (!_blackListDefault.IsSet()) {
+                        return new List<string>(); }
+
 					list = _blackListDefault.Split(';').ToList();
 				}
 
