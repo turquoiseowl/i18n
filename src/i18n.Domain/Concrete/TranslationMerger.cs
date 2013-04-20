@@ -9,16 +9,16 @@ using i18n.Domain.Abstract;
 
 namespace i18n.Domain.Concrete
 {
-	public class TranslationSynchronization
+	public class TranslationMerger
 	{
 		private ITranslationRepository _repository;
 
-		public TranslationSynchronization(ITranslationRepository repository)
+		public TranslationMerger(ITranslationRepository repository)
 		{
 			_repository = repository;
 		}
 
-		public void SynchronizeTranslation(IDictionary<string, TemplateItem> src, Translation dst)
+		public void MergeTranslation(IDictionary<string, TemplateItem> src, Translation dst)
         {
         // Our purpose here is to merge newly parsed message items (src) with those already stored in a translation repo (dst).
         // 1. Where an orphan msgid is found (present in the dst but not the src) we update it in the dst to remove all references.
@@ -27,11 +27,11 @@ namespace i18n.Domain.Concrete
         //
            // 1.
            // Simply remove all references from dst items, for now.
-            foreach (TranslateItem dstItem in dst.Items.Values) {
+            foreach (TranslationItem dstItem in dst.Items.Values) {
                 dstItem.References = null; }
            // 2. and 3.
             foreach (TemplateItem srcItem in src.Values) {
-                TranslateItem dstItem = dst.Items.GetOrAdd(srcItem.Id, k => new TranslateItem { Id = srcItem.Id });
+                TranslationItem dstItem = dst.Items.GetOrAdd(srcItem.Id, k => new TranslationItem { Id = srcItem.Id });
                 dstItem.References = srcItem.References;
                 dstItem.ExtractedComments = srcItem.Comments;
              }
@@ -39,11 +39,11 @@ namespace i18n.Domain.Concrete
 			_repository.SaveTranslation(dst);
         }
 
-		public void SynchronizeAllTranslation(IDictionary<string, TemplateItem> items)
+		public void MergeAllTranslation(IDictionary<string, TemplateItem> items)
 		{
 			foreach (var language in _repository.GetAvailableLanguages())
 			{
-				SynchronizeTranslation(items, _repository.GetTranslation(language.LanguageShortTag));
+				MergeTranslation(items, _repository.GetTranslation(language.LanguageShortTag));
 			}
 		}
 

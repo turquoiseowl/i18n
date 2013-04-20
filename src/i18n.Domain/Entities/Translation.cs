@@ -13,6 +13,6 @@ namespace i18n.Domain.Entities
 	public class Translation
 	{
 		public Language LanguageInformation { get; set; }
-		public virtual ConcurrentDictionary<string, TranslateItem> Items  { get; set; }
+		public virtual ConcurrentDictionary<string, TranslationItem> Items  { get; set; }
 	}
 }
