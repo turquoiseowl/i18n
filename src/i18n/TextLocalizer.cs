@@ -171,7 +171,7 @@ namespace i18n
 					return true;
 				}
 
-				Translation t = _translationRepository.GetLanguage(langtag);
+				Translation t = _translationRepository.GetTranslation(langtag);
 
 				// Cache messages.
 				// NB: if the file changes we want to be able to rebuild the index without recompiling.

@@ -26,7 +26,7 @@ namespace i18n.Domain.Concrete
 
 		#region load and getters
 
-		public Translation GetLanguage(string tag)
+		public Translation GetTranslation(string tag)
 		{
 			return ParseTranslationFile(tag);
 		}

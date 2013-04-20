@@ -14,7 +14,7 @@ namespace i18n.Domain.Abstract
 	/// </summary>
 	public interface ITranslationRepository
 	{
-		Translation GetLanguage(string tag);
+		Translation GetTranslation(string tag);
 		IEnumerable<Language> GetAvailableLanguages();
 		bool TranslationExists(string tag);
 		void SaveTranslation(Translation translation);

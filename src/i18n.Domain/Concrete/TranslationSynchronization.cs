@@ -43,7 +43,7 @@ namespace i18n.Domain.Concrete
 		{
 			foreach (var language in _repository.GetAvailableLanguages())
 			{
-				SynchronizeTranslation(items, _repository.GetLanguage(language.LanguageShortTag));
+				SynchronizeTranslation(items, _repository.GetTranslation(language.LanguageShortTag));
 			}
 		}
 
