@@ -14,11 +14,11 @@ namespace i18n.Tests
         [TestMethod]
         public void ResponseFilter_can_process_nuggets()
         {
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer();
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(null);
 
             //string pre = "«««123»»» «««123»»»";
             string pre = "[[[123]]] [[[123]]]";
-            string post = obj.ProcessNuggets(pre, null, null);
+            string post = obj.ProcessNuggets(pre, null);
             Assert.AreEqual("test.message test.message", post);
 
             //#37 TODO -- more tests.
@@ -329,8 +329,8 @@ namespace i18n.Tests
         }
         void ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, Uri requestUrl = null)
         {
-            i18n.EarlyUrlLocalizer obj = new i18n.EarlyUrlLocalizer();
-            string post = obj.ProcessOutgoing(pre, suffix, null, new UrlLocalizer());
+            i18n.EarlyUrlLocalizer obj = new i18n.EarlyUrlLocalizer(new UrlLocalizer());
+            string post = obj.ProcessOutgoing(pre, suffix, null);
             Assert.AreEqual(expectedPatched, post);
         }
     }

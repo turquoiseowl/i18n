@@ -11,10 +11,17 @@ namespace i18n
     /// </summary>
     public class NuggetLocalizer : INuggetLocalizer
     {
+        private ITextLocalizer m_textLocalizer;
 
-    #region INuggetLocalizer
+        public NuggetLocalizer(
+            ITextLocalizer textLocalizer)
+        {
+            m_textLocalizer = textLocalizer;
+        }
 
-        public string ProcessNuggets(string entity, ITextLocalizer textLocalizer, LanguageItem[] languages)
+    #region [INuggetLocalizer]
+
+        public string ProcessNuggets(string entity, LanguageItem[] languages)
         {
            // Lookup any/all msgid nuggets in the entity and replace with any translated message.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
@@ -40,10 +47,10 @@ namespace i18n
                 LanguageTag lt;
                 string message;
                // Check for unit-test caller.
-                if (textLocalizer == null) {
+                if (m_textLocalizer == null) {
                     return "test.message"; }
                // Lookup resource using canonical msgid.
-				message = textLocalizer.GetText(nugget.MsgId, languages, out lt) ?? nugget.MsgId;
+				message = m_textLocalizer.GetText(nugget.MsgId, languages, out lt) ?? nugget.MsgId;
                //
                 if (nugget.IsFormatted) {
                    // Convert any identifies in a formatted nugget: %0 -> {0}

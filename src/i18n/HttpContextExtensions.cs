@@ -48,7 +48,7 @@ namespace i18n
         {
             // Lookup resource.
             LanguageTag lt;
-            msgid = LocalizedApplication.TextLocalizer.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
+            msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
         public static string GetText(this HttpContext context, string msgid)
@@ -73,8 +73,8 @@ namespace i18n
             UserLanguages[0] = new LanguageItem(pal, LanguageItem.PalQualitySetting, 0);
 
             // Run through any handlers installed for this event.
-            if (LocalizedApplication.SetPrincipalAppLanguageForRequestHandlers != null) {
-                foreach (LocalizedApplication.SetLanguageHandler handler in LocalizedApplication.SetPrincipalAppLanguageForRequestHandlers.GetInvocationList())
+            if (LocalizedApplication.Current.SetPrincipalAppLanguageForRequestHandlers != null) {
+                foreach (LocalizedApplication.SetLanguageHandler handler in LocalizedApplication.Current.SetPrincipalAppLanguageForRequestHandlers.GetInvocationList())
                 {
                     handler(context, pal);
                 }
@@ -104,7 +104,7 @@ namespace i18n
         //
             ILanguageTag langtag = GetRequestUserLanguages(context)[0].LanguageTag;
             if (langtag == null) {
-                langtag = LocalizedApplication.DefaultLanguageTag; }
+                langtag = LocalizedApplication.Current.DefaultLanguageTag; }
             return langtag;
         }
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)

@@ -6,6 +6,12 @@ namespace i18n
 {
     public class EarlyUrlLocalizer : IEarlyUrlLocalizer
     {
+        private IUrlLocalizer m_urlLocalizer;
+
+        public EarlyUrlLocalizer(IUrlLocalizer urlLocalizer)
+        {
+            m_urlLocalizer = urlLocalizer;
+        }
 
     #region IEarlyUrlLocalizer
 
@@ -14,16 +20,15 @@ namespace i18n
         /// <see href="https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
         /// </summary>
         public void ProcessIncoming(
-            HttpContextBase context,
-            IUrlLocalizer urlLocalizer)
+            HttpContextBase context)
         {
             // Is URL explicitly excluded from localization?
-            if (!urlLocalizer.FilterIncoming(context.Request.Url)) {
+            if (!m_urlLocalizer.FilterIncoming(context.Request.Url)) {
                 return; } // YES. Continue handling request.
 
             // NO. Is request URL localized?
             string urlNonlocalized;
-            string langtag = urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
+            string langtag = m_urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
             if (langtag == null)
             {
                 // NO.
@@ -40,7 +45,7 @@ namespace i18n
                     throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
 
                 // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, lt.ToString(), urlLocalizer);
+                RedirectWithLanguage(context, lt.ToString(), m_urlLocalizer);
                 return;
             }
 
@@ -65,7 +70,7 @@ namespace i18n
             {
                 // YES. Localize URL with matching App Language.
                 // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, appLangTag.ToString(), urlLocalizer);
+                RedirectWithLanguage(context, appLangTag.ToString(), m_urlLocalizer);
                 return;
             }
             // NO. Do nothing to URL; expect a 404 which corresponds to language not supported.
@@ -75,8 +80,7 @@ namespace i18n
         public string ProcessOutgoing(
             string entity, 
             string langtag, 
-            HttpContextBase context,
-            IUrlLocalizer urlLocalizer)
+            HttpContextBase context)
         {
         // The goal here to localize same-host URLs in the entity body and so save a redirect 
         // on subsequent requests to those URLs by the user-agent (i.e. Early URL Localization
@@ -102,7 +106,7 @@ namespace i18n
                         
                         // If URL is already localized...leave matched token alone.
                         string urlNonlocalized;
-                        if (urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
+                        if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
                             return match.Groups[0].Value; } // original
 
                         // If URL is not local (i.e. remote host)...leave matched token alone.
@@ -110,11 +114,11 @@ namespace i18n
                             return match.Groups[0].Value; } // original
 
                         // Is URL explicitly excluded from localization?
-                        if (!LocalizedApplication.UrlLocalizer.FilterOutgoing(url, requestUrl)) {
+                        if (!m_urlLocalizer.FilterOutgoing(url, requestUrl)) {
                             return match.Groups[0].Value; } // original
 
                         // Localized the URL.
-                        url = urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
+                        url = m_urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
 
                         // Rebuild and return matched token.
                         string res = string.Format("{0}{1}{2}", 
@@ -152,13 +156,13 @@ namespace i18n
         protected static void RedirectWithLanguage(
             HttpContextBase context, 
             string langtag,
-            IUrlLocalizer urlLocalizer)
+            IUrlLocalizer m_urlLocalizer)
         {
             // Construct localized URL.
-            string urlNew = urlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, UriKind.Relative, langtag);
+            string urlNew = m_urlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, UriKind.Relative, langtag);
 
             // Redirect user agent to new local URL.
-            if (LocalizedApplication.PermanentRedirects) {
+            if (LocalizedApplication.Current.PermanentRedirects) {
                 context.Response.StatusCode = 301;
                 context.Response.Status = "301 Moved Permanently";
             }

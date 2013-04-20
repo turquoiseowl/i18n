@@ -141,7 +141,7 @@ namespace i18n
                 {
                     // If the URL is nonlocalized incoming URL, this implies default language.
                     if (result == null && incomingUrl) {
-                        result = LocalizedApplication.DefaultLanguage;
+                        result = LocalizedApplication.Current.DefaultLanguage;
                         urlPatched = url;
                     }
                     return result;
@@ -159,7 +159,7 @@ namespace i18n
             {
                 case UrlLocalizationScheme.Scheme2:
                 {
-                    if (LocalizedApplication.DefaultLanguageTag.Equals(langtag)) {
+                    if (LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
                         return url; }
                     break;
                 }

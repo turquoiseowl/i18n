@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRootServices.cs" />
     <Compile Include="EarlyUrlLocalizer.cs" />
     <Compile Include="IEarlyUrlLocalizer.cs" />
     <Compile Include="INuggetLocalizer.cs" />

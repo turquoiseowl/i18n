@@ -13,6 +13,21 @@ namespace i18n
     /// </summary>
     public class ResponseFilter : Stream
     {
+        private IEarlyUrlLocalizer m_earlyUrlLocalizer;
+        private INuggetLocalizer m_nuggetLocalizer;
+
+        public ResponseFilter(
+            HttpContextBase httpContext, 
+            Stream outputStream,
+            IEarlyUrlLocalizer earlyUrlLocalizer,
+            INuggetLocalizer nuggetLocalizer)
+        {
+            m_httpContext = httpContext;
+            m_outputStream = outputStream;
+            m_earlyUrlLocalizer = earlyUrlLocalizer;
+            m_nuggetLocalizer = nuggetLocalizer;
+        }
+
         /// <summary>
         /// The stream onto which we pass data once processed. This will typically be set 
         /// to the stream which was the original value of Response.Filter before we got there.
@@ -23,12 +38,6 @@ namespace i18n
         /// HTTP context with which the filter is associated.
         /// </summary>
         protected HttpContextBase m_httpContext;
-
-        public ResponseFilter(HttpContextBase httpContext, Stream outputStream)
-        {
-            m_httpContext = httpContext;
-            m_outputStream = outputStream;
-        }
 
     #region [Stream]
 
@@ -41,12 +50,10 @@ namespace i18n
             string entity = enc.GetString(buffer, offset, count);
 
             // Translate any embedded messages aka 'nuggets'.
-            if (LocalizedApplication.NuggetLocalizer != null
-                && LocalizedApplication.TextLocalizer != null)
+            if (m_nuggetLocalizer != null)
             {
-                entity = LocalizedApplication.NuggetLocalizer.ProcessNuggets(
+                entity = m_nuggetLocalizer.ProcessNuggets(
                     entity,
-                    LocalizedApplication.TextLocalizer,
                     m_httpContext.GetRequestUserLanguages());
             }
 
@@ -62,13 +69,12 @@ namespace i18n
             //   <img src="..."> tags
             //   <a href="..."> tags
             //   <link href="..."> tags
-            if (LocalizedApplication.EarlyUrlLocalizer != null)
+            if (m_earlyUrlLocalizer != null)
             {
-                entity = LocalizedApplication.EarlyUrlLocalizer.ProcessOutgoing(
+                entity = m_earlyUrlLocalizer.ProcessOutgoing(
                     entity, 
                     m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
-                    m_httpContext,
-                    LocalizedApplication.UrlLocalizer);
+                    m_httpContext);
             }
 
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);

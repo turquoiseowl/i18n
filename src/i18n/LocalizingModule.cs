@@ -7,33 +7,47 @@ using System.Web;
 
 namespace i18n
 {
-/*
-    LocalizingModule can be installed like this:
-
-        IIS7+ Integrated mode:
-
-          <system.webServer>
-            <modules>
-              <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" />
-            </modules>
-          </system.webServer>
-
-        IIS7 Classic mode and II6:
-
-          <system.web>
-            <httpModules>
-              <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" /> <!-- #37 -->
-            </httpModules>
-          </system.web>
-*/
-
     /// <summary>
     /// HTTP module responsible for:
     /// 1. Implementing early URL localization
     /// 2. Installing our ResponseFilter into the ASP.NET pipeline.
     /// </summary>
+    /// <remarks>
+    ///     LocalizingModule can be installed like this:
+    /// 
+    ///         IIS7+ Integrated mode:
+    /// 
+    ///           &lt;system.webServer&gt;
+    ///             &lt;modules&gt;
+    ///               &lt;add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" /&gt;
+    ///             &lt;/modules&gt;
+    ///           &lt;/system.webServer&gt;
+    /// 
+    ///         IIS7 Classic mode and II6:
+    /// 
+    ///           &lt;system.web&gt;
+    ///             &lt;httpModules&gt;
+    ///               &lt;add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" /&gt; &lt;!-- #37 --&gt;
+    ///             &lt;/httpModules&gt;
+    ///           &lt;/system.web&gt;
+    /// </remarks>
     public class LocalizingModule : IHttpModule
     {
+        private IEarlyUrlLocalizer m_earlyUrlLocalizer;
+        private INuggetLocalizer m_nuggetLocalizer;
+
+        public LocalizingModule()
+        :   this(
+                LocalizedApplication.Current.EarlyUrlLocalizerForApp, 
+                LocalizedApplication.Current.NuggetLocalizerForApp)
+        {}
+        public LocalizingModule(
+            IEarlyUrlLocalizer earlyUrlLocalizer,
+            INuggetLocalizer nuggetLocalizer)
+        {
+            m_earlyUrlLocalizer = earlyUrlLocalizer;
+            m_nuggetLocalizer = nuggetLocalizer;
+        }
 
     #region [IHttpModule]
 
@@ -42,7 +56,7 @@ namespace i18n
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
             
             // Wire up our event handlers into the ASP.NET pipeline.
-            if (LocalizedApplication.EarlyUrlLocalizer != null) {
+            if (m_earlyUrlLocalizer != null) {
                 application.BeginRequest += OnBeginRequest; }
             application.ReleaseRequestState += OnReleaseRequestState;
         }
@@ -63,11 +77,9 @@ namespace i18n
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            if (LocalizedApplication.EarlyUrlLocalizer != null)
+            if (m_earlyUrlLocalizer != null)
             {
-                LocalizedApplication.EarlyUrlLocalizer.ProcessIncoming(
-                    context, 
-                    LocalizedApplication.UrlLocalizer);
+                m_earlyUrlLocalizer.ProcessIncoming(context);
             }
         }
 
@@ -85,10 +97,14 @@ namespace i18n
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
             // in the pipeline.
-            if (LocalizedApplication.ContentTypesToLocalize != null
-                && LocalizedApplication.ContentTypesToLocalize.Match(context.Response.ContentType).Success) {
+            if (LocalizedApplication.Current.ContentTypesToLocalize != null
+                && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
-                context.Response.Filter = new ResponseFilter(context, context.Response.Filter);
+                context.Response.Filter = new ResponseFilter(
+                    context, 
+                    context.Response.Filter,
+                    m_earlyUrlLocalizer,
+                    m_nuggetLocalizer);
             }
         }
     }

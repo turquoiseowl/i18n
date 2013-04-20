@@ -11,12 +11,8 @@ namespace i18n
         /// <param name="context">
         /// Current http context.
         /// </param>
-        /// <param name="urlLocalizer">
-        /// URL localizer service to use when amending a URL.
-        /// </param>
         void ProcessIncoming(
-            HttpContextBase context,
-            IUrlLocalizer urlLocalizer);
+            HttpContextBase context);
 
         /// <summary>
         /// Method for performing Late Url Localization of the passed response entity
@@ -32,16 +28,12 @@ namespace i18n
         /// Current http context.
         /// May be null if/when testing.
         /// </param>
-        /// <param name="urlLocalizer">
-        /// URL localizer service to use when amending a URL.
-        /// </param>
         /// <returns>
         /// Processed (and possibly modified) entity.
         /// </returns>
         string ProcessOutgoing(
             string entity, 
             string langtag, 
-            HttpContextBase context,
-            IUrlLocalizer urlLocalizer);
+            HttpContextBase context);
     }
 }

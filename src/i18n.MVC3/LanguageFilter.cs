@@ -124,12 +124,12 @@ namespace i18n
         {
             // Construct new URL.
             UriBuilder ub = new UriBuilder(filterContext.HttpContext.Request.Url);
-            ub.Path = LocalizedApplication.UrlLocalizer.SetLangTagInUrlPath(
+            ub.Path = LocalizedApplication.Current.UrlLocalizerService.SetLangTagInUrlPath(
                 filterContext.HttpContext.Request.RawUrl, 
                 UriKind.Relative,
                 langtag.ToString());
             // Redirect user agent to new URL.
-			var result = new RedirectResult(ub.Path, LocalizedApplication.PermanentRedirects); //relative path so ports do not become a problem with load balanced systems
+			var result = new RedirectResult(ub.Path, LocalizedApplication.Current.PermanentRedirects); //relative path so ports do not become a problem with load balanced systems
             result.ExecuteResult(filterContext);
         }
     }

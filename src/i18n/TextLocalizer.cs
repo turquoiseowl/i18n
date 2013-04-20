@@ -85,9 +85,9 @@ namespace i18n
             // Optionally try default language.
             if (fallbackOnDefault)
             {
-                text = TryGetTextFor(LocalizedApplication.DefaultLanguageTag.ToString(), key);
+                text = TryGetTextFor(LocalizedApplication.Current.DefaultLanguageTag.ToString(), key);
                 if (text != null) {
-                    o_langtag = LocalizedApplication.DefaultLanguageTag;
+                    o_langtag = LocalizedApplication.Current.DefaultLanguageTag;
                     return text; }
             }
 
@@ -96,7 +96,7 @@ namespace i18n
 
     #endregion
 
-        private static readonly object Sync = new object();
+        internal readonly object Sync = new object();
 
         /// <summary>
         /// Assesses whether a language is PO-valid, that is whether or not one or more
@@ -152,7 +152,7 @@ namespace i18n
 
             // If the language is the default language, by definition the text always exists
             // and as there isn't a translation defined for the key, we return the key itself.
-            if (string.Compare(langtag, LocalizedApplication.DefaultLanguageTag.ToString(), true) == 0) {
+            if (string.Compare(langtag, LocalizedApplication.Current.DefaultLanguageTag.ToString(), true) == 0) {
                 return key; }
 
             // Lookup failed.
