@@ -145,9 +145,6 @@ namespace i18n.Domain.Concrete
 
 			bool hasReferences = false;
 
-			//you can toggle parameter in UTF8Encoding to set BOM on/off
-			//var utf8WithoutBom = new System.Text.UTF8Encoding(true);
-			//using (var stream = new StreamWriter(filePath, false, utf8WithoutBom))
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
                // Establish ordering of items in PO file.
@@ -157,6 +154,11 @@ namespace i18n.Domain.Concrete
                     .ThenBy(x => x.Id);
                         // Then order alphanumerically.
                //
+
+				//This is required for poedit to read the files correctly if they contains for instance swedish characters
+				stream.WriteLine("msgstr \"\"");
+				stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\\n\"");
+				stream.WriteLine();
 
 				foreach (var item in orderedItems)
 				{
