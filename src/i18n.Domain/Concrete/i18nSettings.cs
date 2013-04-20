@@ -73,7 +73,19 @@ namespace i18n.Domain.Concrete
 		#region White list
 
 		private const string _whiteListDefault = "*.cs;*.cshtml";
-		public virtual IEnumerable<string> WhiteList
+		
+        /// <summary>
+        /// Describes zero or more file specifications which in turn specify
+        /// the source files to be targeted by FileNuggetParser.
+        /// </summary>
+        /// <remarks>
+        /// Each element in the list may be a full file name e.g. "myfile.js",
+        /// or a file extension e.g. "*.js".<br/>
+        /// When the list is stored in the config file as a string, each element is delimited by
+        /// a semi colon character.<br/>
+        /// Defaults to "*.cs;*.cshtml".
+        /// </remarks>
+        public virtual IEnumerable<string> WhiteList
 		{
 			get
 			{
@@ -109,7 +121,10 @@ namespace i18n.Domain.Concrete
         /// <remarks>
         /// Each element in the list may be either an absolute (rooted) path, or a path
         /// relative to the folder containing the current config file
-        /// (<see cref="AbstractSettingService.GetConfigFileLocation"/>).
+        /// (<see cref="AbstractSettingService.GetConfigFileLocation"/>).<br/>
+        /// When the list is stored in the config file as a string, each element is delimited by
+        /// a semi colon character.<br/>
+        /// Default value is empty list.<br/>
         /// </remarks>
 		public virtual IEnumerable<string> BlackList
 		{
