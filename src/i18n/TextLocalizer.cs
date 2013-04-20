@@ -194,14 +194,14 @@ namespace i18n
 				LoadMessagesIntoCache(langtag);
 			}
 
-
-            if (messages == null || !messages.TryGetValue(key, out message))
+            if (messages == null
+                || !messages.TryGetValue(key, out message)
+                || !message.Message.IsSet())
             {
                 return null;
             }
 
             return message.Message;
-                // We check this for null/empty before adding to collection.
         }
 
         /// <returns>null if not found.</returns>
