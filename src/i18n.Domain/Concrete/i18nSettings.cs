@@ -83,13 +83,11 @@ namespace i18n.Domain.Concrete
 				{
 					return setting.Split(';').ToList();
 				}
-				else
-				{
-                    if (!prefixedString.IsSet()) {
-                        return new List<string>(); }
-
-					return _whiteListDefault.Split(';').ToList();
-				}
+				else if (_whiteListDefault.IsSet())
+                {
+				    return _whiteListDefault.Split(';').ToList();
+                }
+                return new List<string>();
 			}
 			set
 			{
@@ -103,6 +101,16 @@ namespace i18n.Domain.Concrete
 		#region Black list
 
 		private const string _blackListDefault = "";
+
+        /// <summary>
+        /// Describes zero or more source directory/folder paths to be ignored during nugget parsing
+        /// e.g. by FileNuggetParser.
+        /// </summary>
+        /// <remarks>
+        /// Each element in the list may be either an absolute (rooted) path, or a path
+        /// relative to the folder containing the current config file
+        /// (<see cref="AbstractSettingService.GetConfigFileLocation"/>).
+        /// </remarks>
 		public virtual IEnumerable<string> BlackList
 		{
 			get
@@ -114,12 +122,13 @@ namespace i18n.Domain.Concrete
 				{
 					list = setting.Split(';').ToList();
 				}
-				else
-				{
-                    if (!_blackListDefault.IsSet()) {
-                        return new List<string>(); }
-
+				else if (_blackListDefault.IsSet())
+                {
 					list = _blackListDefault.Split(';').ToList();
+                }
+                else
+                {
+                    return new List<string>();
 				}
 
 				List<string> returnList = new List<string>();
