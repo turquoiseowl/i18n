@@ -1,6 +1,7 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using container;
+using i18n.Helpers;
 
 namespace i18n
 {

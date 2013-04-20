@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web.Caching;
+using i18n.Helpers;
 
 namespace i18n
 {
