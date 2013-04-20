@@ -145,6 +145,9 @@ namespace i18n.Domain.Concrete
 
 			bool hasReferences = false;
 
+			//you can toggle parameter in UTF8Encoding to set BOM on/off
+			//var utf8WithoutBom = new System.Text.UTF8Encoding(true);
+			//using (var stream = new StreamWriter(filePath, false, utf8WithoutBom))
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
                // Establish ordering of items in PO file.
@@ -278,7 +281,7 @@ namespace i18n.Domain.Concrete
 			Language language = new Language();
 			language.LanguageShortTag = langtag;
 			translation.LanguageInformation = language;
-			var items = new ConcurrentDictionary<string, TranslateItem>();
+			var items = new ConcurrentDictionary<string, TranslationItem>();
 
 			string path = GetPathForLanguage(langtag);
 
@@ -325,7 +328,7 @@ namespace i18n.Domain.Concrete
 
 					if (itemStarted || line.StartsWith("#~"))
 					{
-						TranslateItem item = ParseBody(fs, line);
+						TranslationItem item = ParseBody(fs, line);
 
                         if (item != null) {
                            //
@@ -385,12 +388,12 @@ namespace i18n.Domain.Concrete
 		/// <param name="fs">A textreader that must be on the second line of a Message id</param>
 		/// <param name="line">The first line of the message id.</param>
 		/// <returns>Returns a TranslationITem with only id and message set</returns>
-		private TranslateItem ParseBody(TextReader fs, string line)
+		private TranslationItem ParseBody(TextReader fs, string line)
 		{
 			if (string.IsNullOrEmpty(line)) {
                 return null; }
 
-            TranslateItem message = new TranslateItem { Id = "" };
+            TranslationItem message = new TranslationItem { Id = "" };
 			StringBuilder sb = new StringBuilder();
 
 			line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
