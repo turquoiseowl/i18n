@@ -44,7 +44,7 @@ namespace i18n
                // NB: we do this before actually populating the collection. This is so that any changes to the
                // folders before we finish populating the collection will cause the cache item to be invalidated
                // and hence reloaded on next request, and so will not be missed.
-                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyAllLanguages());
+                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyForAllLanguages());
 
                // Populate the collection.
 	            List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
@@ -175,7 +175,7 @@ namespace i18n
 
 				// Cache messages.
 				// NB: if the file changes we want to be able to rebuild the index without recompiling.
-				HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, _translationRepository.GetCacheDependencyLanguage(langtag));
+				HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, _translationRepository.GetCacheDependencyForSingleLanguage(langtag));
 			}
             return true;
         }

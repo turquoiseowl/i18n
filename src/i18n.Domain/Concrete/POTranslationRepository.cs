@@ -26,9 +26,9 @@ namespace i18n.Domain.Concrete
 
 		#region load and getters
 
-		public Translation GetTranslation(string tag)
+		public Translation GetTranslation(string langtag)
 		{
-			return ParseTranslationFile(tag);
+			return ParseTranslationFile(langtag);
 		}
 
 
@@ -77,9 +77,9 @@ namespace i18n.Domain.Concrete
 		/// Checks if the language is set as supported in config file
 		/// If not it checks if the PO file is available
 		/// </summary>
-		/// <param name="tag">The tag for which you want to check if support exists. For instance "sv-SE"</param>
+		/// <param name="langtag">The tag for which you want to check if support exists. For instance "sv-SE"</param>
 		/// <returns>True if language exists, otherwise false</returns>
-		public bool TranslationExists(string tag)
+		public bool TranslationExists(string langtag)
 		{
 			List<string> languages = _settings.AvailableLanguages.ToList();
 
@@ -87,14 +87,14 @@ namespace i18n.Domain.Concrete
 			if (languages.Count == 1 && languages[0] == "")
 			{
 				//We instead check if the file exists
-				return File.Exists(GetPathForLanguage(tag));
+				return File.Exists(GetPathForLanguage(langtag));
 			}
 			else
 			{
 				//see if the desired language was one of the returned from settings
 				foreach (var language in languages)
 				{
-					if (language == tag)
+					if (language == langtag)
 					{
 						return true;
 					}
@@ -105,12 +105,12 @@ namespace i18n.Domain.Concrete
 			return false;
 		}
 
-		public CacheDependency GetCacheDependencyLanguage(string tag)
+		public CacheDependency GetCacheDependencyForSingleLanguage(string langtag)
 		{
-			return new CacheDependency(GetPathForLanguage(tag));
+			return new CacheDependency(GetPathForLanguage(langtag));
 		}
 
-		public CacheDependency GetCacheDependencyAllLanguages()
+		public CacheDependency GetCacheDependencyForAllLanguages()
 		{
 			return new FsCacheDependency(GetAbsoluteLocaleDir());
 		}
@@ -120,7 +120,7 @@ namespace i18n.Domain.Concrete
 		#region save
 
 		/// <summary>
-		/// Saves a translation into file with standard pattern locale/tag/message.po
+		/// Saves a translation into file with standard pattern locale/langtag/message.po
 		/// Also saves a backup of previous version
 		/// </summary>
 		/// <param name="translation">The translation you wish to save. Must have Language shortag filled out.</param>
@@ -260,27 +260,27 @@ namespace i18n.Domain.Concrete
 			return _settings.LocaleDirectory;
 		}
 
-		private string GetPathForLanguage(string tag)
+		private string GetPathForLanguage(string langtag)
 		{
-			return Path.Combine(GetAbsoluteLocaleDir(), tag, "messages.po");
+			return Path.Combine(GetAbsoluteLocaleDir(), langtag, "messages.po");
 		}
 
 		/// <summary>
 		/// Parses a PO file into a Language object
 		/// </summary>
-		/// <param name="tag">The language (tag) you wish to load into Translation object</param>
+		/// <param name="langtag">The language (tag) you wish to load into Translation object</param>
 		/// <returns>A complete translation object with all all translations and language values set.</returns>
-		private Translation ParseTranslationFile(string tag)
+		private Translation ParseTranslationFile(string langtag)
 		{
 			//todo: consider that lines we don't understand like headers from poedit and #| should be preserved and outputted again.
 
 			Translation translation = new Translation();
 			Language language = new Language();
-			language.LanguageShortTag = tag;
+			language.LanguageShortTag = langtag;
 			translation.LanguageInformation = language;
 			var items = new ConcurrentDictionary<string, TranslateItem>();
 
-			string path = GetPathForLanguage(tag);
+			string path = GetPathForLanguage(langtag);
 
 			using (var fs = File.OpenText(path))
 			{
