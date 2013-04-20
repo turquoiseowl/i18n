@@ -59,16 +59,37 @@ namespace i18n
         {
         // This method called many times per request. Every effort taken to avoid it making any heap allocations.
         //
+        // Principle Application Language (PAL) Prioritization:
+        //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
+        //   Their browser is set to languages en-US, en, zh-Hans.
+        //   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
+        //   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
+        //   We also have message in en-US and zh-Hans.
+        //   Surely, the message from fr or fr-CA is better match than en-US or zh-Hans.
+        //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
+        //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
+        //   we try all match grades first. Only if there is not match whatsoever for the PAL
+        //   so we move no to the other (browser) languages, where return to prioritizing match grade
+        //   i.e. loop through all the languages first at the strictest match grade before loosening 
+        //   to the next match grade, and so on.
+        //
+            int idxUserLang = 0;
            // Validate arguments.
             if (UserLanguages == null) { throw new ArgumentNullException("UserLanguages"); }
             if (AppLanguages == null) { throw new ArgumentNullException("AppLanguages"); }
             if (maxPasses > (int)LanguageTag.MatchGrade._MaxMatch) {
                 maxPasses = (int)LanguageTag.MatchGrade._MaxMatch; }
-           //
-            for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
-                LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
-                for (int i = 0; i < UserLanguages.Length; ++i) {
-                    LanguageTag ltUser = (LanguageTag)UserLanguages[i].LanguageTag;
+
+            //MC002
+            //if (key == "Sign In") {
+            //    key = key; }
+
+            if (UserLanguages.Length != 0) {
+               // First, find any match for the PAL (if set) (see PAL Prioritization notes above).
+               // Wiz through all match grades for any Principle Application Language.
+                for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
+                    LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
+                    LanguageTag ltUser = (LanguageTag)UserLanguages[idxUserLang].LanguageTag;
                     if (ltUser == null) {
                         continue; }
                         // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
@@ -87,8 +108,38 @@ namespace i18n
                         else {
                             o_text = null; }
                        // Match.
-                        ++UserLanguages[i].UseCount;
+                        ++UserLanguages[idxUserLang].UseCount;
                         return langApp.Value;
+                    }
+                }
+                ++idxUserLang;
+               // No match for PAL, so now try for the browser languages, this time prioritizing the
+               // match grade.
+                for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
+                    LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
+                    for (; idxUserLang < UserLanguages.Length; ++idxUserLang) {
+                        LanguageTag ltUser = (LanguageTag)UserLanguages[idxUserLang].LanguageTag;
+                        if (ltUser == null) {
+                            continue; }
+                            // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
+                            // Or consider making the Match logic more abstract, e.g. requesting number of passes from
+                            // the object, and passing a pass value through to Match.
+                        foreach (KeyValuePair<string, LanguageTag> langApp in AppLanguages) {
+                           // If languages do not match at the current grade...goto next.
+                            if (ltUser.Match(langApp.Value, matchGrade) == 0) {
+                                continue; }
+                           // Optionally test for a resource of the given key in the matching language.
+                            if (TryGetTextFor != null) {
+                                o_text = TryGetTextFor(langApp.Key, key);
+                                if (o_text == null) {
+                                    continue; }
+                            }
+                            else {
+                                o_text = null; }
+                           // Match.
+                            ++UserLanguages[idxUserLang].UseCount;
+                            return langApp.Value;
+                        }
                     }
                 }
             }
