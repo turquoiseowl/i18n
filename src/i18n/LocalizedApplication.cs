@@ -116,14 +116,15 @@ namespace i18n
             // NB: we are registering the factory functions/delegates here, not actually
             // creating the services instances.
             Container.Register<ITranslationRepository>(r => new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null)))); 
+            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
             Container.Register<ITextLocalizer>(r => new TextLocalizer(TranslationRepositoryService)); 
+            Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer(UrlLocalizerService));
             Container.Register<INuggetLocalizer>(r => new NuggetLocalizer(TextLocalizerForApp));
                 // TextLocalizerForApp = re-use any cached TextLocalizer already instantiated.
                 // This prevents NuggetLocalizer using a different TextLocalizer instance from
                 // a client which calls TextLocalizerForApp directly. While it is dangerous to do this
                 // from a DI perspective, it should be okay because any service factory change resets/clears any
                 // cached service instances.
-            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
 
             // Install default handler for Set-PAL event.
             // The default handler applies the setting to both the CurrentCulture and CurrentUICulture
