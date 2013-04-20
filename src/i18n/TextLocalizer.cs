@@ -85,10 +85,8 @@ namespace i18n
             // Optionally try default language.
             if (fallbackOnDefault)
             {
-                text = TryGetTextFor(LocalizedApplication.Current.DefaultLanguageTag.ToString(), key);
-                if (text != null) {
-                    o_langtag = LocalizedApplication.Current.DefaultLanguageTag;
-                    return text; }
+                o_langtag = LocalizedApplication.Current.DefaultLanguageTag;
+                return key;
             }
 
             return null;
@@ -149,11 +147,6 @@ namespace i18n
             string text = LookupText(langtag, key);
             if (text != null) {
                 return text; }
-
-            // If the language is the default language, by definition the text always exists
-            // and as there isn't a translation defined for the key, we return the key itself.
-            if (string.Compare(langtag, LocalizedApplication.Current.DefaultLanguageTag.ToString(), true) == 0) {
-                return key; }
 
             // Lookup failed.
             return null;
