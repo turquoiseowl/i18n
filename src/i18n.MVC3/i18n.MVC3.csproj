@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="I18N.cs" />
     <Compile Include="I18NController.cs" />
+    <Compile Include="I18nModelMetadataProvider.cs" />
     <Compile Include="I18NWebViewPage.cs" />
     <Compile Include="LanguageFilter.cs" />
     <Compile Include="LanguageRouteDecorator.cs" />

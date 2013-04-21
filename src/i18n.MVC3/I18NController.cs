@@ -25,12 +25,26 @@ namespace i18n
 
         public virtual IHtmlString _(string text)
         {
+            if (this.HttpContext == null)
+            {
+                return new MvcHtmlString(text);
+            }
+            else
+            {
             return new MvcHtmlString(_session.GetText(HttpContext, text));
+        }
         }
 
         public virtual string __(string text)
         {
+            if (this.HttpContext == null)
+            {
+                return text;
+            }
+            else
+            {
             return _session.GetText(HttpContext, text);
+            }
         }
     }
 }
