@@ -43,8 +43,8 @@ namespace i18n.PostBuild
 	        var items = nugget.ParseAll();
 	        rep.SaveTemplate(items);
 
-			TranslationSynchronization ts = new TranslationSynchronization(rep);
-			ts.SynchronizeAllTranslation(items);
+			TranslationMerger ts = new TranslationMerger(rep);
+			ts.MergeAllTranslation(items);
 			
 
             Console.WriteLine("i18n.PostBuild completed successfully.");

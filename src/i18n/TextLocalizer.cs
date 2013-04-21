@@ -105,7 +105,7 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-			ConcurrentDictionary<string, TranslateItem> messages = (ConcurrentDictionary<string, TranslateItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
+			ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
@@ -178,8 +178,8 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
-            var messages = (ConcurrentDictionary<string, TranslateItem>) HttpRuntime.Cache[GetCacheKey(langtag)];
-            TranslateItem message = null;
+            var messages = (ConcurrentDictionary<string, TranslationItem>) HttpRuntime.Cache[GetCacheKey(langtag)];
+            TranslationItem message = null;
 
 			//we need to populate the cache
 			if (messages == null)
