@@ -3,6 +3,8 @@ using System.Web.Mvc;
 
 namespace i18n
 {
+    using i18n.NamedStringFormater;
+
     /// <summary>
     /// A base view providing an alias for localizable resources
     /// </summary>
@@ -30,6 +32,11 @@ namespace i18n
         public IHtmlString _(string text, params object[] parameters)
         {
             return new HtmlString(string.Format(Context.GetText(text), parameters));
+        }
+
+        public IHtmlString _(string text, object source)
+        {
+            return new HtmlString(Context.GetText(text).Format(source));
         }
 
     #endregion
@@ -107,7 +114,16 @@ namespace i18n
                 string.Format("\"{0}\"", value):
                 string.Format("{0}=\"{1}\"", attrname, value);
             return new System.Web.HtmlString(raw);
-        }    
+        }
+
+        public IHtmlString _(string value, string attrname, object source)
+        {
+            value = Context.GetText(value).Format(source);
+            string raw = string.IsNullOrEmpty(attrname) ?
+                string.Format("\"{0}\"", value) :
+                string.Format("{0}=\"{1}\"", attrname, value);
+            return new System.Web.HtmlString(raw);
+        }  
 
         /// <summary>
         /// Looks up and returns a plain string containing any translation available of the given text.
@@ -127,6 +143,11 @@ namespace i18n
         public string __(string text, params object[] parameters)
         {
             return string.Format(Context.GetText(text), parameters);
+        }
+
+        public string __(string text, object source)
+        {
+            return Context.GetText(text).Format(source);
         }
     }
 
@@ -159,6 +180,11 @@ namespace i18n
             return new HtmlString(string.Format(Context.GetText(text), parameters));
         }
 
+        public IHtmlString _(string text, object source)
+        {
+            return new HtmlString(Context.GetText(text).Format(source));
+        }
+
     #endregion
 
         /// <summary>
@@ -234,7 +260,16 @@ namespace i18n
                 string.Format("\"{0}\"", value):
                 string.Format("{0}=\"{1}\"", attrname, value);
             return new System.Web.HtmlString(raw);
-        }    
+        }
+
+        public IHtmlString _(string value, string attrname, object source)
+        {
+            value = Context.GetText(value).Format(source);
+            string raw = string.IsNullOrEmpty(attrname) ?
+                string.Format("\"{0}\"", value) :
+                string.Format("{0}=\"{1}\"", attrname, value);
+            return new System.Web.HtmlString(raw);
+        } 
 
         /// <summary>
         /// Looks up and returns a plain string containing any translation available of the given text.
@@ -254,6 +289,11 @@ namespace i18n
         public string __(string text, params object[] parameters)
         {
             return string.Format(Context.GetText(text), parameters);
+        }
+
+        public string __(string text, object source)
+        {
+            return Context.GetText(text).Format(source);
         }
     }
 }

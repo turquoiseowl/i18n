@@ -3,6 +3,8 @@ using System.Web.Mvc;
 
 namespace i18n
 {
+    using i18n.NamedStringFormater;
+
     public static class ModelStateDictionaryExtensions
     {
         public static void AddModelError(this ModelStateDictionary dictionary, string key, IHtmlString errorMessage)
@@ -39,6 +41,11 @@ namespace i18n
             return new HtmlString(string.Format(HttpContext.GetText(text), parameters));
         }
 
+        public IHtmlString _(string text, object source)
+        {
+            return new HtmlString(HttpContext.GetText(text).Format(source));
+        }
+
     #endregion
 
         /// <summary>
@@ -59,6 +66,11 @@ namespace i18n
         public string __(string text, params object[] parameters)
         {
             return string.Format(HttpContext.GetText(text), parameters);
+        }
+
+        public string __(string text, object source)
+        {
+            return HttpContext.GetText(text).Format(source);
         }
     }
 }
