@@ -20,7 +20,7 @@ namespace i18n
         /// </param>
         /// <param name="key">
         /// Optionally specifies the key or a message to be looked up in order to validate
-        /// a language selection. Only is the language passes the validation will it be selected.
+        /// a language selection. Only if the language passes the validation will it be selected.
         /// Set in conjunction with TryGetTextFor.
         /// May be null (while TryGetTextFor is non-null) which specifies that one or more messages 
         /// must exists for a language for it to be considered valid (PO-valid).
@@ -31,7 +31,7 @@ namespace i18n
         /// </param>
         /// <param name="o_text">
         /// When language validation is enabled (TryGetTextFor is non-null) outputs the translated
-        /// text that was returned by TryGetTextFor when teh language was validated.
+        /// text that was returned by TryGetTextFor when the language was validated.
         /// If key == null then this will be set to "".
         /// </param>
         /// <param name="maxPasses">
@@ -42,12 +42,11 @@ namespace i18n
         /// -1 to set to most tolerant (i.e. 4).
         /// </param>
         /// <returns>
-        /// LanguageTag instance selected from AppLanguages with the best match, or null if the is no match
+        /// LanguageTag instance selected from AppLanguages with the best match, or null if there is no match
         /// at all (or UserLanguages and/or AppLanguages is empty).
         /// It is possible for there to be no match at all if no language subtag in the UserLanguages tags
         /// matches the same of any of the tags in AppLanguages list.
         /// </returns>
-        /// <exception cref="System.ArgumentNullException">Thrown if UserLanguages or AppLanguages is null.</exception>
         /// <exception cref="System.ArgumentNullException">Thrown if UserLanguages or AppLanguages is null.</exception>
         public static LanguageTag MatchLists(
             LanguageItem[] UserLanguages, 
