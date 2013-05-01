@@ -96,34 +96,36 @@ namespace i18n
         //   <link href="..."> tags
         // A full list is available here: http://www.w3.org/TR/REC-html40/index/attributes.html
         //
+
             Uri requestUrl = context != null ? context.Request.Url : null;
+
+            // Localize any HTTP headers in the response containing URLs.
+            foreach (string hdr in m_httpHeadersContainingUrls) {
+                string hdrval = context.Response.Headers[hdr];
+                if (!hdrval.IsSet()) {
+                    continue; }
+                string urlNew = LocalizeUrl(hdrval, langtag, requestUrl);
+                if (urlNew == null) {
+                    continue; }
+                context.Response.Headers[hdr] = urlNew;
+            }
+            
+            // Localize any nuggets in the entity.
             return m_regexHtmlUrls.Replace(
                 entity,
                 delegate(Match match)
                 {
                     try {
                         string url = match.Groups[2].Value;
-                        
-                        // If URL is already localized...leave matched token alone.
-                        string urlNonlocalized;
-                        if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
+                        string urlNew = LocalizeUrl(url, langtag, requestUrl);
+                        // If URL was not changed...leave matched token alone.
+                        if (urlNew == null) {
                             return match.Groups[0].Value; } // original
-
-                        // If URL is not local (i.e. remote host)...leave matched token alone.
-                        if (requestUrl != null && !requestUrl.IsLocal(url)) {
-                            return match.Groups[0].Value; } // original
-
-                        // Is URL explicitly excluded from localization?
-                        if (!m_urlLocalizer.FilterOutgoing(url, requestUrl)) {
-                            return match.Groups[0].Value; } // original
-
-                        // Localized the URL.
-                        url = m_urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
 
                         // Rebuild and return matched token.
                         string res = string.Format("{0}{1}{2}", 
                             match.Groups[1].Value,
-                            url, 
+                            urlNew, 
                             match.Groups[3].Value);
                         return res;
                     }
@@ -153,6 +155,8 @@ namespace i18n
                 // See also: http://www.w3.org/TR/REC-html40/index/attributes.html
                 // See also: http://www.mikesdotnetting.com/Article/46/CSharp-Regular-Expressions-Cheat-Sheet
 
+        public static string[] m_httpHeadersContainingUrls = new[] { "Location", "Content-Location" };
+
         protected static void RedirectWithLanguage(
             HttpContextBase context, 
             string langtag,
@@ -172,6 +176,37 @@ namespace i18n
             }
             context.Response.RedirectLocation = urlNew;
             context.Response.End();
+        }
+
+        /// <summary>
+        /// Helper for localizing an individual URL string for a particular langtag value
+        /// and URL of the current request.
+        /// </summary>
+        /// <param name="url">Subject URL to be localized.</param>
+        /// <param name="langtag">Language with which to localize the URL.</param>
+        /// <param name="requestUrl">URL of the current HTTP request being handled.</param>
+        /// <returns>
+        /// String describing the new localized URL, or null if the URL was not localized,
+        /// either because it was already localized, or because it is from another host, or is explicitly
+        /// excluded from localization by the filter.
+        /// </returns>
+        protected string LocalizeUrl(string url, string langtag, Uri requestUrl)
+        {
+            // If URL is already localized...leave matched token alone.
+            string urlNonlocalized;
+            if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
+                return null; } // original
+
+            // If URL is not local (i.e. remote host)...leave matched token alone.
+            if (requestUrl != null && !requestUrl.IsLocal(url)) {
+                return null; } // original
+
+            // Is URL explicitly excluded from localization?
+            if (!m_urlLocalizer.FilterOutgoing(url, requestUrl)) {
+                return null; } // original
+
+            // Localize the URL.
+            return m_urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace i18n
     ///             &lt;/modules&gt;
     ///           &lt;/system.webServer&gt;
     /// 
-    ///         IIS7 Classic mode and II6:
+    ///         IIS7 Classic mode and IIS6:
     /// 
     ///           &lt;system.web&gt;
     ///             &lt;httpModules&gt;
