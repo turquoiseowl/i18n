@@ -5,7 +5,10 @@
 ```
 ### Introduction
 
-The i18n library is designed to replace the use of .NET resources in favor of an easier, globally recognized standard for localizing web applications. Using this library simplifies localization by making it a first class citizen of views, controllers, and validation attributes.
+The i18n library is designed to replace the use of .NET resources in favor 
+of an easier, globally recognized standard for localizing web applications. 
+Using this library simplifies localization by making it a first class citizen 
+of views, controllers, and validation attributes.
 
 ### Features
 - Globally recognized interface; localize like the big kids
@@ -15,18 +18,19 @@ The i18n library is designed to replace the use of .NET resources in favor of an
 - Smart; knows when to hold them, fold them, walk away, or run, based on i18n best practices
 
 ### Usage
-To localize text in your application, use the `_("text")` alias method wherever required. That's it.
+To localize text in your application, surround your strings with [[[ and ]]] markup
+characters to mark them as translatable. That's it. 
 Here's an example of localizing text in a Razor view:
 
 ```html
     <div id="content">
-        <h2>@_("Welcome to my web app!")</h2>
-        <h3><span>@_("Amazing slogan here")</span></h3>
-        <p>@_("Ad copy that would make Hiten Shah fall off his chair!")</p>
-        <span class="button">
+        <h2>[[[Welcome to my web app!]]]</h2>
+        <h3><span>[[[Amazing slogan here]]]</span></h3>
+        <p>[[[Ad copy that would make Hiten Shah fall off his chair!]]]</p>
+        <span class="button" title="[[[Click to see plans and pricing]]]">
             <a href="@Url.Action("Plans", "Home", new { area = "" })">
-                <strong>@_("SEE PLANS & PRICING")</strong>
-                <span>@_("Free unicorn with all plans!")</span>
+                <strong>[[[SEE PLANS & PRICING]]]</strong>
+                <span>[[[Free unicorn with all plans!]]]</span>
             </a>
         </span>
     </div>
@@ -43,7 +47,7 @@ And here's an example in a controller:
         {
             public ActionResult Index()
             {
-                ViewBag.Message = _("Welcome to ASP.NET MVC!");
+                ViewBag.Message = "[[[Welcome to ASP.NET MVC!]]]";
 
                 return View();
             }
@@ -51,66 +55,46 @@ And here's an example in a controller:
     }
 ```
 
-For use in URL-Helpers or other functions that require a plain string, you can use the `__("text")` alias:
-
-```html
-@Html.LabelFor(m => m.Name, __("First Name"))
-```
-
-For use in HTML attributes, you can use the `_("value", "attrname")` overload:
-
-```html
-    <img @_("Our logo", "alt") src="...">...</img>
-```
-
-And the same overload can be used for Javascript embedded into your Razor view:
-
-```html
-    <script type="text/javascript">
-        $(function () {
-            alert(@_("Hello world!", ""));
-        });
-    </script>
-```
-
-#### Installing a base WebViewPage for Razor
-In the view example above, the `_("text")` alias is called on the base class of the Razor view page.
-Depending on whether you're using the provided base classes or your own base class with `ILocalizing` (see below),
-you'll want to change the `~/Views/web.config` file to point Razor to the base class containing the alias.
-Here is how you'd set up the alias using the provided `LocalizingWebViewPage` class:
-
-```xml
-     <system.web.webPages.razor>
-        <!-- ... -->
-        <pages pageBaseType="i18n.LocalizingWebViewPage">
-          <!-- ... -->
-        </pages>
-      </system.web.webPages.razor>
-```
-
-#### Using base classes vs. interfaces
-The central service is `ITextLocalizer`; anywhere you need localization, implement the `ILocalizing` interface.
-The package comes with default base classes for convenience, including `LocalizingController`, `LocalizingWebViewPage`, and
-`LocalizingWebViewPage<T>`. If your project needs prevent you from using a base class, implement `ILocalizing` and defer
-to `ITextLocalizer`; here is what implementing `ILocalizing` on a `Controller` might look like as a reference:
+For use in data annotations:
 
 ```csharp
-    using System.Web.Mvc;
-    using i18n;
-
-    namespace MyApplication
+    public class PasswordResetViewModel
     {
-        public class MyController : Controller, ILocalizing
+        [Required(ErrorMessage="[[[Please fill in this field]]]")]
+        [Email(ErrorMessage = "[[[Email not yet correct]]]")]
+        [Display(Name = "[[[Email Address]]]")]
+        public string Email
         {
-            public virtual IHtmlString _(string text)
-            {
-                return new HtmlString(HttpContext.GetText(text));
-            }
+            get;
+            set;
         }
     }
 ```
 
+For use in MVC URL-Helpers or other functions that require a plain string:
+
+```html
+@Html.LabelFor(m => m.Name, "[[[First Name]]]")
+```
+
+And the same can be used for Javascript:
+
+```html
+    <script type="text/javascript">
+        $(function () {
+            alert("[[[Hello world!]]]");
+        });
+    </script>
+```
+
+### Nugget Syntax
+
+TODO: document nugget format, including formatted nuggets
+TODO: document option for customized nugget markup
+
 #### Building PO databases
+
+TODO: rewrite
 
 To set up automatic PO database building, add the following post-build task to your project, after
 adding `i18n.PostBuild.exe` as a project reference:
@@ -130,8 +114,10 @@ If you change a PO file on the fly, i18n will update accordingly; you do _not_ n
 
 #### Route Localization
 
-To participate in the automatic routing features of this library, call `i18n.RouteLocalization.Enable()` in your startup code;
-this will register a global filter and route decorator to provide the feature.
+TODO: rewrite
+
+To participate in the automatic routing features of this library, call `i18n.RouteLocalization.Enable()` 
+in your startup code; this will register a global filter and route decorator to provide the feature.
 
 I18N comes with the ability to build on top of your existing routes to automatically redirect language choice to
 an appropriate URL suffix.
@@ -156,6 +142,8 @@ and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.co
 By default this is a temporary 302 redirect, but you can choose for it to be a permanent 301 one.
 
 ##### Language Matching
+
+TODO: update
 
 Language matching is performed when a list of one or more user-preferred languages is matched against
 a list of one or more application laguages, the goal being to choose the application languages
@@ -186,16 +174,6 @@ include the following in your Application_Start() method:
 
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
 It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
-
-#### Validation attributes
-
-Generally speaking, the stock validation attributes in ASP.NET MVC are closed to change, which makes it difficult to
-use them with a framework like this. Still, I18N contains replacements for several `ValidationAttributes`, including
-a base class for extending to build your own. These replacements function similarly to the originals, but use the
-`ILocalizing` interface; just use normally and any derived text will pass through the localization process. Any custom
-interactions that occur using these attributes elsewhere in the framework, however, will not work as expected. For the
-most part, you should be able to swap `System.ComponentModel.DataAnnotations` and `i18n.DataAnnotations` namespaces
-cleanly.
 
 #### A reminder about folders in a web application
 
