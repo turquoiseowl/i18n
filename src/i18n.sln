@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Domain", "i18n.Domain\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Domain.Tests", "i18n.Domain.Tests\i18n.Domain.Tests.csproj", "{546A36C4-49B6-4CA9-AFE8-62629DE1E322}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.POTGenerator", "i18n.POTGenerator\i18n.POTGenerator.csproj", "{CF0086A6-BE5F-462F-A735-B91686C20C6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,16 @@ Global
 		{546A36C4-49B6-4CA9-AFE8-62629DE1E322}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{546A36C4-49B6-4CA9-AFE8-62629DE1E322}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{546A36C4-49B6-4CA9-AFE8-62629DE1E322}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CF0086A6-BE5F-462F-A735-B91686C20C6B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
