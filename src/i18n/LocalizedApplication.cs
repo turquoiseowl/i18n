@@ -68,6 +68,20 @@ namespace i18n
         public LanguageTag DefaultLanguageTag { get; set; }
 
         /// <summary>
+        /// Specifies the root path for the site for correct URL Localization.
+        /// </summary>
+        /// <remarks>
+        /// Where the root application path for your site maps to the root of the URL,
+        /// leave this as null.<br/>
+        /// Where the root application path for your site maps to the sub path in the URL,
+        /// set this to that sub path part.<br/>
+        /// E.g. if the application root url is "example.com/MySite",
+        /// set this to "/MySite". It is important that the string starts with a forward slash path separator
+        /// and does NOT end with a forward slash.
+        /// </remarks>
+        public string SiteRootPath { get; set; }
+
+        /// <summary>
         /// Declares a method type for handling the setting of the language.
         /// </summary>
         /// <param name="context">Current http context.</param>
@@ -110,6 +124,7 @@ namespace i18n
             // Default settings.
             DefaultLanguage = ("en");
             PermanentRedirects = false;
+            SiteRootPath = null;
 
             // Register default services.
             // The client app may subsequerntly override any of these.

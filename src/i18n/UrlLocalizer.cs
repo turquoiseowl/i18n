@@ -129,13 +129,15 @@ namespace i18n
         
         public string ExtractLangTagFromUrl(string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
         {
+            string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url);
+
             string result = LanguageTag.ExtractLangTagFromUrl(url, uriKind, out urlPatched);
 
             switch (UrlLocalizationScheme)
             {
                 case UrlLocalizationScheme.Scheme1:
                 {
-                    return result;
+                    break;
                 }
                 case UrlLocalizationScheme.Scheme2:
                 {
@@ -144,7 +146,7 @@ namespace i18n
                         result = LocalizedApplication.Current.DefaultLanguage;
                         urlPatched = url;
                     }
-                    return result;
+                    break;
                 }
                 case UrlLocalizationScheme.Scheme3:
                 default:
@@ -152,6 +154,12 @@ namespace i18n
                     throw new InvalidOperationException();
                 }
             }
+
+           // If site root path was trimmed from the URL above, add it back on now.
+            if (siteRootPath != null) {
+                urlPatched = LocalizedApplication.Current.SiteRootPath + urlPatched; }
+
+            return result;
         }
         public string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag)
         {
@@ -169,7 +177,15 @@ namespace i18n
                 }
             }
 
-            return LanguageTag.SetLangTagInUrlPath(url, uriKind, langtag);
+            string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url);
+
+            url = LanguageTag.SetLangTagInUrlPath(url, uriKind, langtag);
+
+           // If site root path was trimmed from the URL above, add it back on now.
+            if (siteRootPath != null) {
+                url = LocalizedApplication.Current.SiteRootPath + url; }
+
+            return url;
         }
         public string InsertLangTagIntoVirtualPath(string langtag, string virtualPath)
         {
@@ -180,6 +196,30 @@ namespace i18n
         }
 
     #endregion
+
+    // Helpers
+
+        /// <summary>
+        /// Helper for detecting and extracting any site root path string from a URL.
+        /// </summary>
+        /// <param name="url">Subject relative url, trimmed on output if found to be prefixed with site root path.</param>
+        /// <returns>
+        /// If the site root path was founc and trimmed from the url, returns the site root path string.
+        /// Otherwise, returns null.
+        /// </returns>
+        protected string ExtractAnySiteRootPathFromUrl(ref string url)
+        {
+           // If url is prefixed with the site root path, trim it from the url.
+           // E.g. for site root path of "/XYZ"
+           //     /XYZ/Home/Index -> /Home/Index and we return /XYZ
+            if (LocalizedApplication.Current.SiteRootPath.IsSet()
+                && url.IndexOf(LocalizedApplication.Current.SiteRootPath, 0, StringComparison.OrdinalIgnoreCase) == 0) {
+                int len = LocalizedApplication.Current.SiteRootPath.Length;
+                url = url.Substring(len, url.Length -len);
+                return LocalizedApplication.Current.SiteRootPath;
+            }
+            return null;
+        }
 
     }
 }
