@@ -12,6 +12,7 @@ namespace i18n
     /// </summary>
     public interface IRootServices
     {
+        IUrlLocalizer UrlLocalizerForApp { get; }
         ITextLocalizer TextLocalizerForApp { get; }
         IEarlyUrlLocalizer EarlyUrlLocalizerForApp { get; }
         INuggetLocalizer NuggetLocalizerForApp { get; }

@@ -15,8 +15,14 @@ namespace i18n
     public class LocalizedApplication : IRootServices
     {
 
-    #region [IApplicationServices]
+    #region [IRootServices]
 
+        public IUrlLocalizer UrlLocalizerForApp
+        {
+            get {
+                return m_cached_urlLocalizer.Get(() => UrlLocalizerService);
+            }
+        }
         public ITextLocalizer TextLocalizerForApp
         {
             get {
@@ -167,9 +173,10 @@ namespace i18n
         public static LocalizedApplication Current = new LocalizedApplication();
         
         private Container Container { get; set; }
-        private LockFreeProperty<ITextLocalizer> m_cached_textLocalizer = new LockFreeProperty<ITextLocalizer>();
+        private LockFreeProperty<IUrlLocalizer     > m_cached_urlLocalizer      = new LockFreeProperty<IUrlLocalizer>();
+        private LockFreeProperty<ITextLocalizer    > m_cached_textLocalizer     = new LockFreeProperty<ITextLocalizer>();
         private LockFreeProperty<IEarlyUrlLocalizer> m_cached_earlyUrlLocalizer = new LockFreeProperty<IEarlyUrlLocalizer>();
-        private LockFreeProperty<INuggetLocalizer> m_cached_nuggetLocalizer = new LockFreeProperty<INuggetLocalizer>();
+        private LockFreeProperty<INuggetLocalizer  > m_cached_nuggetLocalizer   = new LockFreeProperty<INuggetLocalizer>();
 
         /// <summary>
         /// Helper for clearing the cached-allocated per-appdomain services maintained by this class.
