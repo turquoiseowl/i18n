@@ -79,7 +79,7 @@ namespace i18n
         /// set this to "/MySite". It is important that the string starts with a forward slash path separator
         /// and does NOT end with a forward slash.
         /// </remarks>
-        public string SiteRootPath { get; set; }
+        internal string SiteRootPath { get; set; }
 
         /// <summary>
         /// Declares a method type for handling the setting of the language.
@@ -124,7 +124,11 @@ namespace i18n
             // Default settings.
             DefaultLanguage = ("en");
             PermanentRedirects = false;
-            SiteRootPath = null;
+            var mycontext = HttpContext.Current;
+            if(mycontext!=null && mycontext.Request.ApplicationPath != null)
+                SiteRootPath = mycontext.Request.ApplicationPath.TrimEnd('/');
+            if(String.IsNullOrWhiteSpace(SiteRootPath) || SiteRootPath.Trim() == "/")
+                SiteRootPath = null;
 
             // Register default services.
             // The client app may subsequerntly override any of these.
