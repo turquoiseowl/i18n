@@ -68,18 +68,22 @@ namespace i18n
         public LanguageTag DefaultLanguageTag { get; set; }
 
         /// <summary>
-        /// Specifies the root path for the site for correct URL Localization.
+        /// The ASP.NET application's virtual application root path on the server,
+        /// used by Url Localization.
         /// </summary>
         /// <remarks>
-        /// Where the root application path for your site maps to the root of the URL,
-        /// leave this as null.<br/>
-        /// Where the root application path for your site maps to the sub path in the URL,
-        /// set this to that sub path part.<br/>
+        /// This is set by the ctor automatically to the ApplicationPath of
+        /// HttpContext.Current, when available. Should that not be available
+        /// then the value defaults to "/".<br/>
+        /// In situations where the application is configured to run under a virtual folder
+        /// and you init this class in such a way that HttpContext.Current is not
+        /// available, it will be necessary to set this correctly manually to the application
+        /// root path.<br/>
         /// E.g. if the application root url is "example.com/MySite",
         /// set this to "/MySite". It is important that the string starts with a forward slash path separator
         /// and does NOT end with a forward slash.
         /// </remarks>
-        internal string SiteRootPath { get; set; }
+        public string ApplicationPath { get; set; }
 
         /// <summary>
         /// Declares a method type for handling the setting of the language.
@@ -124,11 +128,13 @@ namespace i18n
             // Default settings.
             DefaultLanguage = ("en");
             PermanentRedirects = false;
+
+            // Attempt to determine ApplicationPath.
             var mycontext = HttpContext.Current;
             if(mycontext!=null && mycontext.Request.ApplicationPath != null)
-                SiteRootPath = mycontext.Request.ApplicationPath.TrimEnd('/');
-            if(String.IsNullOrWhiteSpace(SiteRootPath) || SiteRootPath.Trim() == "/")
-                SiteRootPath = null;
+                ApplicationPath = mycontext.Request.ApplicationPath.TrimEnd('/');
+            if(String.IsNullOrWhiteSpace(ApplicationPath))
+                ApplicationPath = "/";
 
             // Register default services.
             // The client app may subsequerntly override any of these.

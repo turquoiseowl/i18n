@@ -157,7 +157,7 @@ namespace i18n
 
            // If site root path was trimmed from the URL above, add it back on now.
             if (siteRootPath != null) {
-                urlPatched = LocalizedApplication.Current.SiteRootPath + urlPatched; }
+                urlPatched = LocalizedApplication.Current.ApplicationPath + urlPatched; }
 
             return result;
         }
@@ -183,7 +183,7 @@ namespace i18n
 
            // If site root path was trimmed from the URL above, add it back on now.
             if (siteRootPath != null) {
-                url = LocalizedApplication.Current.SiteRootPath + url; }
+                url = LocalizedApplication.Current.ApplicationPath + url; }
 
             return url;
         }
@@ -212,11 +212,11 @@ namespace i18n
            // If url is prefixed with the site root path, trim it from the url.
            // E.g. for site root path of "/XYZ"
            //     /XYZ/Home/Index -> /Home/Index and we return /XYZ
-            if (LocalizedApplication.Current.SiteRootPath.IsSet()
-                && url.IndexOf(LocalizedApplication.Current.SiteRootPath, 0, StringComparison.OrdinalIgnoreCase) == 0) {
-                int len = LocalizedApplication.Current.SiteRootPath.Length;
+            if (LocalizedApplication.Current.ApplicationPath != "/"
+                && url.IndexOf(LocalizedApplication.Current.ApplicationPath, 0, StringComparison.OrdinalIgnoreCase) == 0) {
+                int len = LocalizedApplication.Current.ApplicationPath.Length;
                 url = url.Substring(len, url.Length -len);
-                return LocalizedApplication.Current.SiteRootPath;
+                return LocalizedApplication.Current.ApplicationPath;
             }
             return null;
         }
