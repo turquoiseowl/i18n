@@ -271,8 +271,8 @@ namespace i18n.Domain.Concrete
 		private const string _directoriesToScan = ".";
 
         /// <summary>
-        /// Specifies one or more paths to the root directory/folder of the branches
-        /// which FileNuggetParser is to scan for source files.
+        /// A semi-colon-delimited string that specifies one or more paths to the 
+        /// root directory/folder of the branches which FileNuggetParser is to scan for source files.
         /// </summary>
         /// <remarks>
         /// Each string may be an absolute (rooted) path, or a path
@@ -281,7 +281,8 @@ namespace i18n.Domain.Concrete
         /// Default value is "." which equates to the the single folder containing the 
         /// current config file (<see cref="AbstractSettingService.GetConfigFileLocation"/>).<br/>
         /// Typically, you may set to ".." equating to the solution folder for the
-        /// project containing the current config file.
+        /// project containing the current config file.<br/>
+        /// An example of a multi-path string is "c:\mywebsite;c:\mylibs\asp.net".
         /// </remarks>
 		public virtual IEnumerable<string> DirectoriesToScan
 		{
