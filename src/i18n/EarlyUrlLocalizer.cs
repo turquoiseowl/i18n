@@ -104,7 +104,7 @@ namespace i18n
                 string hdrval = context.Response.Headers[hdr];
                 if (!hdrval.IsSet()) {
                     continue; }
-                string urlNew = LocalizeUrl(hdrval, langtag, requestUrl);
+                string urlNew = LocalizeUrl(hdrval, langtag, requestUrl, true);
                 if (urlNew == null) {
                     continue; }
                 context.Response.Headers[hdr] = urlNew;
@@ -117,7 +117,7 @@ namespace i18n
                 {
                     try {
                         string url = match.Groups[2].Value;
-                        string urlNew = LocalizeUrl(url, langtag, requestUrl);
+                        string urlNew = LocalizeUrl(url, langtag, requestUrl, false);
                         // If URL was not changed...leave matched token alone.
                         if (urlNew == null) {
                             return match.Groups[0].Value; } // original
@@ -190,11 +190,11 @@ namespace i18n
         /// either because it was already localized, or because it is from another host, or is explicitly
         /// excluded from localization by the filter.
         /// </returns>
-        protected string LocalizeUrl(string url, string langtag, Uri requestUrl)
+        protected string LocalizeUrl(string url, string langtag, Uri requestUrl, bool incomingUrl)
         {
             // If URL is already localized...leave matched token alone.
             string urlNonlocalized;
-            if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, false, out urlNonlocalized) != null) {
+            if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
                 return null; } // original
 
             // If URL is not local (i.e. remote host)...leave matched token alone.
