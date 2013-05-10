@@ -18,7 +18,7 @@ namespace i18n.Domain.Concrete
 		private Configuration _configuration;
 		private AppSettingsSection _settings;
 
-		public WebConfigSettingService(string configLocation) : base(configLocation)
+		public WebConfigSettingService(string configLocation = null) : base(configLocation)
 		{
 			//http://stackoverflow.com/questions/4738/using-configurationmanager-to-load-config-from-an-arbitrary-location/4746#4746
 			try
@@ -38,7 +38,7 @@ namespace i18n.Domain.Concrete
 				else
 				{
 					//No config file was sent in so we use default one
-					_configuration = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+					_configuration = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current != null ? HttpContext.Current.Request.ApplicationPath : null);
 					_settings = _configuration.AppSettings;
 				}
 			}
