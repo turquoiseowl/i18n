@@ -20,8 +20,8 @@ of views, controllers, and validation attributes.
 ### Project Configuration
 
 The i18n library works by modifying your HTTP traffic to perform string replacement and
-patching of URLs with language tags (URL Localization). This work is done by the
-HttpModule called i18n.LocalizingModule which must be enabled in your web.config file as follows:
+patching of URLs with language tags (URL Localization). The work is done by an
+HttpModule called i18n.LocalizingModule which should be enabled in your web.config file as follows:
 
 ```xml
   <system.web>
@@ -46,7 +46,7 @@ of your application's source files:
     <add key="i18n.DirectoriesToScan" value=".." /> <!-- Rel to web.config file -->
     <add key="i18n.WhiteList" value="*.cs;*.cshtml;*.sitemap" />
   </appSettings>
-```xml
+```
 
 Finally, certain behaviours of i18n may be altered at runtime on application startup. The following
 code shows the most common options:
