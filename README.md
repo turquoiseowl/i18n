@@ -17,6 +17,67 @@ of views, controllers, and validation attributes.
 - Automatic; no routing changes required, just use an alias method where you want localization
 - Smart; knows when to hold them, fold them, walk away, or run, based on i18n best practices
 
+### Project Configuration
+
+The i18n library works by modifying your HTTP traffic to perform string replacement and
+patching of URLs with language tags (URL Localization). This work is done by the
+HttpModule called i18n.LocalizingModule which must be enabled in your web.config file as follows:
+
+```xml
+  <system.web>
+    <httpModules>
+      <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" />
+    </httpModules>
+  </system.web>
+  <system.webServer> <!-- IIS7 'Integrated Mode'-specific config stuff -->
+    <modules>
+      <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" />
+    </modules>
+  </system.webServer>
+```
+
+Note: The ```<system.webServer>``` element is added for completeness and may not be required.
+
+The following ```<appSettings>``` are then required to specify the type and location 
+of your application's source files:
+
+```xml
+  <appSettings>
+    <add key="i18n.DirectoriesToScan" value=".." /> <!-- Rel to web.config file -->
+    <add key="i18n.WhiteList" value="*.cs;*.cshtml;*.sitemap" />
+  </appSettings>
+```xml
+
+Finally, certain behaviours of i18n may be altered at runtime on application startup. The following
+code shows the most common options:
+
+```csharp
+    public class MvcApplication : System.Web.HttpApplication
+    {
+        protected void Application_Start()
+        {
+            // Change from the default of 'en'.
+            i18n.LocalizedApplication.Current.DefaultLanguage = "fr";
+
+            // Change from the of temporary redirects during URL localization
+            i18n.LocalizedApplication.Current.PermanentRedirects = true;
+
+            // This line can be used to disable URL Localization.
+            //i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null;
+
+            // Change the URL localization scheme from Scheme1.
+            i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;
+
+            // Blacklist certain URLs from being 'localized'.
+            i18n.UrlLocalizer.IncomingUrlFilters += delegate(Uri url) {
+                if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.InvariantCultureIgnoreCase)) {
+                    return false; }
+                return true;
+            };
+        }
+    }
+```
+
 ### Usage
 To localize text in your application, surround your strings with [[[ and ]]] markup
 characters to mark them as translatable. That's it. 
