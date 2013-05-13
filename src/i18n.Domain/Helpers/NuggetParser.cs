@@ -173,7 +173,7 @@ namespace i18n.Helpers
            // Lookup any/all nuggets in the entity and call the client delegate (ProcessNugget) for each.
             return m_regexNuggetBreakdown.Replace(entity, delegate(Match match)
 	        {
-                Nugget nugget = InitNuggetFromRegexMatch(match);
+                Nugget nugget = NuggetFromRegexMatch(match);
                //
                 string modifiedNuggetString = ProcessNugget(
                     match.Groups[0].Value, // entire nugget string
@@ -193,7 +193,7 @@ namespace i18n.Helpers
         public Nugget BreakdownNugget(string nugget)
         {
             Match match = m_regexNuggetBreakdown.Match(nugget);
-            return InitNuggetFromRegexMatch(match);
+            return NuggetFromRegexMatch(match);
         }
 
     // Helpers
@@ -215,7 +215,7 @@ namespace i18n.Helpers
         /// <summary>
         /// Returns a nugget instance loaded from a regex match, or null if error.
         /// </summary>
-        private Nugget InitNuggetFromRegexMatch(Match match)
+        private Nugget NuggetFromRegexMatch(Match match)
         {
             if (!match.Success
                 || match.Groups.Count != 4) {
