@@ -93,11 +93,11 @@ namespace i18n.Domain.Concrete
 				string setting = _settingService.GetSetting(prefixedString);
 				if (setting != null)
 				{
-					return setting.Split(';').ToList();
+					return setting.Split(';').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 				}
 				else if (_whiteListDefault.IsSet())
                 {
-				    return _whiteListDefault.Split(';').ToList();
+				    return _whiteListDefault.Split(';').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                 }
                 return new List<string>();
 			}
@@ -148,7 +148,7 @@ namespace i18n.Domain.Concrete
 				}
 
 				List<string> returnList = new List<string>();
-				foreach (var path in list)
+				foreach (var path in list.Where(x => !string.IsNullOrWhiteSpace(x)))
 				{
 					returnList.Add(MakePathAbsoluteAndFromConfigFile(path));
 				}
@@ -301,7 +301,7 @@ namespace i18n.Domain.Concrete
 				}
 
 				List<string> returnList = new List<string>();
-				foreach (var path in list)
+				foreach (var path in list.Where(x => !string.IsNullOrWhiteSpace(x)))
 				{
 					returnList.Add(MakePathAbsoluteAndFromConfigFile(path));
 				}
@@ -331,11 +331,11 @@ namespace i18n.Domain.Concrete
 				string setting = _settingService.GetSetting(prefixedString);
 				if (setting != null)
 				{
-					return setting.Split(';').ToList();
+					return setting.Split(';').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 				}
 				else
 				{
-					return _availableLanguages.Split(';').ToList();
+					return _availableLanguages.Split(';').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 				}
 			}
 			set
