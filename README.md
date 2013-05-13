@@ -70,7 +70,7 @@ code shows the most common options:
 
             // Blacklist certain URLs from being 'localized'.
             i18n.UrlLocalizer.IncomingUrlFilters += delegate(Uri url) {
-                if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.InvariantCultureIgnoreCase)) {
+                if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.OrdinalIgnoreCase)) {
                     return false; }
                 return true;
             };

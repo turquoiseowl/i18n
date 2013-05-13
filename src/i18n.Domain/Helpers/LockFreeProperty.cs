@@ -6,7 +6,7 @@ using System.Text;
 namespace i18n.Domain.Helpers
 {
     /// <summary>
-    /// Helper class for implementing a reference property with a lock-free thread-safe accessors.
+    /// Helper class for implementing a reference property with a lock-free thread-safe accessor.
     /// Null value may be set and remembered.
     /// </summary>
     public class LockFreeProperty<T> where T : class

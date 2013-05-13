@@ -49,7 +49,7 @@ namespace i18n.Domain.Concrete
 					currentFullPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
 					foreach (var blackItem in _settings.BlackList)
 					{
-						if (currentFullPath == null || currentFullPath.StartsWith(blackItem))
+						if (currentFullPath == null || currentFullPath.StartsWith(blackItem, StringComparison.OrdinalIgnoreCase))
 						{
 							//this is a file that is under a blacklisted directory so we do not parse it.
 							blacklistFound = true;
