@@ -46,7 +46,8 @@ namespace i18n.Domain.Concrete
 
 
 			//This means there was no languages from settings
-			if (languages.Count == 1 && languages[0] == "")
+			if (languages.Count == 0
+                || (languages.Count == 1 && languages[0] == ""))
 			{
 				//We instead check for file structure
 				DirectoryInfo di = new DirectoryInfo(GetAbsoluteLocaleDir());
@@ -84,7 +85,8 @@ namespace i18n.Domain.Concrete
 			List<string> languages = _settings.AvailableLanguages.ToList();
 
 			//This means there was no languages from settings
-			if (languages.Count == 1 && languages[0] == "")
+			if (languages.Count == 0
+                || (languages.Count == 1 && languages[0] == ""))
 			{
 				//We instead check if the file exists
 				return File.Exists(GetPathForLanguage(langtag));

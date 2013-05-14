@@ -93,7 +93,7 @@ namespace i18n
         /// <param name="headerval">
         /// HTTP Accept-Language header value.
         /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html.
-        /// May be empty string for zero languages in which case pal MUST be non-null.
+        /// May be null or empty string for zero languages.
         /// </param>
         /// <param name="pal">
         /// Optional language to store at the first element position in the array, which is reserved
@@ -108,12 +108,8 @@ namespace i18n
         {
         // This method is designed to be as efficient as possible (avoiding string allocations where possible).
         //
-            if (null == headerval) {
-                throw new ArgumentNullException("headerval"); }
-            if (!headerval.IsSet() && pal == null) {
-                throw new ArgumentNullException("pal"); }
             int begin, end, pos1;
-            int len = headerval.Length;
+            int len = headerval != null ? headerval.Length : 0;
             int ordinal = 0;
            // Init array with enough elements for each language entry in the header.
             var LanguageItems = new LanguageItem[(len > 0 ? headerval.CountOfChar(',') + 1 : 0) + 1];

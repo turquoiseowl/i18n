@@ -132,7 +132,9 @@ namespace i18n
                 // Construct UserLanguages list and cache it for the rest of the request.
                 context.Items["i18n.UserLanguages"] 
                     = UserLanguages 
-                    = LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+                    = LanguageItem.ParseHttpLanguageHeader(
+                        context.Request.Headers["Accept-Language"],
+                        LocalizedApplication.Current.DefaultLanguageTag);
             }
             return UserLanguages;
         }
