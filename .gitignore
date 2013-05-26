@@ -1,6 +1,8 @@
 # i18n
 src/packages
 *.nupkg
+*.po
+*.pot
 
 #ignore thumbnails created by windows
 Thumbs.db
