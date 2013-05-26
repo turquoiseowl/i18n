@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>I18N</id>
-    <version>1.0.8</version>
+    <version>2.0.0</version>
     <authors>Daniel Crenna</authors>
     <owners>Daniel Crenna</owners>
     <summary>Smart internationalization for .NET web apps</summary>
@@ -17,7 +17,7 @@
     <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
     <tags>i18n localization globalization</tags>
     <dependencies>
-      <dependency id="container" version="0.0.4" />      
+      <dependency id="container" version="1.1.0" />      
     </dependencies>
   </metadata>
 </package>

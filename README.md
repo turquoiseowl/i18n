@@ -128,16 +128,16 @@ to `ILocalizingService`; here is what implementing `ILocalizing` on a `Controlle
 
 #### Building PO databases
 
-To set up automatic PO database building, add the following post-build task to your project, after
-adding `i18n.PostBuild.exe` as a project reference:
+To set up automatic PO database building, add the following text to your main project file:
 
 ```
-    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
-    //using all available parameter:
-    // msgmerge: optional parameter for msgmerge
-    // gettext: optional parameter for gettext
-    // inputpaths: comma delimited input paths. Useful if the project is split in several sub projects. i.e. "inputpaths:C:\temp\Project1,C:\temp\Project2"
-    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)" "msgmerge:(optional params for msgmerge)" "gettext:(optional params for gettext)" "inputpaths:(comma delimited input paths)"
+   // using all available parameters:
+   // MsgMerge: optional parameter for msgmerge
+   // GetText: optional parameter for gettext
+   // InputPaths: comma delimited input paths. Useful if the project is split in several sub projects. i.e. "inputpaths:C:\temp\Project1,C:\temp\Project2"
+   <Target Name="AfterBuild">
+	<i18nTask ProjectDirectories="$(ProjectDir)" />
+   </Target>
 ```
     
 After a successful build, this task will rip through your source code, finding everywhere you've used the

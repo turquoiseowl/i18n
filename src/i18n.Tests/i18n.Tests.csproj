@@ -34,11 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\packages\Castle.Core.3.1.0\lib\net40-client\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FakeItEasy">
-      <HintPath>..\packages\FakeItEasy.1.7.4626.65\lib\NET40\FakeItEasy.dll</HintPath>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -47,28 +46,40 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="I18NSessionTests.cs" />
-    <Compile Include="PostBuildTaskTests.cs" />
+    <Compile Include="..\i18n.MSBuild.Task\StringExtensions.cs">
+      <Link>StringExtensions.cs</Link>
+    </Compile>
+    <Compile Include="Helpers\MockController.cs" />
+    <Compile Include="Helpers\MockSessionProvider.cs" />
+    <Compile Include="Helpers\MockHelper.cs" />
+    <Compile Include="MSBuildTests.cs" />
+    <Compile Include="SessionTests.cs" />
+    <Compile Include="WebApiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\i18n.PostBuild\i18n.PostBuild.csproj">
-      <Project>{9BE8E007-C6B8-43F7-83D2-E89F51EF8614}</Project>
-      <Name>i18n.PostBuild</Name>
+    <ProjectReference Include="..\i18n.MSBuild.Task\i18n.MSBuild.Task.csproj">
+      <Project>{0726213f-38ae-47b6-92f9-41640e92bfb9}</Project>
+      <Name>i18n.MSBuild.Task</Name>
     </ProjectReference>
     <ProjectReference Include="..\i18n\i18n.csproj">
       <Project>{E7A9BBA3-8A95-492C-8806-4DE63C1DBA06}</Project>
       <Name>i18n</Name>
     </ProjectReference>
   </ItemGroup>
+  <PropertyGroup>
+    <i18nDeveloper>true</i18nDeveloper>
+  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="$(SolutionDir)\..\i18n.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Add target to your main .csproj file. -->
+  <!--
+   <Target Name="AfterBuild">
+    <ItemGroup>
+      <iProjectDirectories Include="$(ProjectDir)" />
+    </ItemGroup>
+    <i18nTask 
+        ProjectDirectories="@(iProjectDirectories)"
+        MsgMerge="http://www.gnu.org/s/hello/manual/gettext/msgmerge-Invocation.html"
+        GetText="http://www.gnu.org/s/hello/manual/gettext/xgettext-Invocation.html" />
+  </Target>
+   -->
+  
+  <UsingTask AssemblyFile="$(i18nTaskDir)i18n.MSBuild.Task.dll" TaskName="i18nTask" />
+
+  <PropertyGroup>
+    <versionGetText>gettext-0.18.1.1</versionGetText>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- $root\tools -->
+    <i18nTaskDir Condition="'$(i18nDeveloper)' == 'true'">$(MSBuildThisFileDirectory)\tools</i18nTaskDir>
+    <!-- bin\build (nuget) -->
+    <i18nTaskDir Condition="'$(i18nTaskDir)' == ''">$(MSBuildThisFileDirectory)</i18nTaskDir>
+    <!-- $root\tools -->
+    <i18nGetTextDir Condition="'$(i18nDeveloper)' == 'true'">$(MSBuildThisFileDirectory)\tools\$(versionGetText)\*.*</i18nGetTextDir>
+    <!-- bin\tools (nuget) -->
+    <i18nGetTextDir Condition="'$(i18nGetTextDir)' == ''">$(MSBuildThisFileDirectory)\..\tools\gettext\*.*</i18nGetTextDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <i18nOutputPath>$(OutputPath)\gettext</i18nOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CleanDependsOn>$(CleanDependsOn);Cleani18n</CleanDependsOn>
+    <BuildDependsOn>$(BuildDependsOn);Copyi18n</BuildDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <i18nGetTextFiles Include="$(i18nGetTextDir)" />
+  </ItemGroup>
+
+  <Target Name="Copyi18n">
+    <Copy SourceFiles="@(i18nGetTextFiles)" DestinationFolder="$(i18nOutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="Cleani18n">
+    <Delete Files="$(i18nOutputPath)\*.*" />
+    <RemoveDir Directories="$(i18nOutputPath)" />
+  </Target>
+
+</Project>
