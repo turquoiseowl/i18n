@@ -8,6 +8,9 @@ namespace i18n
     /// </summary>
     public class I18N
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static string DefaultTwoLetterISOLanguageName
         {
             get { return DefaultSettings.DefaultTwoLetterISOLanguageName; }

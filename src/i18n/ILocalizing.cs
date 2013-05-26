@@ -8,9 +8,10 @@ namespace i18n
     public interface ILocalizing
     {
         /// <summary>
-        /// Returns localized text for the given key, if available
+        /// If available try returning a localized 
+        /// string for given key.
         /// </summary>
-        /// <param name="text">The text to localize</param>
+        /// <param name="text">Text to localize</param>
         IHtmlString _(string text);
     }
 }

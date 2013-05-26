@@ -2,10 +2,16 @@
 
 namespace i18n.DataAnnotations
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RequiredAttribute : System.ComponentModel.DataAnnotations.RequiredAttribute, ILocalizing
     {
         private readonly I18NSession _session;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RequiredAttribute()
         {
             _session = new I18NSession();   

@@ -11,11 +11,19 @@ namespace i18n
     {
         private readonly I18NSession _session;
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected I18NWebViewPage()
         {
             _session = new I18NSession();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public IHtmlString _(string text)
         {
             return new MvcHtmlString(_session.GetText(Context, text));
@@ -29,7 +37,7 @@ namespace i18n
         /// Workaround for limitation writing HTML attributes whose values are translatable strings,
         /// as discussed in issue #8.
         /// The problem is that xgettext, when set to c# mode, does not detect the _() function when
-        /// used within double quotes. Thus, <img alt="@_("logo")"> doesn't get picked up.
+        /// used within double quotes. Thus, <img alt="@_("logo")" /> doesn't get picked up.
         /// Using this overload of the _() helper avoids the problem by encoding the quotes within
         /// the method.
         /// </remarks>
@@ -58,7 +66,9 @@ namespace i18n
         ///           });
         ///     </script>
         /// </example>
-        /// <seealso cref="https://github.com/danielcrenna/i18n/issues/8"/>
+        /// <seealso>
+        ///   <cref>https://github.com/danielcrenna/i18n/issues/8</cref>
+        /// </seealso>
         public IHtmlString _(string value, string attrname)
         {
             value = _session.GetText(Context, value);
@@ -68,26 +78,39 @@ namespace i18n
             return new System.Web.HtmlString(raw);
         }    
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public string __(string text)
         {
             return _session.GetText(Context, text);
         }    
+
     }
 
-    
+
     /// <summary>
     /// A base view providing an alias for localizable resources
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public abstract class I18NWebViewPage : WebViewPage, ILocalizing
     {
         private readonly I18NSession _session;
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected I18NWebViewPage()
         {
             _session = new I18NSession();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public IHtmlString _(string text)
         {
             return new MvcHtmlString(_session.GetText(Context, text));

@@ -2,6 +2,9 @@
 
 namespace i18n.DataAnnotations
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class ValidationAttribute : System.ComponentModel.DataAnnotations.ValidationAttribute, ILocalizing
     {
         private readonly I18NSession _session;

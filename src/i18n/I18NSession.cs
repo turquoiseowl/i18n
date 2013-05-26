@@ -9,6 +9,11 @@ namespace i18n
     {
         protected const string SessionKey = "po:language";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="language"></param>
         public virtual void Set(HttpContextBase context, string language)
         {
             if(context.Session != null)
@@ -17,6 +22,11 @@ namespace i18n
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static string GetLanguageFromSession(HttpContext context)
         {
             object val;
@@ -25,6 +35,11 @@ namespace i18n
                        : null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static string GetLanguageFromSession(HttpContextBase context)
         {
             object val;
@@ -33,6 +48,11 @@ namespace i18n
                        : null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public virtual string GetLanguageFromSessionOrService(HttpContextBase context)
         {
             var language = GetLanguageFromSession(context);
@@ -48,6 +68,12 @@ namespace i18n
             return language;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public virtual string GetText(HttpContext context, string text)
         {
             // Prefer a stored value to browser-supplied preferences
@@ -62,6 +88,12 @@ namespace i18n
             return DefaultSettings.LocalizingService.GetText(text, languages);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public virtual string GetText(HttpContextBase context, string text)
         {
             // Prefer a stored value to browser-supplied preferences
@@ -78,6 +110,11 @@ namespace i18n
             return HttpUtility.HtmlDecode(text);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public virtual string GetUrlFromRequest(HttpRequestBase context)
         {
             var url = context.RawUrl;

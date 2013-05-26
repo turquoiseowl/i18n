@@ -41,8 +41,9 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="container">
-      <HintPath>..\packages\container.0.0.4\lib\net40\container.dll</HintPath>
+    <Reference Include="container, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\container.1.1.0\lib\net40\container.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -71,7 +72,6 @@
     <Compile Include="ILocalizingService.cs" />
     <Compile Include="IHtmlStringFormatter.cs" />
     <Compile Include="LocalizingService.cs" />
-    <Compile Include="PostBuildTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="I18NSession.cs" />
     <Compile Include="DataAnnotations\RequiredAttribute.cs" />
@@ -79,7 +79,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

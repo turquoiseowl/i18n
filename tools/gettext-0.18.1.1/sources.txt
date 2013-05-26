@@ -1,0 +1,2 @@
+http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.1.tar.gz
+http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.1.1.tar.gz
