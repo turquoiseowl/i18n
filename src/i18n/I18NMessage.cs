@@ -7,8 +7,17 @@ namespace i18n
     /// </summary>
     public class I18NMessage
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string Comment { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string MsgId { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string MsgStr { get; set; }
 
         public override string ToString()

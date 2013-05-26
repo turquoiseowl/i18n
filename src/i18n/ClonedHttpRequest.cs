@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.IO;
+using System.Security.Authentication.ExtendedProtection;
+using System.Security.Principal;
+using System.Text;
 using System.Web;
 
 namespace i18n
@@ -17,38 +21,66 @@ namespace i18n
 
         public override string RawUrl
         {
-            get { return _url; }
+            get
+            {
+                return _url;
+            }
         }
+
         public override string FilePath
         {
-            get { return _url; }
+            get
+            {
+                return _url;
+            }
         }
+
         public override string Path
         {
-            get { return _url; }
+            get
+            {
+                return _url;
+            }
         }
+
         public override string AppRelativeCurrentExecutionFilePath
         {
-            get { return VirtualPathUtility.ToAppRelative(_url); }
+            get
+            {
+                return VirtualPathUtility.ToAppRelative(_url);
+            }
         }
+
         public override string CurrentExecutionFilePath
         {
-            get { return _url; }
+            get
+            {
+                return _url;
+            }
         }
 
         public override string[] AcceptTypes
         {
-            get { return _base.AcceptTypes; }
+            get
+            {
+                return _base.AcceptTypes;
+            }
         }
 
         public override string AnonymousID
         {
-            get { return _base.AnonymousID; }
+            get
+            {
+                return _base.AnonymousID;
+            }
         }
 
         public override string ApplicationPath
         {
-            get { return _base.ApplicationPath; }
+            get
+            {
+                return _base.ApplicationPath;
+            }
         }
         
         public override byte[] BinaryRead(int count)
@@ -58,34 +90,58 @@ namespace i18n
 
         public override HttpBrowserCapabilitiesBase Browser
         {
-            get { return _base.Browser; }
+            get
+            {
+                return _base.Browser;
+            }
         }
 
         public override HttpClientCertificate ClientCertificate
         {
-            get { return _base.ClientCertificate; }
+            get
+            {
+                return _base.ClientCertificate;
+            }
         }
 
-        public override System.Text.Encoding ContentEncoding
+        public override Encoding ContentEncoding
         {
-            get { return _base.ContentEncoding; }
-            set { _base.ContentEncoding = value; }
+            get
+            {
+                return _base.ContentEncoding;
+            }
+            set
+            {
+                _base.ContentEncoding = value;
+            }
         }
 
         public override int ContentLength
         {
-            get { return _base.ContentLength; }
+            get
+            {
+                return _base.ContentLength;
+            }
         }
 
         public override HttpCookieCollection Cookies
         {
-            get { return _base.Cookies; }
+            get
+            {
+                return _base.Cookies;
+            }
         }
 
         public override string ContentType
         {
-            get { return base.ContentType; }
-            set { _base.ContentType = value; }
+            get
+            {
+                return base.ContentType;
+            }
+            set
+            {
+                _base.ContentType = value;
+            }
         }
 
         public override bool Equals(object obj)
@@ -95,18 +151,30 @@ namespace i18n
         
         public override HttpFileCollectionBase Files
         {
-            get { return _base.Files; }
+            get
+            {
+                return _base.Files;
+            }
         }
 
         public override Stream Filter
         {
-            get { return _base.Filter; }
-            set { _base.Filter = value; }
+            get
+            {
+                return _base.Filter;
+            }
+            set
+            {
+                _base.Filter = value;
+            }
         }
 
-        public override System.Collections.Specialized.NameValueCollection Form
+        public override NameValueCollection Form
         {
-            get { return _base.Form; }
+            get
+            {
+                return _base.Form;
+            }
         }
 
         public override int GetHashCode()
@@ -114,7 +182,7 @@ namespace i18n
             return _base.GetHashCode();
         }
 
-        public override System.Collections.Specialized.NameValueCollection Headers
+        public override NameValueCollection Headers
         {
             get
             {
@@ -122,7 +190,7 @@ namespace i18n
             }
         }
 
-        public override System.Security.Authentication.ExtendedProtection.ChannelBinding HttpChannelBinding
+        public override ChannelBinding HttpChannelBinding
         {
             get
             {
@@ -170,7 +238,7 @@ namespace i18n
             }
         }
 
-        public override System.Security.Principal.WindowsIdentity LogonUserIdentity
+        public override WindowsIdentity LogonUserIdentity
         {
             get
             {
@@ -188,12 +256,13 @@ namespace i18n
             return _base.MapPath(virtualPath);
         }
 
-        public override string MapPath(string virtualPath, string baseVirtualDir, bool allowCrossAppMapping)
+        public override string MapPath(string virtualPath, string baseVirtualDir,
+            bool allowCrossAppMapping)
         {
             return _base.MapPath(virtualPath, baseVirtualDir, allowCrossAppMapping);
         }
 
-        public override System.Collections.Specialized.NameValueCollection Params
+        public override NameValueCollection Params
         {
             get
             {
@@ -225,9 +294,12 @@ namespace i18n
             }
         }
 
-        public override System.Collections.Specialized.NameValueCollection QueryString
+        public override NameValueCollection QueryString
         {
-            get { return HttpUtility.ParseQueryString(new Uri(_url).Query); }
+            get
+            {
+                return HttpUtility.ParseQueryString(new Uri(_url).Query);
+            }
         }
 
         public override System.Web.Routing.RequestContext RequestContext
@@ -255,7 +327,7 @@ namespace i18n
             _base.SaveAs(filename, includeHeaders);
         }
 
-        public override System.Collections.Specialized.NameValueCollection ServerVariables
+        public override NameValueCollection ServerVariables
         {
             get
             {

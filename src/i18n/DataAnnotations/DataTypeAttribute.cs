@@ -11,7 +11,8 @@ namespace i18n.DataAnnotations
         private readonly I18NSession _session;
 
         ///<summary>
-        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> class by using the specified type name
+        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> 
+        /// class by using the specified type name
         ///</summary>
         ///<param name="dataType"></param>
         public DataTypeAttribute(DataType dataType) : base(Convert(dataType))
@@ -57,7 +58,8 @@ namespace i18n.DataAnnotations
         }
 
         ///<summary>
-        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> class by using the specified field template name
+        /// Initializes a new instance of the <see cref="DataTypeAttribute"/> 
+        /// class by using the specified field template name
         ///</summary>
         ///<param name="customDataType"></param>
         public DataTypeAttribute(string customDataType) : base(customDataType)
@@ -75,7 +77,8 @@ namespace i18n.DataAnnotations
         }
 
         /// <summary>
-        /// Applies formatting to an error message, based on the data field where the error occurred. 
+        /// Applies formatting to an error message, based on the data field 
+        /// where the error occurred. 
         /// </summary>
         /// <returns>
         /// An instance of the formatted error message.

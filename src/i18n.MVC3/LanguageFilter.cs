@@ -15,6 +15,9 @@ namespace i18n
         private readonly I18NSession _session;
         private readonly ILocalizingService _service;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public LanguageFilter()
         {
             _session = new I18NSession();

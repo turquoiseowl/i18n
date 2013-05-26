@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6,6 +7,7 @@ namespace i18n
 {
     internal static class Extensions
     {
+
         /// <summary>
         /// Helper for testing whether a string ends with one of any out of a collection of strings,
         /// in a case-insentive way.
@@ -15,11 +17,7 @@ namespace i18n
         /// <returns>The first RHS string that matches the end of LHS, or null if none match.</returns>
         public static string EndsWithAnyIgnoreCase(this string lhs, params string[] rhs)
         {
-            foreach (string str in rhs) {
-                if (lhs.EndsWith(str, StringComparison.OrdinalIgnoreCase)) {
-                    return str; }
-            }
-            return null;
+            return rhs.FirstOrDefault(str => lhs.EndsWith(str, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -34,10 +32,10 @@ namespace i18n
         /// </returns>
         public static string Unquote(this string lhs, string quotechar = "\"")
         {
-            int begin = lhs.IndexOf(quotechar);
+            int begin = lhs.IndexOf(quotechar, StringComparison.Ordinal);
             if (begin == -1) {
                 return null; }
-            int end = lhs.LastIndexOf(quotechar);
+            int end = lhs.LastIndexOf(quotechar, StringComparison.Ordinal);
             if (end <= begin) {
                 return null; }
             return lhs.Substring(begin +1, end -begin -1);
@@ -47,11 +45,13 @@ namespace i18n
         /// Looks up in the subject string standard C escape sequences and converts them
         /// to their actual character counterparts.
         /// </summary>
-        /// <seealso cref="http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626"/>
+        /// <seealso>
+        ///   <cref>http://stackoverflow.com/questions/6629020/evaluate-escaped-string/8854626#8854626</cref>
+        /// </seealso>
         public static string Unescape(this string s)
         {
-            StringBuilder sb = new StringBuilder();
-            Regex r = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
+            var sb = new StringBuilder();
+            var r = new Regex("\\\\[abfnrtv?\"'\\\\]|\\\\[0-3]?[0-7]{1,2}|\\\\u[0-9a-fA-F]{4}|.");
             MatchCollection mc = r.Matches(s, 0);
 
             foreach (Match m in mc) {

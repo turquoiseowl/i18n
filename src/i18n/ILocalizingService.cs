@@ -6,7 +6,8 @@
     public interface ILocalizingService
     {
         /// <summary>
-        /// Returns the best matching language for this application's resources, based the provided languages
+        /// Returns the best matching language for this application's 
+        /// resources, based the provided languages
         /// </summary>
         /// <param name="languages">A sorted list of language preferences</param>
         string GetBestAvailableLanguageFrom(string[] languages);

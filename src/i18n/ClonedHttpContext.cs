@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Globalization;
+using System.Security.Principal;
 using System.Web;
+using System.Web.Caching;
+using System.Web.Profile;
+using System.Web.SessionState;
 
 namespace i18n
 {
@@ -52,7 +57,7 @@ namespace i18n
             }
         }
 
-        public override System.Web.Caching.Cache Cache
+        public override Cache Cache
         {
             get
             {
@@ -99,7 +104,7 @@ namespace i18n
             return _base.GetGlobalResourceObject(classKey, resourceKey);
         }
 
-        public override object GetGlobalResourceObject(string classKey, string resourceKey, System.Globalization.CultureInfo culture)
+        public override object GetGlobalResourceObject(string classKey, string resourceKey, CultureInfo culture)
         {
             return _base.GetGlobalResourceObject(classKey, resourceKey, culture);
         }
@@ -114,7 +119,7 @@ namespace i18n
             return _base.GetLocalResourceObject(virtualPath, resourceKey);
         }
 
-        public override object GetLocalResourceObject(string virtualPath, string resourceKey, System.Globalization.CultureInfo culture)
+        public override object GetLocalResourceObject(string virtualPath, string resourceKey, CultureInfo culture)
         {
             return _base.GetLocalResourceObject(virtualPath, resourceKey, culture);
         }
@@ -181,7 +186,7 @@ namespace i18n
             }
         }
 
-        public override System.Web.Profile.ProfileBase Profile
+        public override ProfileBase Profile
         {
             get
             {
@@ -238,7 +243,7 @@ namespace i18n
             }
         }
 
-        public override void SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior sessionStateBehavior)
+        public override void SetSessionStateBehavior(SessionStateBehavior sessionStateBehavior)
         {
             _base.SetSessionStateBehavior(sessionStateBehavior);
         }
@@ -276,7 +281,7 @@ namespace i18n
             }
         }
 
-        public override System.Security.Principal.IPrincipal User
+        public override IPrincipal User
         {
             get
             {
