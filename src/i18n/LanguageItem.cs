@@ -149,7 +149,7 @@ namespace i18n
                 string langtag = headerval.Substring(begin, pos1 -begin).Trim();
                // Wrap langtag.
                 LanguageTag lt = i18n.LanguageTag.GetCachedInstance(langtag);
-                if (!lt.Language.IsSet()) {
+                if (lt==null || !lt.Language.IsSet()) {
                     continue; }
                // Ignore the langtag if already added.
                 if (pal.IsValid() && pal.Equals(lt)) {
