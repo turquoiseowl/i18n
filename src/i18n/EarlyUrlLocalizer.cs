@@ -26,6 +26,10 @@ namespace i18n
             if (!m_urlLocalizer.FilterIncoming(context.Request.Url)) {
                 return; } // YES. Continue handling request.
 
+            bool allowRedirect =
+                   context.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
+                || context.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase);
+
             // NO. Is request URL localized?
             string urlNonlocalized;
             string langtag = m_urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
@@ -44,9 +48,22 @@ namespace i18n
                 if (lt == null) {
                     throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
 
-                // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, lt.ToString(), m_urlLocalizer);
-                return;
+                // If redirection allowed...redirect user agent (browser) to localized URL.
+                // The principle purpose of this redirection is to ensure the browser is showing the correct URL
+                // in its address field.
+                if (allowRedirect) {
+                    RedirectWithLanguage(context, lt.ToString(), m_urlLocalizer);
+                    return;
+                }
+        
+                // Otherwise, handle the request under the language infered above but without doing the redirect.
+                // NB: this will mean that the user agent (browser) won't have the correct URL displayed;
+                // however, this typically won't be an issue because we are talking about POST, PUT and DELETE methods
+                // here which are typically not shown to the user.
+                else {
+                    context.SetPrincipalAppLanguageForRequest(lt);
+                    return; // Continue handling request.
+                }
             }
 
             // YES. Does langtag EXACTLY match an App Language?
@@ -69,9 +86,11 @@ namespace i18n
                 && !appLangTag.Equals(langtag))
             {
                 // YES. Localize URL with matching App Language.
-                // Redirect user agent to localized URL.
-                RedirectWithLanguage(context, appLangTag.ToString(), m_urlLocalizer);
-                return;
+                // Conditionally redirect user agent to localized URL.
+                if (allowRedirect) {
+                    RedirectWithLanguage(context, appLangTag.ToString(), m_urlLocalizer);
+                    return;
+                }
             }
             // NO. Do nothing to URL; expect a 404 which corresponds to language not supported.
             // Continue handling request.
