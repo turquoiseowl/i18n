@@ -289,78 +289,81 @@ namespace i18n.Domain.Concrete
 
 			string path = GetPathForLanguage(langtag);
 
-			using (var fs = File.OpenText(path))
-			{
-				// http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
+            if (File.Exists(path)) {
 
-				string line;
-				bool itemStarted = false;
-				while ((line = fs.ReadLine()) != null)
-				{
-					List<string> extractedComments = new List<string>();
-					List<string> translatorComments = new List<string>();
-					List<string> flags = new List<string>();
-					List<string> references = new List<string>();
+			    using (var fs = File.OpenText(path))
+			    {
+				    // http://www.gnu.org/s/hello/manual/gettext/PO-Files.html
 
-					//read all comments, flags and other descriptive items for this string
-					//if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
-					if (line.StartsWith("#") && !line.StartsWith("#~"))
-					{
-						do
-						{
-							itemStarted = true;
-							switch (line[1])
-							{
-								case '.': //Extracted comments
-									extractedComments.Add(line.Substring(2).Trim());
-									break;
-								case ':': //references
-									references.Add(line.Substring(2).Trim());
-									break;
-								case ',': //flags
-									flags.Add(line.Substring(2).Trim());
-									break;
-								case '|': //msgid previous-untranslated-string - NOT used by us
-									break;
-								default: //translator comments
-									translatorComments.Add(line.Substring(1).Trim());
-									break;
-							}
+				    string line;
+				    bool itemStarted = false;
+				    while ((line = fs.ReadLine()) != null)
+				    {
+					    List<string> extractedComments = new List<string>();
+					    List<string> translatorComments = new List<string>();
+					    List<string> flags = new List<string>();
+					    List<string> references = new List<string>();
 
-						} while ((line = fs.ReadLine()) != null && line.StartsWith("#"));
-					}
+					    //read all comments, flags and other descriptive items for this string
+					    //if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
+					    if (line.StartsWith("#") && !line.StartsWith("#~"))
+					    {
+						    do
+						    {
+							    itemStarted = true;
+							    switch (line[1])
+							    {
+								    case '.': //Extracted comments
+									    extractedComments.Add(line.Substring(2).Trim());
+									    break;
+								    case ':': //references
+									    references.Add(line.Substring(2).Trim());
+									    break;
+								    case ',': //flags
+									    flags.Add(line.Substring(2).Trim());
+									    break;
+								    case '|': //msgid previous-untranslated-string - NOT used by us
+									    break;
+								    default: //translator comments
+									    translatorComments.Add(line.Substring(1).Trim());
+									    break;
+							    }
 
-					if (itemStarted || line.StartsWith("#~"))
-					{
-						TranslationItem item = ParseBody(fs, line);
+						    } while ((line = fs.ReadLine()) != null && line.StartsWith("#"));
+					    }
 
-                        if (item != null) {
-                           //
-					        item.TranslatorComments = translatorComments;
-					        item.ExtractedComments = extractedComments;
-					        item.Flags = flags;
-					        item.References = references;
-                           //
-                            items.AddOrUpdate(
-                                item.Id, 
-                                // Add routine.
-                                k => {
-			                        return item;
-                                },
-                                // Update routine.
-                                (k, v) => {
-                                    v.References = v.References.Append(item.References);
-                                    v.ExtractedComments = v.ExtractedComments.Append(item.References);
-                                    v.TranslatorComments = v.TranslatorComments.Append(item.References);
-                                    v.Flags = v.Flags.Append(item.References);
-                                    return v;
-                                });
-                        }
-					}
+					    if (itemStarted || line.StartsWith("#~"))
+					    {
+						    TranslationItem item = ParseBody(fs, line);
 
-					itemStarted = false;
-				}
-			}
+                            if (item != null) {
+                               //
+					            item.TranslatorComments = translatorComments;
+					            item.ExtractedComments = extractedComments;
+					            item.Flags = flags;
+					            item.References = references;
+                               //
+                                items.AddOrUpdate(
+                                    item.Id, 
+                                    // Add routine.
+                                    k => {
+			                            return item;
+                                    },
+                                    // Update routine.
+                                    (k, v) => {
+                                        v.References = v.References.Append(item.References);
+                                        v.ExtractedComments = v.ExtractedComments.Append(item.References);
+                                        v.TranslatorComments = v.TranslatorComments.Append(item.References);
+                                        v.Flags = v.Flags.Append(item.References);
+                                        return v;
+                                    });
+                            }
+					    }
+
+					    itemStarted = false;
+				    }
+			    }
+            }
 			translation.Items = items;
 			return translation;
 		}
