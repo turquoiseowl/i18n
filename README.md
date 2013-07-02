@@ -177,13 +177,13 @@ Nugget markup also supports comments (*extracted comments* in PO parlance) to be
 
 #### Nugget markup customization
 
-The characters for marking nuggets were chosen on the basis that they were unlikely to clash with
+The character sequences for marking-up nuggets ([[[, ]]], ||| and ///) were chosen on the basis that they were unlikely to clash with
 common character sequences in HTML markup while at the same time being convenient for the programmer
-to enter (on most types of keyboard).
+to enter (on most keyboards).
 
-However, in recognition that the possibility of a clash remains, and nuggets being falsely detected
-in the source code or HTML response, i18n supports user-defined nugget markup sequences. These can
-be configured in web.config as follows:
+However, recognizing that a clash remains possible and nuggets thereby being falsely detected
+in source code or the HTML response, i18n supports user-defined sequences for the markup. You can
+configure these in web.config as shown in the following example:
 
 ```xml
   <appSettings>
@@ -194,7 +194,7 @@ be configured in web.config as follows:
     <add key="i18n.NuggetCommentToken" value="////" />
     ...
   </appSettings>
-```xml
+```
 
 ### Building PO databases
 
