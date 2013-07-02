@@ -152,8 +152,11 @@ namespace i18n
                 if (lt==null || !lt.Language.IsSet()) {
                     continue; }
                // Ignore the langtag if already added.
-                if (pal.IsValid() && pal.Equals(lt)) {
-                    continue; }
+                //if (pal.IsValid() && pal.Equals(lt)) {
+                //    continue; }
+                    // NB: the above check disabled as it can cause the first lang in the header,
+                    // where it matches the PAL intially, to be lost if/when the PAL is later changed 
+                    // to something else.
                // Store a new representative item.
                // NB: LanguageItem is a value type so no alloc done here.
                 LanguageItems[ordinal] = new LanguageItem(lt, qvalue, ordinal);

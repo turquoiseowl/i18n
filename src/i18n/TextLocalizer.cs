@@ -48,6 +48,12 @@ namespace i18n
 
                // Populate the collection.
 	            List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
+
+                // Ensure default language is included in AppLanguages where appropriate.
+                if (LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage
+                    && !languages.Any(x => LocalizedApplication.Current.DefaultLanguageTag.Equals(x))) {
+                    languages.Add(LocalizedApplication.Current.DefaultLanguageTag.ToString()); }
+
                 foreach (var langtag in languages)
                 {
 					if (IsLanguageValid(langtag))
@@ -105,6 +111,11 @@ namespace i18n
         {
         // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
         //
+            // Default language is always valid.
+            if (LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage
+                && LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
+                return true; }
+
 			ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
@@ -148,6 +159,12 @@ namespace i18n
             if (text != null) {
                 return text; }
 
+            // If we are looking up in the default language, and the message keys describe values
+            // in that language...return the key.
+            if (LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)
+                && LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage) {
+                return key; }
+
             // Lookup failed.
             return null;
         }
@@ -168,7 +185,12 @@ namespace i18n
 
 				// Cache messages.
 				// NB: if the file changes we want to be able to rebuild the index without recompiling.
-				HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, _translationRepository.GetCacheDependencyForSingleLanguage(langtag));
+                // NB: it is possible for GetCacheDependencyForSingleLanguage to return null in the
+                // case of the default language where it is added to AppLanguages yet doesn't actually exist.
+                // See MessageKeyIsValueInDefaultLanguage.
+                var cd = _translationRepository.GetCacheDependencyForSingleLanguage(langtag);
+				if (cd != null) {
+                    HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd); }
 			}
             return true;
         }

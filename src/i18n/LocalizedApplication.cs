@@ -45,10 +45,15 @@ namespace i18n
     #endregion
 
         /// <summary>
-        /// The default language for all localized keys; when a PO database
-        /// is built, the default key file is stored at this locale location.
+        /// The language to be used as the default for the application where no
+        /// explicit language is specified or determined for a request. Defaults to "en".
         /// </summary>
         /// <remarks>
+        /// When MessageKeyIsValueInDefaultLanguage is true, GetText may interpret
+        /// the message keys to be message values in the DefaultLanguage (where
+        /// no explicit message value is defined in the DefaultLanguage) and so
+        /// output the message key.<br/>
+        /// The DefaultLanguage is used in Url Localization Scheme2 for the default URL.<br/>
         /// Supports a subset of BCP 47 language tag spec corresponding to the Windows
         /// support for language names, namely the following subtags:
         ///     language (mandatory, 2 alphachars)
@@ -72,6 +77,20 @@ namespace i18n
             }
         }
         public LanguageTag DefaultLanguageTag { get; set; }
+
+        /// <summary>
+        /// Specifies whether the key for a message may be assumed to be the value for
+        /// the message in the default language. Defaults to true.
+        /// </summary>
+        /// <remarks>
+        /// When true, the i18n GetText method will take it that a translation exists
+        /// for all messages in the default language, even though in reality a translation
+        /// is not present for the message in the default language's PO file.<br/>
+        /// When false, an explicit translation is required in the default language. Typically
+        /// this can be useful where key are not strings to be output but rather codes or mnemonics
+        /// of some kind.
+        /// </remarks>
+        public bool MessageKeyIsValueInDefaultLanguage { get; set; }
 
         /// <summary>
         /// The ASP.NET application's virtual application root path on the server,
@@ -133,6 +152,7 @@ namespace i18n
 
             // Default settings.
             DefaultLanguage = ("en");
+            MessageKeyIsValueInDefaultLanguage = true;
             PermanentRedirects = false;
 
             // Attempt to determine ApplicationPath.

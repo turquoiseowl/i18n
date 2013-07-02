@@ -67,8 +67,8 @@ namespace i18n
         //   Surely, the message from fr or fr-CA is better match than en-US or zh-Hans.
         //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
         //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
-        //   we try all match grades first. Only if there is not match whatsoever for the PAL
-        //   so we move no to the other (browser) languages, where return to prioritizing match grade
+        //   we try all match grades first. Only if there is no match whatsoever for the PAL
+        //   do we move no to the other (browser) languages, where return to prioritizing match grade
         //   i.e. loop through all the languages first at the strictest match grade before loosening 
         //   to the next match grade, and so on.
         //
@@ -79,8 +79,8 @@ namespace i18n
             if (maxPasses > (int)LanguageTag.MatchGrade._MaxMatch) {
                 maxPasses = (int)LanguageTag.MatchGrade._MaxMatch; }
 
-            //MC002
-            //if (key == "Sign In") {
+            //#78
+            //if (key == "Sign In 123") {
             //    key = key; }
 
             if (UserLanguages.Length != 0) {
@@ -116,8 +116,8 @@ namespace i18n
                // match grade.
                 for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
                     LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
-                    for (; idxUserLang < UserLanguages.Length; ++idxUserLang) {
-                        LanguageTag ltUser = (LanguageTag)UserLanguages[idxUserLang].LanguageTag;
+                    for (int i = idxUserLang; i < UserLanguages.Length; ++i) {
+                        LanguageTag ltUser = (LanguageTag)UserLanguages[i].LanguageTag;
                         if (ltUser == null) {
                             continue; }
                             // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
@@ -136,7 +136,7 @@ namespace i18n
                             else {
                                 o_text = null; }
                            // Match.
-                            ++UserLanguages[idxUserLang].UseCount;
+                            ++UserLanguages[i].UseCount;
                             return langApp.Value;
                         }
                     }

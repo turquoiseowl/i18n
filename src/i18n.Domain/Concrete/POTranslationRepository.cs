@@ -109,7 +109,10 @@ namespace i18n.Domain.Concrete
 
 		public CacheDependency GetCacheDependencyForSingleLanguage(string langtag)
 		{
-			return new CacheDependency(GetPathForLanguage(langtag));
+            var path = GetPathForLanguage(langtag);
+            if (!File.Exists(path)) {
+                return null; }
+			return new CacheDependency(path);
 		}
 
 		public CacheDependency GetCacheDependencyForAllLanguages()
