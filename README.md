@@ -148,12 +148,55 @@ And the same can be used for Javascript:
     </script>
 ```
 
-### Nugget Syntax
+### Nuggets
 
-TODO: document nugget format, including formatted nuggets
-TODO: document option for customized nugget markup
+Strings you want to be translatable are known as messages. These in turn are 'marked-up' in your
+source code as 'Nuggets'. The nugget markup allows i18n to filter the HTTP response looking for the
+message strings which are replaced with translated strings where available.
 
-#### Building PO databases
+A simple nugget looks like this:
+
+```
+[[[translate me]]]
+```
+
+This defines a message with the key "translate me".
+
+Nugget markup supports formated messages as follows:
+
+```
+string.Format("[[[welcome %0, today is %1|||{0}|||{1}]]]", name, day)
+```
+Where the %0 and %1 tokens are replaced by the strings that replaces the {0} and {1} items, respectively.
+
+Nugget markup also supports comments (*extracted comments* in PO parlance) to be passed to the translator like so:
+
+```
+[[[translate me///this is an extracted comment]]]
+```
+
+#### Nugget markup customization
+
+The characters for marking nuggets were chosen on the basis that they were unlikely to clash with
+common character sequences in HTML markup while at the same time being convenient for the programmer
+to enter (on most types of keyboard).
+
+However, in recognition that the possibility of a clash remains, and nuggets being falsely detected
+in the source code or HTML response, i18n supports user-defined nugget markup sequences. These can
+be configured in web.config as follows:
+
+```xml
+  <appSettings>
+    ...
+    <add key="i18n.NuggetBeginToken" value="[&[" />
+    <add key="i18n.NuggetEndToken" value="]&]" />
+    <add key="i18n.NuggetDelimiterToken" value="||||" />
+    <add key="i18n.NuggetCommentToken" value="////" />
+    ...
+  </appSettings>
+```xml
+
+### Building PO databases
 
 TODO: rewrite
 
@@ -173,7 +216,7 @@ From here, you use any of the widely available PO editing tools (like [POEdit](h
 to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
 If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
 
-#### Route Localization
+### Route Localization
 
 TODO: rewrite
 
@@ -202,7 +245,7 @@ Where a *loose* match is made above, the URL is updated with the matched applica
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
 By default this is a temporary 302 redirect, but you can choose for it to be a permanent 301 one.
 
-##### Language Matching
+### Language Matching
 
 TODO: update
 
@@ -236,7 +279,7 @@ include the following in your Application_Start() method:
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
 It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
 
-#### A reminder about folders in a web application
+### A reminder about folders in a web application
 
 Your `locale` folder is exposed to HTTP requests as-is, just like a typical log directory, so remember to block all requests
 to this folder by adding a `Web.config` file. 
@@ -264,6 +307,3 @@ contribute back anything new. Specifically, these would be great places to add m
 
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
 * Better parsing and handling of PO files for more general purposes / outside editors
-* Additional validation attributes (though these days I think this feature should be tossed)
-* Generic handling that will work in ASP.NET Web API
-* Support for additional storage mechanisms beyond ASP.NET Session (i.e. cookies, closures, etc.)
