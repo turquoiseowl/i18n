@@ -151,7 +151,7 @@ And the same can be used for Javascript:
 
 Strings you want to be translatable are known as messages. These in turn are 'marked-up' in your
 source code as 'Nuggets'. The nugget markup allows i18n to filter the HTTP response looking for the
-message strings which are replaced with translated strings where available.
+message strings which are replaced with translated strings, where available.
 
 A simple nugget looks like this:
 
@@ -164,11 +164,14 @@ This defines a message with the key "translate me".
 Nugget markup supports formated messages as follows:
 
 ```
-string.Format("[[[welcome %0, today is %1|||{0}|||{1}]]]", name, day)
+string.Format("[[[welcome %1, today is %0|||{0}|||{1}]]]", day, name)
 ```
-Where the %0 and %1 tokens are replaced by the strings that replaces the {0} and {1} items, respectively.
 
-Nugget markup also supports comments (*extracted comments* in PO parlance) to be passed to the translator like so:
+where the %0 and %1 tokens are replaced by the strings that replace the {0} and {1} items, respectively.
+(The reason for the extra level of redirection here is to facilitate the translator rearranging the order of
+the tokens for different languages.)
+
+Nugget markup also supports comments (_extracted comments_ in PO parlance) to be passed to the translator like so:
 
 ```
 [[[translate me///this is an extracted comment]]]
@@ -181,8 +184,8 @@ common character sequences in HTML markup while at the same time being convenien
 to enter (on most keyboards).
 
 However, recognizing that a clash remains possible and nuggets thereby being falsely detected
-in source code or the HTML response, i18n supports user-defined sequences for the markup. You can
-configure these in web.config as shown in the following example:
+in source code or the HTML response, i18n allows you to define your own sequences for the markup
+which you know are not going to clash. You can configure these in web.config as shown in the following example:
 
 ```xml
   <appSettings>
