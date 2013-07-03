@@ -6,21 +6,20 @@
 ### Introduction
 
 The i18n library is designed to replace the use of .NET resources in favor 
-of an easier, globally recognized standard for localizing web applications. 
-Using this library simplifies localization by making it a first class citizen 
-of views, controllers, and validation attributes.
+of an easier, globally recognized standard for localizing ASP.NET web applications. 
 
 ### Features
 - Globally recognized interface; localize like the big kids
-- Localizes everything; views, controllers, validation attributes, and even routes!
+- Localizes everything: HTML, Razor, C#, JavaScript, ...
 - SEO-friendly; language selection varies the URL, and `Content-Language` is set appropriately
-- Automatic; no routing changes required, just use an alias method where you want localization
+- Automatic; no URL/routing changes required in the app
+- High performance, minimal overhead and minimal heap allocations
 - Smart; knows when to hold them, fold them, walk away, or run, based on i18n best practices
 
 ### Project Configuration
 
 The i18n library works by modifying your HTTP traffic to perform string replacement and
-patching of URLs with language tags (URL Localization). The work is done by an
+patching of URLs with language tags ([URL Localization](#url-localization)). The work is done by an
 HttpModule called i18n.LocalizingModule which should be enabled in your web.config file as follows:
 
 ```xml
@@ -198,38 +197,54 @@ configure these in web.config as shown in the following example:
 
 ### Building PO databases
 
-TODO: rewrite
-
 To set up automatic PO database building, add the following post-build task to your project, after
 adding `i18n.PostBuild.exe` as a project reference:
 
 ```
-    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)"
+    "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)\web.config"
 ```
     
-After a successful build, this task will rip through your source code, finding everywhere you've used the `ILocalizing._("text")` alias, 
-and uses this to build a master .PO template file located at `/locale/messages.pot` relative to your web application folder. After the
-new template is constructed, any locales that exist inside the `/locale` folder are automatically merged with the template, so that
-new strings can be flagged for further translation.
+Alternatively, you may choose to install the `i18n.POTGenerator.vsix` Visual Studio 2012 extension.
+This installs an `i18n` button in the Solution Window for manual triggering of PO generation. Note that
+it is necessary to highlight the project in question within the Solution Window before pressing the button.
 
-From here, you use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
-to provide locale-specific text and place them in your `/locale` folder relative to the provided language, i.e. `locale/fr`. 
-If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to redeploy your application.
+The PO generator will rip through your source code (as defined by the
+i18n.DirectoriesToScan and i18n.WhiteList settings in web.config), finding every nugget, 
+and uses this to build a master .POT template file located at `locale/messages.pot`
+relative to your web application folder. After the new template is constructed, any locales that exist 
+inside the `locale` folder (or as defined by the i18n.AvailableLanguages semi-colon-delimited web.config setting)
+are automatically merged with the template, so that new strings can be flagged for further translation.
 
-### Route Localization
+From here, you can use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
+to provide locale-specific text and place them in your `locale` folder relative to the provided language, e.g. `locale/fr`. 
+If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to restart your application.
 
-TODO: rewrite
+### URL Localization
 
-To participate in the automatic routing features of this library, call `i18n.RouteLocalization.Enable()` 
-in your startup code; this will register a global filter and route decorator to provide the feature.
+In keeping with emerging standards for internationalized web applications, i18n provides support for
+localized URLs. For example, `www.example.com/de` or `www.example.com/en-us/signin`.
 
-I18N comes with the ability to build on top of your existing routes to automatically redirect language choice to
-an appropriate URL suffix.
+Out of the box, i18n will attempt to ensure the current language for any request is shown correctly in the
+address box of the user's browser, redirecting from any non-localized URL if necessary to a localized one.
+This is known as [Early URL Localization](https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?pli=1).
+See also [Principal Application Language](#principal-application-language).
 
-First of all, the set of application languages is established for which one or more translated messages exist.
-Then, for each request, one of these languages is selected as the Principal Application Language (PAL) for the request.
+While URLs from the user-agent perspective are localized, from the app's perspective they are nonlocalized.
+Thus you can write your app without worrying about the language tag in the URL.
 
-The PAL is determined by the first of the following conditions that is met:
+The default URL Localization scheme (Scheme1) will show the language tag in the URL always; an alternative
+scheme, Scheme2, will show the language tag only if it is not the default. Alternatively, URL localization
+can be disabled by setting `i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null` in `Application_Start`.
+
+### Principal Application Language
+
+During startup of your ASP.NET application, i18n determines the set of application 
+languages for which one or more translated messages exist.
+
+Then, on each request, one of these languages is selected as the Principal Application 
+Language (PAL) for the request.
+
+The PAL for the request is determined by the first of the following conditions that is met:
 
 1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
 
@@ -243,18 +258,134 @@ The PAL is determined by the first of the following conditions that is met:
 
 Where a *loose* match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
-By default this is a temporary 302 redirect, but you can choose for it to be a permanent 301 one.
+By default this is a temporary 302 redirect, but you can choose for it to be a permanent 301 one
+by setting `i18n.LocalizedApplication.Current.PermanentRedirects = true` in Application_Start.
+
+The `GetPrincipalAppLanguageForRequest` extension method to HttpContext can be called to access the
+PAL of the current request. For example, it may be called in a Razor view as follows to display
+the current langue to the user:
+
+```xml
+    <div>
+        <p id="lang_cur" title="@Context.GetPrincipalAppLanguageForRequest()">
+            @Context.GetPrincipalAppLanguageForRequest().GetNativeNameTitleCase()
+        </p>
+    </div>
+```
+
+### Explicit User Language Selection
+
+You probably want to allow users to override their browser language settings by providing a language selection
+feature in your application. There are two parts to implementing this feature with i18n which revolve around
+the setting of a cookie called `i18n.langtag`.
+
+Firstly, you need to provide HTML that displays the current language and allows the user to explicitly select
+a language (from those ApplicationLanguages available). An example of how to do that in ASP.NET MVC and Razor follows:
+
+```xml
+@using i18n
+...
+<div id="language">
+  <div>
+    <p id="lang_cur" title="@Context.GetPrincipalAppLanguageForRequest()">@Context.GetPrincipalAppLanguageForRequest().GetNativeNameTitleCase()</p>
+  </div>
+  <div id="lang_menu" style="display: none;">
+    <table class="table_grid">
+      <tbody>
+        @{
+          int i;
+          int maxcols = 3;
+          KeyValuePair<string, i18n.LanguageTag>[] langs = LanguageHelpers.GetAppLanguages().OrderBy(x => x.Key).ToArray();
+          int cellcnt = langs.Length +1;
+          for (i = 0; i < cellcnt;) {
+            bool lastRow = i + maxcols >= cellcnt;
+            <tr class="@(Html.Raw((i % 2) == 0 ? "even":"odd")) @(Html.Raw(lastRow ? "last":""))">
+              @for (int j = 0; j < maxcols && i < cellcnt; ++i, ++j) {
+                string langtag;
+                string title;
+                string nativelangname;
+                if (i == 0) {
+                  langtag = "";
+                  title = "[[[Browser default language setting]]]";
+                  nativelangname = "[[[Auto]]]";
+                }
+                else {
+                  i18n.LanguageTag lt = langs[i -1].Value;
+                  title = langtag = lt.ToString();
+                  nativelangname = lt.NativeNameTitleCase;
+                }
+                <td>
+                  @Html.ActionLink(
+                    linkText: nativelangname, 
+                    actionName: "SetLanguage", 
+                    controllerName: "Account", 
+                    routeValues: new { langtag = langtag, returnUrl = Request.Url },
+                    htmlAttributes: new { title = title } )
+                </td>
+              }
+              @* Fill last row with empty cells if ness, so that borders are added and balanced out. *@
+              @if (lastRow) {
+                for (; i % maxcols != 0; ++i) {
+                  <td></td>
+                }
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+```
+
+On selection of a language in the above code, the AccountController.SetLanguage method is called, an example of
+which follows:
+
+```csharp
+
+    using i18n;
+    ...
+
+    //
+    // GET: /Account/SetLanguage
+
+    [AllowAnonymous]
+    public ActionResult SetLanguage(string langtag, string returnUrl)
+    {
+        // If valid 'langtag' passed.
+        i18n.LanguageTag lt = i18n.LanguageTag.GetCachedInstance(langtag);
+        if (lt.IsValid()) {
+            // Set persistent cookie in the client to remember the language choice.
+            Response.Cookies.Add(new HttpCookie("i18n.langtag")
+            {
+                Value = lt.ToString(),
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddYears(1)
+            });
+        }
+        // Owise...delete any 'language' cookie in the client.
+        else {
+            Response.Cookies["i18n.langtag"].FlagForRemoval(); }
+        // Update PAL setting so that new language is reflected in any URL patched in the 
+        // response (Late URL Localization).
+        HttpContext.SetPrincipalAppLanguageForRequest(lt);
+        // Patch in the new langtag into any return URL.
+        if (returnUrl.IsSet()) {
+            returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
+        // Redirect user agent as approp.
+        return this.RedirectWithSubSite(returnUrl);
+    }
+```
 
 ### Language Matching
-
-TODO: update
 
 Language matching is performed when a list of one or more user-preferred languages is matched against
 a list of one or more application laguages, the goal being to choose the application languages
 which the user is most likely to understand. The algorithm for this is multi-facted and multi-pass and takes the Language, 
 Script and Region subtags into account.
 
-Matching is performed once per-request to determine the principal language, and also once per GetText call. 
+Matching is performed once per-request to determine the [Principal Application Language](#principal-application-language)
+for the request, and also once per message to be translated (aka GetText call). 
 The multi-pass approach ensures a thorough attempt is made at matching a user's list of preferred 
 languages (from their Accept-Language HTTP header). E.g. in the context of the following request:
 
@@ -269,15 +400,28 @@ that, the default language *en* is fallen back on.
 In recognition of the potential bottleneck of the GetText call (which typically is called many times per-request),
 the matching algorithm is efficient for managed code (lock-free and essentially heap-allocation free).
 
-To enable Enhanced mode in your project (the default mode being the original, Basic mode),
-include the following in your Application_Start() method:
-
-```csharp
-    i18n.RouteLocalization.Enable();
-```
-
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
 It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
+
+##### Language Matching Update
+
+The latest refinement to the language matching algoritm:
+
+```csharp
+        // Principle Application Language (PAL) Prioritization:
+        //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
+        //   Their browser is set to languages en-US, en, zh-Hans.
+        //   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
+        //   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
+        //   We also have message in en-US and zh-Hans.
+        //   Surely, the message from fr or fr-CA is better match than en-US or zh-Hans.
+        //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
+        //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
+        //   we try all match grades first. Only if there is no match whatsoever for the PAL
+        //   do we move no to the other (browser) languages, where return to prioritizing match grade
+        //   i.e. loop through all the languages first at the strictest match grade before loosening 
+        //   to the next match grade, and so on.
+```
 
 ### A reminder about folders in a web application
 
@@ -302,8 +446,10 @@ to this folder by adding a `Web.config` file.
 ```
 
 ### Contributing
+
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
 * Better parsing and handling of PO files for more general purposes / outside editors
+* Input and ideas on a safe universal nugget syntax (see issue #69).
