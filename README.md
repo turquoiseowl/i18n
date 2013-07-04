@@ -6,11 +6,22 @@
 ### Introduction
 
 The i18n library is designed to replace the use of .NET resources in favor 
-of an easier, globally recognized standard for localizing ASP.NET web applications. 
+of an **easier**, globally recognized standard for localizing ASP.NET-based web applications.
+
+### Platforms Supported
+
+i18n itself targets .NET Framework 4, and works with websites and web applications
+based on ASP.NET v4 and above, including:
+
+- ASP.NET MVC
+- ASP.NET Web API
+- ASP.NET WebMatrix / Web Pages
+- ASP.NET Web Forms
 
 ### Features
+
 - Globally recognized interface; localize like the big kids
-- Localizes everything: HTML, Razor, C#, JavaScript, ...
+- Localizes everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
 - SEO-friendly; language selection varies the URL, and `Content-Language` is set appropriately
 - Automatic; no URL/routing changes required in the app
 - High performance, minimal overhead and minimal heap allocations
@@ -176,6 +187,9 @@ Nugget markup also supports comments (_extracted comments_ in PO parlance) to be
 ```
 [[[translate me///this is an extracted comment]]]
 ```
+
+See [Issue #50](https://github.com/turquoiseowl/i18n/issues/50) for more on Nuggets and why we have chosen to
+replace the GetText _() style of marking-up messages.
 
 #### Nugget markup customization
 
