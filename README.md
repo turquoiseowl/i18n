@@ -188,8 +188,16 @@ Nugget markup also supports comments (_extracted comments_ in PO parlance) to be
 [[[translate me///this is an extracted comment]]]
 ```
 
+And if you need to include the markup characters themselves within a message, you can HTML-escape them, for example:
+
+```
+[[[Please don't forget to add GoogleAd tags: [googleadsmall&#93;]]]
+```
+
+where &amp;#93; is the HTML escape sequence for ].
+
 See [Issue #50](https://github.com/turquoiseowl/i18n/issues/50) for more on Nuggets and why we have chosen to
-replace the GetText _() style of marking-up messages.
+replace the GetText / _() style of marking-up messages.
 
 #### Nugget markup customization
 
