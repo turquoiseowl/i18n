@@ -20,8 +20,8 @@ based on ASP.NET v4 and above, including:
 
 ### Features
 
-- Globally recognized interface; localize like the big kids
-- Localizes everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
+- Internationalize your application using the GNU PO standard; localize like the big kids
+- Localize everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
 - SEO-friendly; language selection varies the URL, and `Content-Language` is set appropriately
 - Automatic; no URL/routing changes required in the app
 - High performance, minimal overhead and minimal heap allocations
@@ -194,7 +194,12 @@ And if you need to include the markup characters themselves within a message, yo
 [[[Please don't forget to add GoogleAd tags: [googleadsmall&#93;]]]
 ```
 
-where &amp;#93; is the HTML escape sequence for ].
+where &amp;#93; is the HTML escape sequence for ]. The relevant escape sequences are:
+
+- / = &amp;#47;
+- [ = &amp;#91;
+- ] = &amp;#93;
+- | = &amp;#124;
 
 See [Issue #50](https://github.com/turquoiseowl/i18n/issues/50) for more on Nuggets and why we have chosen to
 replace the GetText / _() style of marking-up messages.
@@ -207,7 +212,7 @@ to enter (on most keyboards).
 
 However, recognizing that a clash remains possible and nuggets thereby being falsely detected
 in source code or the HTML response, i18n allows you to define your own sequences for the markup
-which you know are not going to clash. You can configure these in web.config as shown in the following example:
+which you know are not going to clash. You can configure these in web.config as follows:
 
 ```xml
   <appSettings>
