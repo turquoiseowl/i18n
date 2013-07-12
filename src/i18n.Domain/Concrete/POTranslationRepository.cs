@@ -150,6 +150,17 @@ namespace i18n.Domain.Concrete
 
 			bool hasReferences = false;
 
+            if (!File.Exists(filePath))
+            {
+                var fileInfo = new FileInfo(filePath);
+                var dirInfo = new DirectoryInfo(Path.GetDirectoryName(filePath));
+                if (!dirInfo.Exists)
+                {
+                    dirInfo.Create();
+                }
+                fileInfo.Create().Close();
+            }
+
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
                // Establish ordering of items in PO file.
@@ -234,7 +245,18 @@ namespace i18n.Domain.Concrete
 				File.Delete(filePath);
 			}
 
-			using (StreamWriter stream = new StreamWriter(filePath))
+		    if (! File.Exists(filePath))
+		    {
+		        var fileInfo = new FileInfo(filePath);
+                var dirInfo = new DirectoryInfo(Path.GetDirectoryName(filePath));
+		        if (! dirInfo.Exists)
+		        {
+		            dirInfo.Create();
+		        }
+		        fileInfo.Create().Close();
+		    }
+
+            using (StreamWriter stream = new StreamWriter(filePath))
 			{
 				foreach (var item in items.Values)
 				{
