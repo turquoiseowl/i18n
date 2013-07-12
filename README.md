@@ -20,7 +20,7 @@ based on ASP.NET v4 and above, including:
 
 ### Features
 
-- Internationalize your application using the GNU PO standard; localize like the big kids
+- Leverages the GetText / PO ecosystem; localize like the big kids
 - Localize everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
 - SEO-friendly; language selection varies the URL, and `Content-Language` is set appropriately
 - Automatic; no URL/routing changes required in the app
@@ -107,14 +107,14 @@ Here's an example of localizing text in a Razor view:
     </div>
 ```
 
-And here's an example in a controller:
+And here's an example in an MVC controller:
 
 ```csharp
     using i18n;
     
     namespace MyApplication
     {
-        public class HomeController : LocalizingController
+        public class HomeController : Controller
         {
             public ActionResult Index()
             {
@@ -126,7 +126,7 @@ And here's an example in a controller:
     }
 ```
 
-For use in data annotations:
+At last, you can localize your data annotations as easy as this:
 
 ```csharp
     public class PasswordResetViewModel
@@ -142,13 +142,13 @@ For use in data annotations:
     }
 ```
 
-For use in MVC URL-Helpers or other functions that require a plain string:
+An localize arguments passed to MVC URL-Helpers or other functions that require a plain string:
 
 ```html
 @Html.LabelFor(m => m.Name, "[[[First Name]]]")
 ```
 
-And the same can be used for Javascript:
+And for Javascript:
 
 ```html
     <script type="text/javascript">
@@ -160,9 +160,11 @@ And the same can be used for Javascript:
 
 ### Nuggets
 
-Strings you want to be translatable are known as messages. These in turn are 'marked-up' in your
-source code as 'Nuggets'. The nugget markup allows i18n to filter the HTTP response looking for the
-message strings which are replaced with translated strings, where available.
+In PO terminology, strings you want to be translatable are known as messages.
+In i18n, messages are 'marked-up' in your source code as 'Nuggets'. The nugget markup allows 
+i18n to filter the HTTP response looking for the
+message strings which are replaced with translated strings, where available. They also allow
+message strings to be located by the PostBuild PO file generator.
 
 A simple nugget looks like this:
 
