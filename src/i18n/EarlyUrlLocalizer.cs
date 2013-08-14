@@ -27,8 +27,12 @@ namespace i18n
                 return; } // YES. Continue handling request.
 
             bool allowRedirect =
-                   context.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
-                || context.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase);
+                ! LocalizedApplication.Current.DisableUrlChanges
+                && (
+                       context.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
+                       || context.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase)
+                   );
+                
 
             // NO. Is request URL localized?
             string urlNonlocalized;

@@ -100,7 +100,8 @@ namespace i18n
                     context, 
                     context.Response.Filter,
                     m_rootServices.EarlyUrlLocalizerForApp,
-                    m_rootServices.NuggetLocalizerForApp);
+                    m_rootServices.NuggetLocalizerForApp, 
+                    LocalizedApplication.Current.DisableUrlChanges);
             }
         }
     }

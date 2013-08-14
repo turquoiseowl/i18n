@@ -16,6 +16,7 @@ namespace i18n
     {
         private IEarlyUrlLocalizer m_earlyUrlLocalizer;
         private INuggetLocalizer m_nuggetLocalizer;
+        private bool m_disableUrlChanges;
 
         /// <remarks>
         /// We need to accumulate all written blocks into a staging buffer so that
@@ -42,12 +43,14 @@ namespace i18n
             HttpContextBase httpContext, 
             Stream outputStream,
             IEarlyUrlLocalizer earlyUrlLocalizer,
-            INuggetLocalizer nuggetLocalizer)
+            INuggetLocalizer nuggetLocalizer,
+            bool disableUrlChanges)
         {
             m_httpContext = httpContext;
             m_outputStream = outputStream;
             m_earlyUrlLocalizer = earlyUrlLocalizer;
             m_nuggetLocalizer = nuggetLocalizer;
+            m_disableUrlChanges = disableUrlChanges;
         }
 
     #region [Stream]
@@ -91,7 +94,7 @@ namespace i18n
             //   <img src="..."> tags
             //   <a href="..."> tags
             //   <link href="..."> tags
-            if (m_earlyUrlLocalizer != null)
+            if (m_earlyUrlLocalizer != null && m_disableUrlChanges == false)
             {
                 entity = m_earlyUrlLocalizer.ProcessOutgoing(
                     entity, 

@@ -136,6 +136,8 @@ namespace i18n
         /// </summary>
         public bool PermanentRedirects { get; set; }
 
+        public bool DisableUrlChanges { get; set; }
+
         /// <summary>
         /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
         /// </summary>
