@@ -156,11 +156,17 @@ namespace i18n
             PermanentRedirects = false;
 
             // Attempt to determine ApplicationPath.
-            var mycontext = HttpContext.Current;
-            if(mycontext!=null && mycontext.Request.ApplicationPath != null)
-                ApplicationPath = mycontext.Request.ApplicationPath.TrimEnd('/');
-            if(String.IsNullOrWhiteSpace(ApplicationPath))
-                ApplicationPath = "/";
+            // NB: if this method being called outside of a request handler, HttpContext.Current
+            // fails. Normally, this results in a null being returned; however it has been observed
+            // that it can also throw.
+            try {
+                var mycontext = HttpContext.Current;
+                if(mycontext!=null && mycontext.Request.ApplicationPath != null)
+                    ApplicationPath = mycontext.Request.ApplicationPath.TrimEnd('/');
+            }
+            catch(Exception) {}
+            if (String.IsNullOrWhiteSpace(ApplicationPath)) {
+                ApplicationPath = "/"; }
 
             // Register default services.
             // The client app may subsequerntly override any of these.
