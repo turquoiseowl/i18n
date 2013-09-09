@@ -133,8 +133,12 @@ namespace i18n
                 context.Items["i18n.UserLanguages"] 
                     = UserLanguages 
                     = LanguageItem.ParseHttpLanguageHeader(
-                        context.Request.Headers["Accept-Language"],
-                        LocalizedApplication.Current.DefaultLanguageTag);
+                        context.Request.Headers["Accept-Language"]);
+                            // NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
+                            // here as the second parameter i.e. to specify the PAL. However, this was
+                            // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
+                            // as SetPrincipalAppLanguageForRequest was not being called, that normally
+                            // overwriting the PAL set erroneoulsy here.
             }
             return UserLanguages;
         }
