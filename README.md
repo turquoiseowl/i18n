@@ -280,7 +280,7 @@ The PAL for the request is determined by the first of the following conditions t
 
 1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
 
-2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages.
+2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages (see below).
 
 3. The request contains a cookie called "i18n.langtag" with a language tag that matches (exactly or loosely) one of the application languages.
 
