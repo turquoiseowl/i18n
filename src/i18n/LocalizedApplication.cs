@@ -140,11 +140,12 @@ namespace i18n
         /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
         /// </summary>
         /// <remarks>
-        /// Set to null to disable Late URL Localization. Defaults to text/html and 
-        /// application/javascript. Client may customise this member, for instance in Application_Start.
+        /// Set to null to disable Late URL Localization.<br/>
+        /// Defaults to "^(?:text/html|text/plain|application/javascript|application/json)$".<br/>
+        /// Client may customise this member, for instance in Application_Start.
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.
         /// </remarks>
-        public Regex ContentTypesToLocalize = new Regex("^(?:text/html|application/javascript)$");
+        public Regex ContentTypesToLocalize = new Regex("^(?:text/html|text/plain|application/javascript|application/json)$");
 
         public LocalizedApplication()
         {
