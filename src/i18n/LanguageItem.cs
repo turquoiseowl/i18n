@@ -17,7 +17,7 @@ namespace i18n
     public struct LanguageItem : IComparable<LanguageItem>
     {
     // Decl
-        public const int PalQualitySetting = 2;
+        public const int PalQualitySetting = 0;
     // Data
         /// <summary>
         /// Describes a language. May be null if this represents a null (unset) value.
