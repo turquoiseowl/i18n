@@ -23,13 +23,15 @@ namespace i18n
         /// <param name="languages">A sorted list of language preferences</param>
         public virtual string GetBestAvailableLanguageFrom(string[] languages)
         {
+            if (languages == null || !languages.Any()) return DefaultSettings.DefaultTwoLetterISOLanguageName;
+
             foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
             {
                 var culture = GetCultureInfoFromLanguage(language);
-                
+
                 // en-US
                 var result = GetLanguageIfAvailable(culture.IetfLanguageTag);
-                if(result != null)
+                if (result != null)
                 {
                     return result;
                 }
@@ -53,8 +55,8 @@ namespace i18n
 
         private static string GetLanguageIfAvailable(string culture)
         {
-        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
-        //
+            // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+            //
             culture = culture.ToLowerInvariant();
 
             Dictionary<string, I18NMessage> messages = (Dictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
@@ -87,6 +89,9 @@ namespace i18n
         /// <returns></returns>
         public virtual string GetText(string key, string[] languages)
         {
+            if (key == null) return "";
+            if (languages == null || !languages.Any()) return key;
+
             // Prefer 'en-US', then 'en', before moving to next language choice
             foreach (var language in languages.Where(language => !string.IsNullOrWhiteSpace(language)))
             {
@@ -102,17 +107,17 @@ namespace i18n
                 var regional = TryGetTextFor(culture.IetfLanguageTag, key);
 
                 // If we just tried a region-specific lookup and that failed...try a region-neutral lookup. E.g. fr-CH -> fr.
-                if(!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase) && regional == key)
+                if (!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase) && regional == key)
                 {
                     var global = TryGetTextFor(culture.TwoLetterISOLanguageName, key);
-                    if(global != key)
+                    if (global != key)
                     {
                         return global;
                     }
                     continue;
                 }
 
-                if(regional != key)
+                if (regional != key)
                 {
                     return regional;
                 }
@@ -139,7 +144,7 @@ namespace i18n
                     Directory.CreateDirectory(directory);
                 }
 
-                using(var fs = File.CreateText(path))
+                using (var fs = File.CreateText(path))
                 {
                     fs.Flush();
                 }
@@ -177,8 +182,10 @@ namespace i18n
                 // It is possible for multiple threads to race to this method. The first to
                 // enter the above lock will insert the messages into the cache.
                 // If we lost the race...no need to duplicate the work of the winning thread.
-                if (HttpRuntime.Cache[GetCacheKey(culture)] != null) {
-                    return; }
+                if (HttpRuntime.Cache[GetCacheKey(culture)] != null)
+                {
+                    return;
+                }
 
                 using (var fs = File.OpenText(path))
                 {
@@ -199,7 +206,7 @@ namespace i18n
                         if (line.StartsWith("#"))
                         {
                             sb.Append(CleanCommentLine(line));
-                            while((line = fs.ReadLine()) != null && line.StartsWith("#"))
+                            while ((line = fs.ReadLine()) != null && line.StartsWith("#"))
                             {
                                 sb.Append(CleanCommentLine(line));
                             }
@@ -237,9 +244,9 @@ namespace i18n
 
         private static void ParseBody(TextReader fs, string line, StringBuilder sb, I18NMessage message)
         {
-            if(!string.IsNullOrEmpty(line))
+            if (!string.IsNullOrEmpty(line))
             {
-                if(line.StartsWith("msgid"))
+                if (line.StartsWith("msgid"))
                 {
                     var msgid = line.Unquote();
                     sb.Append(msgid);
@@ -253,7 +260,7 @@ namespace i18n
                 }
 
                 sb.Clear();
-                if(!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
+                if (!string.IsNullOrEmpty(line) && line.StartsWith("msgstr"))
                 {
                     var msgstr = line.Unquote();
                     sb.Append(msgstr);
@@ -275,9 +282,9 @@ namespace i18n
 
         private static string GetTextOrDefault(string culture, string key)
         {
-        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
-        //
-            var messages = (Dictionary<string, I18NMessage>) HttpRuntime.Cache[GetCacheKey(culture)];
+            // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+            //
+            var messages = (Dictionary<string, I18NMessage>)HttpRuntime.Cache[GetCacheKey(culture)];
             I18NMessage message = null;
 
             if (messages == null || !messages.TryGetValue(key, out message))
@@ -286,7 +293,7 @@ namespace i18n
             }
 
             return message.MsgStr;
-                // We check this for null/empty before adding to collection.
+            // We check this for null/empty before adding to collection.
         }
 
         private static CultureInfo GetCultureInfoFromLanguage(string language)
