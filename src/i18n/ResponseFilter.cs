@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -65,11 +66,17 @@ namespace i18n
 
             // Convert byte array into string.
             Encoding enc = m_httpContext.Response.ContentEncoding;
-            string entity = enc.GetString(m_stagingBuffer.GetBuffer(), 0, (int)m_stagingBuffer.Length);
+            Byte[] buf = m_stagingBuffer.GetBuffer();
+            string entity = enc.GetString(buf, 0, (int)buf.Length);
+
+            // Prep for special BOM handling.
+            // NB: at present we only support UTF-8 for this logic.
+            bool utf8WithoutBom = enc is UTF8Encoding && !buf.IsTextWithBom_Utf8();
 
             // Buffer no longer required so release memory.
             m_stagingBuffer.Dispose();
             m_stagingBuffer = null;
+            buf = null;
 
             // Translate any embedded messages aka 'nuggets'.
             if (m_nuggetLocalizer != null)
@@ -102,12 +109,18 @@ namespace i18n
             //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
             // Render the string back to an array of bytes.
-            byte[] buffer = enc.GetBytes(entity);
+            buf = enc.GetBytes(entity);
             enc = null; // release memory asap.
-            int count = buffer.Length;
+            int count = buf.Length;
+
+            // Prep to skip any BOM if it wasn't originally there.
+            // NB: at present we only support UTF-8 for this logic.
+            int skip = 0;
+            if (utf8WithoutBom && buf.IsTextWithBom_Utf8()) {
+                skip = 3; }
 
             // Forward data on to the original response stream.
-            m_outputStream.Write(buffer, 0, count);
+            m_outputStream.Write(buf, skip, count -skip);
 
             // Complete the write.
             m_outputStream.Flush();
