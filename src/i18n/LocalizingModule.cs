@@ -52,8 +52,7 @@ namespace i18n
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
             
             // Wire up our event handlers into the ASP.NET pipeline.
-            if (m_rootServices.EarlyUrlLocalizerForApp != null) {
-                application.BeginRequest += OnBeginRequest; }
+            application.BeginRequest        += OnBeginRequest;
             application.ReleaseRequestState += OnReleaseRequestState;
         }
         public void Dispose() {}
@@ -73,10 +72,16 @@ namespace i18n
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            if (m_rootServices.EarlyUrlLocalizerForApp != null)
-            {
-                m_rootServices.EarlyUrlLocalizerForApp.ProcessIncoming(context);
-            }
+            // Establish the language for the request. That is, we need to call
+            // context.SetPrincipalAppLanguageForRequest with a language, got from the URL,
+            // the i18n.langtag cookie, the Accept-Language header, or failing all that the
+            // default application language.
+            // · If early URL localizer configured, allow it to do it.
+            if (m_rootServices.EarlyUrlLocalizerForApp != null) {
+                m_rootServices.EarlyUrlLocalizerForApp.ProcessIncoming(context); }
+            // · Otherwise skip the URL aspect and detemrine from the other (inferred) attributes.
+            else {
+                context.SetPrincipalAppLanguageForRequest(context.GetInferredLanguage()); }
         }
 
         /// <summary>

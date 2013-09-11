@@ -39,14 +39,7 @@ namespace i18n
                 // langtag = best match between
                 // 1. Inferred user languages (cookie and Accept-Language header)
                 // 2. App Languages.
-                LanguageTag lt = null;
-                HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
-                if (cookie_langtag != null) {
-                    lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
-                if (lt == null) {
-                    lt = LanguageHelpers.GetMatchingAppLanguage(context.GetRequestUserLanguages()); }
-                if (lt == null) {
-                    throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
+                LanguageTag lt = context.GetInferredLanguage();
 
                 // If redirection allowed...redirect user agent (browser) to localized URL.
                 // The principle purpose of this redirection is to ensure the browser is showing the correct URL

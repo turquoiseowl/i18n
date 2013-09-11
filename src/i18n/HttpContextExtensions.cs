@@ -182,5 +182,45 @@ namespace i18n
             return context.GetHttpContextBase().SetContentLanguageHeader();
         }
 
+        /// <summary>
+        /// Returns the language for the current request inferred from the request context:
+        /// that is, attributes of the request other that the URL.
+        /// </summary>
+        /// <remarks>
+        /// The language is infered from the following attributes of the request,
+        /// in order of preference:<br/>
+        ///     i18n.langtag cookie<br/>
+        ///     Accept-Language header<br/>
+        ///     fall back to i18n.LocalizedApplication.Current.DefaultLanguage<br/>
+        /// Additionally, each language is matched by the language matching algorithm
+        /// against the set of application languages available.
+        /// </remarks>
+        /// <param name="context">Context of the current request.</param>
+        /// <returns>
+        /// Returns language tag describing the inferred language.
+        /// </returns>
+        /// <exception cref="System.InvalidOperationException">
+        /// Expected GetRequestUserLanguages to fall back to default language.
+        /// </exception>
+        public static LanguageTag GetInferredLanguage(this HttpContextBase context)
+        {
+            // langtag = best match between
+            // 1. Inferred user languages (cookie and Accept-Language header)
+            // 2. App Languages.
+            LanguageTag lt = null;
+            HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
+            if (cookie_langtag != null) {
+                lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
+            if (lt == null) {
+                lt = LanguageHelpers.GetMatchingAppLanguage(context.GetRequestUserLanguages()); }
+            if (lt == null) {
+                throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
+            return lt;
+        }
+        public static LanguageTag GetInferredLanguage(this HttpContext context)
+        {
+            return context.GetHttpContextBase().GetInferredLanguage();
+        }
+
     }
 }
