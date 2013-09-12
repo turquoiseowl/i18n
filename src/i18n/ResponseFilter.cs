@@ -71,7 +71,13 @@ namespace i18n
 
             // Prep for special BOM handling.
             // NB: at present we only support UTF-8 for this logic.
-            bool utf8WithoutBom = enc is UTF8Encoding && !buf.IsTextWithBom_Utf8();
+            //bool utf8WithoutBom = enc is UTF8Encoding && !buf.IsTextWithBom_Utf8();
+                // #86 -- disabled this BOM handling for now as it doesn't seem to help.
+                // Furthermore, it appears that the Encoding instance returned by 
+                // Response.ContentEncoding above is correctly configured to omit
+                // BOM or not from its GetByte method, depending on whether or not
+                // the response buffer has a BOM in it or not (for instance, see the
+                // ctor of UTF8Encoding that takes a bool for this).
 
             // Buffer no longer required so release memory.
             m_stagingBuffer.Dispose();
@@ -116,8 +122,9 @@ namespace i18n
             // Prep to skip any BOM if it wasn't originally there.
             // NB: at present we only support UTF-8 for this logic.
             int skip = 0;
-            if (utf8WithoutBom && buf.IsTextWithBom_Utf8()) {
-                skip = 3; }
+            //if (utf8WithoutBom && buf.IsTextWithBom_Utf8()) {
+            //    skip = 3; }
+                // #86 -- see matching comment above.
 
             // Forward data on to the original response stream.
             m_outputStream.Write(buf, skip, count -skip);
