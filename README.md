@@ -20,12 +20,12 @@ based on ASP.NET v4 and above, including:
 
 ### Features
 
-- Leverages the [GetText / PO](http://en.wikipedia.org/wiki/Gettext) ecosystem; localize like the big kids
+- Leverages the [GetText / PO](http://en.wikipedia.org/wiki/Gettext) ecosystem: localize like the big kids
 - Localize everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
-- SEO-friendly; language selection varies the URL, and `Content-Language` is set appropriately
-- Automatic; no URL/routing changes required in the app
+- SEO-friendly: language selection varies the URL, and `Content-Language` is set appropriately
+- Automatic: no URL/routing changes required in the app
 - High performance, minimal overhead and minimal heap allocations
-- Smart; knows when to hold them, fold them, walk away, or run, based on i18n best practices
+- Smart: knows when to hold them, fold them, walk away, or run, based on i18n best practices
 
 ### Project Configuration
 
@@ -142,7 +142,7 @@ At last, you can localize your data annotations as easy as this:
     }
 ```
 
-An localize arguments passed to MVC URL-Helpers or other functions that require a plain string:
+And localize arguments passed to MVC URL-Helpers or other functions that require a plain string:
 
 ```html
 @Html.LabelFor(m => m.Name, "[[[First Name]]]")
@@ -172,7 +172,7 @@ A simple nugget looks like this:
 [[[translate me]]]
 ```
 
-This defines a message with the key "translate me".
+This defines a message with the key (aka msgid) of "translate me".
 
 Nugget markup supports formated messages as follows:
 
@@ -482,7 +482,8 @@ to this folder by adding a `Web.config` file.
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
+* Plurals support.
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
-* Better parsing and handling of PO files for more general purposes / outside editors
+* Better parsing and handling of PO files for more general purposes / outside editors.
 * Input and ideas on a safe universal nugget syntax (see issue #69).
 * ASP.NET AJAX support (see issue #86).
