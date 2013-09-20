@@ -66,10 +66,8 @@ namespace i18n
 
             // Convert byte array into string.
             Encoding enc = m_httpContext.Response.ContentEncoding;
-            byte[] buf = new byte[m_stagingBuffer.Length];
-            m_stagingBuffer.Position = 0;
-            m_stagingBuffer.Read(buf, 0, (int)m_stagingBuffer.Length);
-            string entity = enc.GetString(buf);
+            Byte[] buf = m_stagingBuffer.GetBuffer();
+            string entity = enc.GetString(buf, 0, (int)m_stagingBuffer.Length);
 
             // Prep for special BOM handling.
             // NB: at present we only support UTF-8 for this logic.
