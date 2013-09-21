@@ -268,6 +268,55 @@ The default URL Localization scheme (Scheme1) will show the language tag in the 
 scheme, Scheme2, will show the language tag only if it is not the default. Alternatively, URL localization
 can be disabled by setting `i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null` in `Application_Start`.
 
+#### Exclude URLs from being localized
+
+URLs to non-internationalized resources need not be localized. Typically, there
+is no harm in them being localized as i18n will route the request approriately either
+way. However, where the Principal Application Language for a request is not required,
+such as for when reading a CSS file or font file, it can save a redirection round
+trip by instructing i18n NOT to localize the URL.
+
+There are two ways to instruct i18n NOT to localize a URL:
+
+Firstly, you can set a RegEx pattern to match against the localpath part of the URLs to be excluded. For instance:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        // Blacklist certain URLs from being 'localized'.
+        i18n.UrlLocalizer.QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.jpg|\.png|\.svg|\.woff|\.eot)$");
+    }
+```
+
+Indeed, the default value for the QuickUrlExclusionFilter settings is as shown above however
+feel free to override or set to null to disable.
+
+For finer control, the second method is to define filter delegates that are passed the URL and return
+true if the URL is to be localized, otherwise false. For example:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        // Blacklist certain URLs from being 'localized'.
+        i18n.UrlLocalizer.IncomingUrlFilters += delegate(Uri url) {
+            if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.OrdinalIgnoreCase)) {
+                return false; }
+            return true;
+        };
+        i18n.UrlLocalizer.OutgoingUrlFilters += delegate(string url, Uri currentRequestUrl) {
+            Uri uri;
+            if (Uri.TryCreate(url, UriKind.Absolute, out uri)
+                || Uri.TryCreate(currentRequestUrl, url, out uri)) {
+                if (uri.LocalPath.EndsWith("sitemap.xml", StringComparison.OrdinalIgnoreCase)) {
+                    return false; }
+            }
+            return true;
+        };
+    }
+```
+
 ### Principal Application Language
 
 During startup of your ASP.NET application, i18n determines the set of application 
