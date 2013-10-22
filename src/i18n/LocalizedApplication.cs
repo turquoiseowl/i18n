@@ -145,7 +145,7 @@ namespace i18n
         /// Client may customise this member, for instance in Application_Start.
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.
         /// </remarks>
-        public Regex ContentTypesToLocalize = new Regex("^(?:text/html|text/plain|application/javascript|application/json)$");
+        public Regex ContentTypesToLocalize = new Regex("^(?:text/html|text/plain|text/javascript|text/json|application/javascript|application/json)$");
 
         public LocalizedApplication()
         {
