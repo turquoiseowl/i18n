@@ -58,7 +58,7 @@ namespace i18n
                 if (_textLocalizer == null) {
                     return "test.message"; }
                // Lookup resource using canonical msgid.
-				message = _textLocalizer.GetText(nugget.MsgId, languages, out lt) ?? nugget.MsgId;
+				message = _textLocalizer.GetText(HttpUtility.HtmlDecode(nugget.MsgId), languages, out lt) ?? nugget.MsgId;
                //
                 if (nugget.IsFormatted) {
                    // Convert any identifies in a formatted nugget: %0 -> {0}
