@@ -141,12 +141,17 @@ namespace i18n
         /// </summary>
         /// <remarks>
         /// Set to null to disable Late URL Localization.<br/>
-        /// Defaults to "^(?:text/html|text/plain|application/javascript|application/json)$".<br/>
-        /// Client may customise this member, for instance in Application_Start.
-        /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.
+        /// Defaults to @"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|json))(?:\s*;.*)?)$").<br/>
+        /// Client may customise this member, for instance in Application_Start.<br/>
+        /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.<br/>
+        /// Explanation of the default regex:<br/>
+        ///  Content-type string must begin with "text" or "application"<br/>
+        ///  This must be followed by "/"<br/>
+        ///  This must be followed by "plain" or "html" ...<br/>
+        ///  And finally this may be followed by the following sequence:<br/>
+        ///      zero or more whitespace then ";" then any number of any chars up to end of string.
         /// </remarks>
-        public Regex ContentTypesToLocalize = new Regex("^(?:text/html|text/plain|text/javascript|text/json|application/javascript|application/json)$");
-
+        public Regex ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|json))(?:\s*;.*)?)$");
         public LocalizedApplication()
         {
             Container = new Container();
