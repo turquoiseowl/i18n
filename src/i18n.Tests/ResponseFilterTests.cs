@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using i18n.Domain.Concrete;
 
 namespace i18n.Tests
 {
@@ -14,7 +15,7 @@ namespace i18n.Tests
         [TestMethod]
         public void ResponseFilter_can_process_nuggets()
         {
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(null);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), null);
 
             //string pre = "«««123»»» «««123»»»";
             string pre = "[[[123]]] [[[123]]]";

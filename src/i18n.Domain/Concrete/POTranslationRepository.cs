@@ -167,7 +167,7 @@ namespace i18n.Domain.Concrete
                 var orderedItems = translation.Items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
                         // Non-orphan items before orphan items.
-                    .ThenBy(x => x.Id);
+                    .ThenBy(x => x.MsgKey);
                         // Then order alphanumerically.
                //
 
@@ -215,8 +215,15 @@ namespace i18n.Domain.Concrete
 
 					string prefix = hasReferences ? "" : prefix = "#~ ";
 
-                    WriteString(stream, hasReferences, "msgid", item.Id);
+                    if (_settings.MessageContextEnabledFromComment
+                        && item.ExtractedComments != null
+                        && item.ExtractedComments.Count() != 0) {
+                        WriteString(stream, hasReferences, "msgctxt", item.ExtractedComments.First());
+                    }
+
+                    WriteString(stream, hasReferences, "msgid", item.MsgId);
                     WriteString(stream, hasReferences, "msgstr", escape(item.Message));
+
                     stream.WriteLine("");
 				}
 			}
@@ -273,7 +280,7 @@ namespace i18n.Domain.Concrete
 						stream.WriteLine("#: " + reference);
 					}
 
-					stream.WriteLine("msgid \"" + escape(item.Id) + "\"");
+					stream.WriteLine("msgid \"" + escape(item.MsgId) + "\"");
 					stream.WriteLine("");
 				}
 			}
@@ -359,7 +366,7 @@ namespace i18n.Domain.Concrete
 
 					    if (itemStarted || line.StartsWith("#~"))
 					    {
-						    TranslationItem item = ParseBody(fs, line);
+						    TranslationItem item = ParseBody(fs, line, extractedComments);
 
                             if (item != null) {
                                //
@@ -369,7 +376,7 @@ namespace i18n.Domain.Concrete
 					            item.References = references;
                                //
                                 items.AddOrUpdate(
-                                    item.Id, 
+                                    item.MsgKey, 
                                     // Add routine.
                                     k => {
 			                            return item;
@@ -417,16 +424,24 @@ namespace i18n.Domain.Concrete
 		/// Parses the body of a PO file item. That is to say the message id and the message itself.
 		/// Reason for why it must be on second line (textreader) is so that you can read until you have read to far without peek previously for meta data.
 		/// </summary>
-		/// <param name="fs">A textreader that must be on the second line of a Message id</param>
-		/// <param name="line">The first line of the message id.</param>
-		/// <returns>Returns a TranslationITem with only id and message set</returns>
-		private TranslationItem ParseBody(TextReader fs, string line)
+		/// <param name="fs">A textreader that must be on the second line of a message body</param>
+		/// <param name="line">The first line of the message body.</param>
+		/// <returns>Returns a TranslationItem with only key, id and message set</returns>
+		private TranslationItem ParseBody(TextReader fs, string line, List<string> extractedComments)
 		{
 			if (string.IsNullOrEmpty(line)) {
                 return null; }
 
-            TranslationItem message = new TranslationItem { Id = "" };
+            TranslationItem message = new TranslationItem { MsgKey = "" };
 			StringBuilder sb = new StringBuilder();
+
+            string msgctxt = null;
+			line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
+			if (line.StartsWith("msgctxt"))
+			{
+				msgctxt = Unquote(line);
+				line = fs.ReadLine();
+			}
 
 			line = RemoveCommentIfHistorical(line); //so that we read in removed historical records too
 			if (line.StartsWith("msgid"))
@@ -447,7 +462,12 @@ namespace i18n.Domain.Concrete
 					}
 				}
 
-				message.Id = Unescape(sb.ToString());
+                message.MsgId = Unescape(sb.ToString());
+                
+                // If no msgctxt is set then msgkey is the msgid; otherwise it is msgid+msgctxt.
+                message.MsgKey = string.IsNullOrEmpty(msgctxt) ?
+                    message.MsgId:
+                    TemplateItem.KeyFromMsgidAndComment(message.MsgId, msgctxt, true);
 			}
 
 			sb.Clear();

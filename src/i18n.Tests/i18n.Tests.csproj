@@ -57,6 +57,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\i18n.Domain\i18n.Domain.csproj">
+      <Project>{bc2104ab-dc34-45b3-ab4d-3035f11fbdb8}</Project>
+      <Name>i18n.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\i18n.PostBuild\i18n.PostBuild.csproj">
       <Project>{9BE8E007-C6B8-43F7-83D2-E89F51EF8614}</Project>
       <Name>i18n.PostBuild</Name>

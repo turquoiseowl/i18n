@@ -347,5 +347,33 @@ namespace i18n.Domain.Concrete
 
 		#endregion
 
+		#region MessageContextEnabledFromComment
+
+		private bool? _cached_MessageContextEnabledFromComment;
+        public virtual bool MessageContextEnabledFromComment
+		{
+			get
+			{
+                // NB: this is not particularly thread-safe, but not seen as dangerous
+                // if done concurrently as modification is one-way.
+                if (_cached_MessageContextEnabledFromComment != null) {
+                    return _cached_MessageContextEnabledFromComment.Value; }
+
+				string prefixedString = GetPrefixedString("MessageContextEnabledFromComment");
+				string setting = _settingService.GetSetting(prefixedString);
+				bool result = !string.IsNullOrEmpty(setting) &&  setting == "true";
+                _cached_MessageContextEnabledFromComment = result;
+                return result;
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("MessageContextEnabledFromComment");
+				_settingService.SetSetting(prefixedString, value ? "true" : "false");
+                _cached_MessageContextEnabledFromComment = value;
+			}
+		}
+
+		#endregion
+
 	}
 }

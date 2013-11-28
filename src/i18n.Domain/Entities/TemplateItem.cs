@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using i18n;
 
 namespace i18n.Domain.Entities
 {
@@ -12,13 +13,25 @@ namespace i18n.Domain.Entities
 	/// </summary>
 	public class TemplateItem
 	{
-		public string Id;
+		public string MsgKey;
+        public string MsgId;
 		public IEnumerable<string> References { get; set; }
 		public IEnumerable<string> Comments { get; set; }
 
         public override string ToString()
         {
-            return Id;
+            return MsgKey;
         }
+
+        public static string KeyFromMsgidAndComment(
+            string msgid, 
+            string comment,
+            bool MessageContextFromComment)
+        {
+            if (MessageContextFromComment && !string.IsNullOrEmpty(comment)) {
+                return string.Format("{0}:£#£#£:{1}", msgid, comment); }
+            return msgid;
+        }
+
 	}
 }

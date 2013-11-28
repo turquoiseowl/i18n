@@ -17,7 +17,8 @@ namespace i18n.Domain.Entities
 		//this of course means that messages needs to be a collection and the POTranslationRepository's parse and save functions needs to be updated.
 		//this should preferably be decided upon and fixed before anyone writes a database repository
 	
-		public string Id { get; set; }
+		public string MsgKey { get; set; }
+		public string MsgId { get; set; }
 		public string Message { get; set; }
 		public IEnumerable<string> References { get; set; }
 		public IEnumerable<string> ExtractedComments { get; set; }
@@ -26,7 +27,7 @@ namespace i18n.Domain.Entities
 
         public override string ToString()
         {
-            return Id;
+            return MsgKey;
         }
 	}
 }

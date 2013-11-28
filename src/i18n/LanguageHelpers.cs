@@ -41,7 +41,7 @@ namespace i18n
         public static LanguageTag GetMatchingAppLanguage(LanguageItem[] languages, int maxPasses = -1)
         {
             LanguageTag lt = null;
-            LocalizedApplication.Current.TextLocalizerForApp.GetText(null, languages, out lt, maxPasses);
+            LocalizedApplication.Current.TextLocalizerForApp.GetText(null, null, languages, out lt, maxPasses);
             return lt;
         }
     }

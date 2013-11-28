@@ -120,14 +120,16 @@ namespace i18n.Domain.Concrete
 			string reference = filePath + ":" + lineNumber.ToString();
             string msgid = nugget.MsgId.Replace("\r\n", "\n").Replace("\r", "\\n");
                 // NB: In memory msgids are normalized so that LFs are converted to "\n" char sequence.
+            string key = TemplateItem.KeyFromMsgidAndComment(msgid, nugget.Comment, _settings.MessageContextEnabledFromComment);
 			List<string> tmpList;
            //
             templateItems.AddOrUpdate(
-                msgid, 
+                key,
                 // Add routine.
                 k => {
 			        TemplateItem item = new TemplateItem();
-			        item.Id = msgid;
+                    item.MsgKey = key;
+			        item.MsgId = msgid;
 
 			        tmpList = new List<string>();
 			        tmpList.Add(reference);

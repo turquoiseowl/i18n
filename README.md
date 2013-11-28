@@ -227,6 +227,24 @@ which you know are not going to clash. You can configure these in web.config as 
   </appSettings>
 ```
 
+#### Message Context Support
+
+i18n allows you to assign a ```msgctxt``` value to each message. Teh value of the msgctxt is
+taken from any comment you have defined in the nugget. This feature is optional and disabled
+by default. To enable this feature:
+
+
+```xml
+  <appSettings>
+    ...
+    <add key="i18n.MessageContextEnabledFromComment" value="true" />
+    ...
+  </appSettings>
+```
+
+Note that note all PO editors support msgctxt and indeed may be thrown by the value
+when present in .PO files. See Issue #90 for more details.
+
 ### Building PO databases
 
 To set up automatic PO database building, add the following post-build task to your project, after

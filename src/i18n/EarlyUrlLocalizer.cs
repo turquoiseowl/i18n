@@ -112,14 +112,16 @@ namespace i18n
             Uri requestUrl = context != null ? context.Request.Url : null;
 
             // Localize any HTTP headers in the response containing URLs.
-            foreach (string hdr in m_httpHeadersContainingUrls) {
-                string hdrval = context.Response.Headers[hdr];
-                if (!hdrval.IsSet()) {
-                    continue; }
-                string urlNew = LocalizeUrl(hdrval, langtag, requestUrl, true);
-                if (urlNew == null) {
-                    continue; }
-                context.Response.Headers[hdr] = urlNew;
+            if (context != null) {
+                foreach (string hdr in m_httpHeadersContainingUrls) {
+                    string hdrval = context.Response.Headers[hdr];
+                    if (!hdrval.IsSet()) {
+                        continue; }
+                    string urlNew = LocalizeUrl(hdrval, langtag, requestUrl, true);
+                    if (urlNew == null) {
+                        continue; }
+                    context.Response.Headers[hdr] = urlNew;
+                }
             }
             
             // Localize any nuggets in the entity.

@@ -42,18 +42,19 @@ namespace i18n
         /// Should no translation exist, the msgid string is returned.
         /// </remarks>
         /// <param name="context">Describes the current request.</param>
-        /// <param name="msgid">Identifies the message to be translated.</param>
+        /// <param name="msgid">Specifies the message to be translated.</param>
+        /// <param name="msgcomment">Specifies the optional message comment value of the subject resource, or null/empty.</param>
         /// <returns>Localized string, or msgid if no translation exists.</returns>
-        public static string GetText(this HttpContextBase context, string msgid)
+        public static string GetText(this HttpContextBase context, string msgid, string msgcomment)
         {
             // Lookup resource.
             LanguageTag lt;
-            msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, context.GetRequestUserLanguages(), out lt) ?? msgid;
+            msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, msgcomment, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
-        public static string GetText(this HttpContext context, string msgid)
+        public static string GetText(this HttpContext context, string msgid, string msgcomment)
         {
-            return context.GetHttpContextBase().GetText(msgid);
+            return context.GetHttpContextBase().GetText(msgid, msgcomment);
         }
 
         /// <summary>

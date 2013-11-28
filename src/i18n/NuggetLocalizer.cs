@@ -12,21 +12,24 @@ namespace i18n
     /// </summary>
     public class NuggetLocalizer : INuggetLocalizer
     {
+        private i18nSettings _settings;
+
         private ITextLocalizer _textLocalizer;
 
         private NuggetParser _nuggetParser;
 
         public NuggetLocalizer(
+            i18nSettings settings,
             ITextLocalizer textLocalizer)
         {
+            _settings = settings;
             _textLocalizer = textLocalizer;
 
-            i18nSettings settings = new i18nSettings(new WebConfigSettingService(null));
             _nuggetParser = new NuggetParser(new NuggetTokens(
-			    settings.NuggetBeginToken,
-			    settings.NuggetEndToken,
-			    settings.NuggetDelimiterToken,
-			    settings.NuggetCommentToken));
+			    _settings.NuggetBeginToken,
+			    _settings.NuggetEndToken,
+			    _settings.NuggetDelimiterToken,
+			    _settings.NuggetCommentToken));
         }
 
     #region [INuggetLocalizer]
@@ -58,7 +61,7 @@ namespace i18n
                 if (_textLocalizer == null) {
                     return "test.message"; }
                // Lookup resource using canonical msgid.
-				message = _textLocalizer.GetText(HttpUtility.HtmlDecode(nugget.MsgId), languages, out lt) ?? nugget.MsgId;
+				message = _textLocalizer.GetText(HttpUtility.HtmlDecode(nugget.MsgId), HttpUtility.HtmlDecode(nugget.Comment), languages, out lt) ?? nugget.MsgId;
                //
                 if (nugget.IsFormatted) {
                    // Convert any identifies in a formatted nugget: %0 -> {0}

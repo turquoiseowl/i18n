@@ -31,7 +31,8 @@ namespace i18n.Domain.Concrete
                 dstItem.References = null; }
            // 2. and 3.
             foreach (TemplateItem srcItem in src.Values) {
-                TranslationItem dstItem = dst.Items.GetOrAdd(srcItem.Id, k => new TranslationItem { Id = srcItem.Id });
+                TranslationItem dstItem = dst.Items.GetOrAdd(srcItem.MsgKey, k => new TranslationItem { MsgKey = srcItem.MsgKey });
+                dstItem.MsgId = srcItem.MsgId;
                 dstItem.References = srcItem.References;
                 dstItem.ExtractedComments = srcItem.Comments;
              }

@@ -18,10 +18,13 @@
         /// <summary>
         /// Looks up and returns localized text for a resource.
         /// </summary>
-        /// <param name="key">
-        /// Idenfities the msgid of the subject resource.
+        /// <param name="msgid">
+        /// Specifies the msgid of the subject resource.
         /// Null if we are not interested in a particular resource but wish to know
         /// the best matching language for which ANY resources are available (one or more).
+        /// </param>
+        /// <param name="msgcomment">
+        /// Specifies the optional message comment value of the subject resource, or null/empty.
         /// </param>
         /// <param name="languages">
         /// A list of language preferences, sorted in order or preference (most preferred first).
@@ -45,7 +48,8 @@
         /// or null if no match was made.
         /// </returns>
         string GetText(
-            string key, 
+            string msgid, 
+            string msgcomment, 
             LanguageItem[] languages, 
             out LanguageTag o_langtag,
             int maxPasses = -1);

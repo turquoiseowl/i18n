@@ -180,9 +180,9 @@ namespace i18n
             // creating the services instances.
             Container.Register<ITranslationRepository>(r => new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null)))); 
             Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
-            Container.Register<ITextLocalizer>(r => new TextLocalizer(TranslationRepositoryService)); 
+            Container.Register<ITextLocalizer>(r => new TextLocalizer(new i18nSettings(new WebConfigSettingService(null)), TranslationRepositoryService)); 
             Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer(UrlLocalizerService));
-            Container.Register<INuggetLocalizer>(r => new NuggetLocalizer(TextLocalizerForApp));
+            Container.Register<INuggetLocalizer>(r => new NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), TextLocalizerForApp));
                 // TextLocalizerForApp = re-use any cached TextLocalizer already instantiated.
                 // This prevents NuggetLocalizer using a different TextLocalizer instance from
                 // a client which calls TextLocalizerForApp directly. While it is dangerous to do this
