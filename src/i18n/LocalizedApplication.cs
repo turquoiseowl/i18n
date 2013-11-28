@@ -151,7 +151,7 @@ namespace i18n
         ///  And finally this may be followed by the following sequence:<br/>
         ///      zero or more whitespace then ";" then any number of any chars up to end of string.
         /// </remarks>
-        public Regex ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|json))(?:\s*;.*)?)$");
+        public Regex ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$");
         public LocalizedApplication()
         {
             Container = new Container();
