@@ -64,14 +64,45 @@ namespace i18n
         /// <summary>
         /// Checks if the response is already compressed.
         /// </summary>
-        /// <seealso href="http://stackoverflow.com/questions/444798/case-insensitive-containsstring"/>
         private bool IsResponseCompressed(HttpResponseBase response)
         {
-            if (response.Filter == null) {
-                return false; }
-            string filter = response.Filter.ToString();
-            return filter.Contains("gzip", StringComparison.OrdinalIgnoreCase)
-                || filter.Contains("deflate", StringComparison.OrdinalIgnoreCase);
+            if (HttpRuntime.UsingIntegratedPipeline)
+            {
+            // Establish whether the response has already been compressed e.g. gzip.
+            // In HTTP terms, that is indicated by the presence of the Content-Encoding
+            // header in the response e.g. "Content-Encoding: gzip".
+            // However, this is made difficult here by ASP.NET because of the way it
+            // excludes certain headers from the ResponseHttp.Headers array: specifically
+            // those that it manages through other members of HttpResponse.
+            // However, it appears that, although there is an HttpResponse.ContentEncoding property,
+            // this has nothing to do with the "Content-Encoding" header (the former being to do with
+            // character encoding and tghe latter with post-encoding like compression). Thus, the latter is
+            // not managed by HttpResponse object and so we interpret its presence
+            // to mean that the webapp or a previous response filter has specifically appended
+            // the header e.g. with:
+            //      context.Response.AppendHeader("Content-Encoding", "gzip");
+            // Thus, if a "Content-Encoding" header is absent (or set erroneously to something
+            // that suggests "no encoding") we assume the content has not been compressed.
+            // Ref: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.5
+            //
+                string ce = response.Headers.Get("Content-Encoding");
+                bool contentIsNotCompressed = string.IsNullOrEmpty(ce)
+                    || string.Compare(ce, "identity", StringComparison.OrdinalIgnoreCase) == 0
+                    || ce.StartsWith("utf", StringComparison.OrdinalIgnoreCase)
+                    || ce.StartsWith("unicode", StringComparison.OrdinalIgnoreCase);
+                return !contentIsNotCompressed;
+            }
+            else
+            {
+            // HACK alert: Asp.NET in classic mode app dopes not make this easy.
+            // http://stackoverflow.com/questions/5434858/can-i-detect-if-content-has-been-compressed-in-my-httpmodule
+            //
+                if (response.Filter == null) {
+                    return false; }
+                string filter = response.Filter.ToString();
+                return filter.Contains("gzip", StringComparison.OrdinalIgnoreCase)
+                    || filter.Contains("deflate", StringComparison.OrdinalIgnoreCase);
+            }
         }
 
     // Events handlers
@@ -107,31 +138,6 @@ namespace i18n
         //
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
-            // Establish whether the response has already been compressed e.g. gzip.
-            // In HTTP terms, that is indicated by the presence of the Content-Encoding
-            // header in the response e.g. "Content-Encoding: gzip".
-            // However, this is made difficult here by ASP.NET because of the way it
-            // excludes certain headers from the ResponseHttp.Headers array: specifically
-            // those that it manages through other members of HttpResponse.
-            // However, it appears that, although there is an HttpResponse.ContentEncoding property,
-            // this has nothing to do with the "Content-Encoding" header (the former being to do with
-            // character encoding and tghe latter with post-encoding like compression). Thus, the latter is
-            // not managed by HttpResponse object and so we interpret its presence
-            // to mean that the webapp or a previous response filter has specifically appended
-            // the header e.g. with:
-            //      context.Response.AppendHeader("Content-Encoding", "gzip");
-            // Thus, if a "Content-Encoding" header is absent (or set erroneously to something
-            // that suggests "no encoding") we assume the content has not been compressed.
-            // Ref: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.5
-/*
-            string ce = context.Response.Headers.Get("Content-Encoding");
-            if (ce != null) {
-                ce = ce.ToLowerInvariant(); }
-            bool contentIsNotCompressed = string.IsNullOrEmpty(ce)
-                || ce == "identity"
-                || ce.StartsWith("utf")
-                || ce.StartsWith("unicode");
- */
             bool contentIsNotCompressed = !IsResponseCompressed(context.Response);
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
