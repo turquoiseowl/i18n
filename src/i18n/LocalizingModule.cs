@@ -94,11 +94,34 @@ namespace i18n
         //
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
-
+            // Establish whether the response has already been compressed e.g. gzip.
+            // In HTTP terms, that is indicated by the presence of the Content-Encoding
+            // header in the response e.g. "Content-Encoding: gzip".
+            // However, this is made difficult here by ASP.NET because of the way it
+            // excludes certain headers from the ResponseHttp.Headers array: specifically
+            // those that it manages through other members of HttpResponse.
+            // However, it appears that, although there is an HttpResponse.ContentEncoding property,
+            // this has nothing to do with the "Content-Encoding" header (the former being to do with
+            // character encoding and tghe latter with post-encoding like compression). Thus, the latter is
+            // not managed by HttpResponse object and so we interpret its presence
+            // to mean that the webapp or a previous response filter has specifically appended
+            // the header e.g. with:
+            //      context.Response.AppendHeader("Content-Encoding", "gzip");
+            // Thus, if a "Content-Encoding" header is absent (or set erroneously to something
+            // that suggests "no encoding") we assume the content has not been compressed.
+            // Ref: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.5
+            string ce = context.Response.Headers.Get("Content-Encoding");
+            if (ce != null) {
+                ce = ce.ToLowerInvariant(); }
+            bool contentIsNotCompressed = string.IsNullOrEmpty(ce)
+                || ce == "identity"
+                || ce.StartsWith("utf")
+                || ce.StartsWith("unicode");
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
             // in the pipeline.
-            if (LocalizedApplication.Current.ContentTypesToLocalize != null
+            if (contentIsNotCompressed
+                && LocalizedApplication.Current.ContentTypesToLocalize != null
                 && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
                 context.Response.Filter = new ResponseFilter(
