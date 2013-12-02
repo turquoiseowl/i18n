@@ -18,6 +18,15 @@ namespace i18n
         }
 
         /// <summary>
+        /// Facilitates efficient, case-insensitive comparisons.
+        /// </summary>
+        /// <example>bool contains = title.Contains("string", StringComparison.OrdinalIgnoreCase);</example>
+        public static bool Contains(this string source, string toCheck, StringComparison comp)
+        {
+            return source.IndexOf(toCheck, comp) >= 0;
+        }
+
+        /// <summary>
         /// Efficiently returns the number of time the specified char appears in the string.
         /// </summary>
         public static int CountOfChar(

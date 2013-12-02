@@ -61,6 +61,19 @@ namespace i18n
 
     // Implementation
 
+        /// <summary>
+        /// Checks if the response is already compressed.
+        /// </summary>
+        /// <seealso href="http://stackoverflow.com/questions/444798/case-insensitive-containsstring"/>
+        private bool IsResponseCompressed(HttpResponseBase response)
+        {
+            if (response.Filter == null) {
+                return false; }
+            string filter = response.Filter.ToString();
+            return filter.Contains("gzip", StringComparison.OrdinalIgnoreCase)
+                || filter.Contains("deflate", StringComparison.OrdinalIgnoreCase);
+        }
+
     // Events handlers
 
         /// <summary>
@@ -110,6 +123,7 @@ namespace i18n
             // Thus, if a "Content-Encoding" header is absent (or set erroneously to something
             // that suggests "no encoding") we assume the content has not been compressed.
             // Ref: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.5
+/*
             string ce = context.Response.Headers.Get("Content-Encoding");
             if (ce != null) {
                 ce = ce.ToLowerInvariant(); }
@@ -117,6 +131,8 @@ namespace i18n
                 || ce == "identity"
                 || ce.StartsWith("utf")
                 || ce.StartsWith("unicode");
+ */
+            bool contentIsNotCompressed = !IsResponseCompressed(context.Response);
             // If the content type of the entity is eligible for processing...wire up our filter
             // to do the processing. The entity data will be run through the filter a bit later on
             // in the pipeline.
