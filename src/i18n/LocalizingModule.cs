@@ -53,7 +53,7 @@ namespace i18n
             
             // Wire up our event handlers into the ASP.NET pipeline.
             application.BeginRequest        += OnBeginRequest;
-            application.ReleaseRequestState += OnReleaseRequestState;
+            application.PostReleaseRequestState += OnPostReleaseRequestState;
         }
         public void Dispose() {}
 
@@ -129,11 +129,11 @@ namespace i18n
         }
 
         /// <summary>
-        /// Handler for the ReleaseRequestState ASP.NET request pipeline event.
+        /// Handler for the PostReleaseRequestState ASP.NET request pipeline event.
         /// This event occurs late on in the pipeline but prior to the response being filtered.
         /// We take the opportunity to inject our i8n post-processing of the response.
         /// </summary>
-        private void OnReleaseRequestState(object sender, EventArgs e)
+        private void OnPostReleaseRequestState(object sender, EventArgs e)
         {
         //
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
