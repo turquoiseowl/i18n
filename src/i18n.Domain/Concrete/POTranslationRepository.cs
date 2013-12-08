@@ -281,6 +281,7 @@ namespace i18n.Domain.Concrete
 					}
 
 					stream.WriteLine("msgid \"" + escape(item.MsgId) + "\"");
+					stream.WriteLine("msgstr \"\"");
 					stream.WriteLine("");
 				}
 			}
