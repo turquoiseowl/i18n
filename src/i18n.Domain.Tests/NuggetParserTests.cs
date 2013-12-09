@@ -11,7 +11,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
            // Act.
             Nugget nugget = nuggetParser.BreakdownNugget(nuggetString);
            // Assert.
@@ -47,7 +47,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello]]]</p><p>[[[there]]]</p>";
            // Act.
             nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget1, string entity1)
@@ -67,7 +67,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello|||{0}]]]</p><p>[[[there]]]</p>";
            // Act.
             nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget1, string entity1)
@@ -87,7 +87,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello|||{0}]]]</p><p>[[[there|||{0}|||{1}///comment comment comment]]]</p>";
            // Act.
             nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget1, string entity1)
@@ -130,7 +130,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[[", "]]]]]", "||", "//");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[[hello||{0}]]]]]</p><p>[[[[there||{0}||{1}//comment comment comment]]]]]</p>";
            // Act.
             CanParseEntity_CustomNuggetTokens_Act(entity, nuggetParser);
@@ -141,7 +141,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[:", ":]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[:hello|||{0}:]]]</p><p>[[[:there|||{0}|||{1}///comment comment comment:]]]</p>";
            // Act.
             CanParseEntity_CustomNuggetTokens_Act(entity, nuggetParser);
@@ -152,7 +152,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("```", "'''", "###", "@@@");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>```hello###{0}'''</p><p>```there###{0}###{1}@@@comment comment comment'''</p>";
            // Act.
             CanParseEntity_CustomNuggetTokens_Act(entity, nuggetParser);
@@ -163,7 +163,7 @@ namespace i18n.Domain.Tests
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            NuggetParser nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello\r\n%0|||{0}]]]</p><p>[[[there]]]</p>";
            // Act.
             int i = 0;
@@ -187,20 +187,33 @@ namespace i18n.Domain.Tests
         }
 
         [TestMethod]
-        [Description("Issue #110: Parsing an empty parameter should not leave delimiters intact.")]
-        public void NuggetParser_CanParseEntity_EmptyParam() {
+        [Description("Issue #110: Parsing a nugget with empty parameter in Response should not leave delimiters intact.")]
+        public void NuggetParser_ResponseMode_CanParseEntity_EmptyParam() {
             var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
-            var nuggetParser = new NuggetParser(nuggetTokens);
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
             var input = "[[[Title: %0|||]]]";
             var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
                 Assert.IsTrue(nugget.IsFormatted);
-
                 var message = NuggetLocalizer.ConvertIdentifiersInMsgId(nugget.MsgId);
                 message = String.Format(message, nugget.FormatItems);
                 return message;
             });
 
             Assert.AreEqual("Title: ", result);
+        }
+
+        [TestMethod]
+        [Description("Issue #110: Parsing a nugget with empty parameter in Source should leave delimiters intact.")]
+        public void NuggetParser_SourceMode_CanParseEntity_EmptyParam() {
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
+            var input = "[[[Title: %0|||]]]";
+            var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
+                Assert.IsFalse(nugget.IsFormatted);
+                return nugget.MsgId;
+            });
+
+            Assert.AreEqual("Title: %0|||", result);
         }
     }
 }

@@ -29,7 +29,8 @@ namespace i18n
 			    _settings.NuggetBeginToken,
 			    _settings.NuggetEndToken,
 			    _settings.NuggetDelimiterToken,
-			    _settings.NuggetCommentToken));
+			    _settings.NuggetCommentToken),
+                NuggetParser.Context.SourceProcessing);
         }
 
     #region [INuggetLocalizer]

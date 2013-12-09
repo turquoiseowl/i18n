@@ -120,6 +120,17 @@ namespace i18n.Helpers
         NuggetTokens m_nuggetTokens;
 
         /// <summary>
+        /// Nuggets may be parsed during the different stages as enumerated here.
+        /// </summary>
+        public enum Context { SourceProcessing, ResponseProcessing };
+
+        /// <summary>
+        /// Specifies whether the nugget is being parsed as part of source processing
+        /// or response processing.
+        /// </summary>
+        Context m_context;
+
+        /// <summary>
         /// Initialized during CON to a regex suitable for breaking down a nugget into its component parts,
         /// as defined by the NuggetTokens definition passed to the CON.
         /// </summary>
@@ -128,17 +139,20 @@ namespace i18n.Helpers
     // Con
 
         public NuggetParser(
-		    NuggetTokens nuggetTokens)
+		    NuggetTokens nuggetTokens,
+            Context context)
         {
             m_nuggetTokens = nuggetTokens;
+            m_context = context;
            // Prep the regexes. We escape each token char to ensure it is not misinterpreted.
            // · Breakdown e.g. "\[\[\[(.+?)(?:\|\|\|(.+?))*(?:\/\/\/(.+?))?\]\]\]"
             m_regexNuggetBreakdown = new Regex(
-                string.Format(@"{0}(.+?)(?:{1}(.*?))*(?:{2}(.+?))?{3}",
+                string.Format(@"{0}(.+?)(?:{1}(.{4}?))*(?:{2}(.+?))?{3}",
                     EscapeString(m_nuggetTokens.BeginToken), 
                     EscapeString(m_nuggetTokens.DelimiterToken), 
                     EscapeString(m_nuggetTokens.CommentToken), 
-                    EscapeString(m_nuggetTokens.EndToken)), 
+                    EscapeString(m_nuggetTokens.EndToken),
+                    m_context == Context.SourceProcessing ? "+" : "*"), 
                 RegexOptions.CultureInvariant 
                     | RegexOptions.Singleline);
                         // RegexOptions.Singleline in fact enable multi-line nuggets.
@@ -229,6 +243,9 @@ namespace i18n.Helpers
                 n.FormatItems = new string[formatItems.Count];
                 int i = 0;
                 foreach (Capture capture in formatItems) {
+                    if (m_context == Context.SourceProcessing
+                        && !capture.Value.IsSet()) {
+                        return null; } // bad format
                     n.FormatItems[i++] = capture.Value;
                 }
             }
