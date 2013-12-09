@@ -155,8 +155,10 @@ namespace i18n
                 return url; }
 
             // If absolute url (include host and optionally scheme)
+            // NOTE: The check for .IsFile is meant for Mono systems where "/my-path/" is
+            //       a valid absolute path. It'll be resolved to "file:///my-path/".
             Uri uri;
-            if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
+            if (Uri.TryCreate(url, UriKind.Absolute, out uri) && !uri.IsFile) {
                 UriBuilder ub = new UriBuilder(url);
                 ub.Path = ub.Path.UrlPrependPath(folder);
                 return ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
