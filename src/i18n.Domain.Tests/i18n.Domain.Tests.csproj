@@ -8,6 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>i18n.Domain.Tests</RootNamespace>
     <AssemblyName>i18n.Domain.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -57,10 +58,6 @@
     <ProjectReference Include="..\i18n.Domain\i18n.Domain.csproj">
       <Project>{bc2104ab-dc34-45b3-ab4d-3035f11fbdb8}</Project>
       <Name>i18n.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\i18n\i18n.csproj">
-      <Project>{E7A9BBA3-8A95-492C-8806-4DE63C1DBA06}</Project>
-      <Name>i18n</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

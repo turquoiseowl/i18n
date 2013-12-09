@@ -134,7 +134,7 @@ namespace i18n.Helpers
            // Prep the regexes. We escape each token char to ensure it is not misinterpreted.
            // · Breakdown e.g. "\[\[\[(.+?)(?:\|\|\|(.+?))*(?:\/\/\/(.+?))?\]\]\]"
             m_regexNuggetBreakdown = new Regex(
-                string.Format(@"{0}(.+?)(?:{1}(.*?))*(?:{2}(.+?))?{3}",
+                string.Format(@"{0}(.+?)(?:{1}(.+?))*(?:{2}(.+?))?{3}",
                     EscapeString(m_nuggetTokens.BeginToken), 
                     EscapeString(m_nuggetTokens.DelimiterToken), 
                     EscapeString(m_nuggetTokens.CommentToken), 
@@ -229,6 +229,8 @@ namespace i18n.Helpers
                 n.FormatItems = new string[formatItems.Count];
                 int i = 0;
                 foreach (Capture capture in formatItems) {
+                    if (!capture.Value.IsSet()) {
+                        return null; } // bad format
                     n.FormatItems[i++] = capture.Value;
                 }
             }
