@@ -185,5 +185,22 @@ namespace i18n.Domain.Tests
                 return null;
             });
         }
+
+        [TestMethod]
+        [Description("Issue #110: Parsing an empty parameter should not leave ']]]' intact.")]
+        public void NuggetParser_CanParseEntity_EmptyParam() {
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            var nuggetParser = new NuggetParser(nuggetTokens);
+            var input = "[[[Title: %0|||]]]";
+            var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
+                Assert.IsTrue(nugget.IsFormatted);
+
+                var message = NuggetLocalizer.ConvertIdentifiersInMsgId(nugget.MsgId);
+                message = String.Format(message, nugget.FormatItems);
+                return message;
+            });
+
+            Assert.AreEqual("Title: ", result);
+        }
     }
 }
