@@ -1,3 +1,5 @@
+#### [Update 20131213 -- v1 of i18n library has reached end-of-life. The v2 branch contains the latest, supported version.]
+
 # i18n
 ## Smart internationalization for .NET web apps
 ```
