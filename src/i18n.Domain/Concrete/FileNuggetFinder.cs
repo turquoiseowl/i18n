@@ -18,7 +18,7 @@ namespace i18n.Domain.Concrete
 
 		public FileNuggetFinder(i18nSettings settings)
 		{
-			_settings = settings;
+            _settings = settings;
             _nuggetParser = new NuggetParser(new NuggetTokens(
 			    _settings.NuggetBeginToken,
 			    _settings.NuggetEndToken,
@@ -46,52 +46,51 @@ namespace i18n.Domain.Concrete
 			{
 				foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
 				{
-					blacklistFound = false;
-                    try
+                    if (filePath.Length >= 260)
                     {
-                        currentFullPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
-                        foreach (var blackItem in _settings.BlackList)
+                        Console.WriteLine("Path too long to process. Path: " + filePath);
+                        continue;
+                    }
+
+					blacklistFound = false;
+                    currentFullPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
+                    foreach (var blackItem in _settings.BlackList)
+                    {
+                        if (currentFullPath == null || currentFullPath.StartsWith(blackItem, StringComparison.OrdinalIgnoreCase))
                         {
-                            if (currentFullPath == null || currentFullPath.StartsWith(blackItem, StringComparison.OrdinalIgnoreCase))
-                            {
-                                //this is a file that is under a blacklisted directory so we do not parse it.
-                                blacklistFound = true;
-                                break;
-                            }
-                        }
-                        if (!blacklistFound)
-                        {
-
-
-                            //we check every filePath against our white list. if it's on there in at least one form we check it.
-                            foreach (var whiteListItem in fileWhiteList)
-                            {
-                                //We have a catch all for a filetype
-                                if (whiteListItem.StartsWith("*."))
-                                {
-                                    if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
-                                    {
-                                        //we got a match
-                                        ParseFile(filePath, templateItems);
-                                        break;
-                                    }
-                                }
-                                else //a file, like myfile.js
-                                {
-                                    if (Path.GetFileName(filePath) == whiteListItem)
-                                    {
-                                        //we got a match
-                                        ParseFile(filePath, templateItems);
-                                        break;
-                                    }
-                                }
-                            }
-
+                            //this is a file that is under a blacklisted directory so we do not parse it.
+                            blacklistFound = true;
+                            break;
                         }
                     }
-                    catch (PathTooLongException ex)
+                    if (!blacklistFound)
                     {
-                        Console.WriteLine("Skipping path that was too long: " + filePath);
+
+
+                        //we check every filePath against our white list. if it's on there in at least one form we check it.
+                        foreach (var whiteListItem in fileWhiteList)
+                        {
+                            //We have a catch all for a filetype
+                            if (whiteListItem.StartsWith("*."))
+                            {
+                                if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
+                                {
+                                    //we got a match
+                                    ParseFile(filePath, templateItems);
+                                    break;
+                                }
+                            }
+                            else //a file, like myfile.js
+                            {
+                                if (Path.GetFileName(filePath) == whiteListItem)
+                                {
+                                    //we got a match
+                                    ParseFile(filePath, templateItems);
+                                    break;
+                                }
+                            }
+                        }
+
                     }
 				}
 			}
