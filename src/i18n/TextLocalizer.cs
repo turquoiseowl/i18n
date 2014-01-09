@@ -225,6 +225,7 @@ namespace i18n
 			if (messages == null)
 			{
 				LoadMessagesIntoCache(langtag);
+                messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
 			}
 
             if (messages == null
