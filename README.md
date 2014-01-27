@@ -464,7 +464,12 @@ which follows:
         }
         // Owise...delete any 'language' cookie in the client.
         else {
-            Response.Cookies["i18n.langtag"].FlagForRemoval(); }
+            var cookie = Response.Cookies["i18n.langtag"];
+            if (cookie != null) {
+                cookie.Value = null;
+                cookie.Expires = DateTime.UtcNow.AddMonths(-1);
+            }
+        }
         // Update PAL setting so that new language is reflected in any URL patched in the 
         // response (Late URL Localization).
         HttpContext.SetPrincipalAppLanguageForRequest(lt);
@@ -472,8 +477,9 @@ which follows:
         if (returnUrl.IsSet()) {
             returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
         // Redirect user agent as approp.
-        return this.RedirectWithSubSite(returnUrl);
+        return this.Redirect(returnUrl);
     }
+
 ```
 
 ### Language Matching
