@@ -19,11 +19,14 @@ namespace i18n.Domain.Concrete
 			_settingService = settings;
 		}
 
+	    public String ProjectDirectory {
+	        get { return Path.GetDirectoryName(_settingService.GetConfigFileLocation()); }
+	    }
+
 		private string GetPrefixedString(string key)
 		{
 			return _prefix + key;
 		}
-
 
 		private string MakePathAbsoluteAndFromConfigFile(string path)
 		{
