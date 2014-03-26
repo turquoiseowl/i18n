@@ -76,7 +76,7 @@ namespace i18n.Domain.Concrete
                                 if (Path.GetExtension(filePath) == whiteListItem.Substring(1))
                                 {
                                     //we got a match
-                                    ParseFile(filePath, templateItems);
+                                    ParseFile(_settings.ProjectDirectory, filePath, templateItems);
                                     break;
                                 }
                             }
@@ -85,7 +85,7 @@ namespace i18n.Domain.Concrete
                                 if (Path.GetFileName(filePath) == whiteListItem)
                                 {
                                     //we got a match
-                                    ParseFile(filePath, templateItems);
+                                    ParseFile(_settings.ProjectDirectory, filePath, templateItems);
                                     break;
                                 }
                             }
@@ -98,8 +98,12 @@ namespace i18n.Domain.Concrete
 			return templateItems;
 		}
 
-		private void ParseFile(string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
+		private void ParseFile(string projectDirectory, string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
         {
+            var referencePath = (projectDirectory != null) && filePath.StartsWith(projectDirectory, StringComparison.OrdinalIgnoreCase)
+                ? filePath.Substring(projectDirectory.Length + 1)
+                : filePath;
+
             DebugHelpers.WriteLine("FileNuggetFinder.ParseFile -- {0}", filePath);
            // Lookup any/all nuggets in the file and for each add a new template item.
 			using (var fs = File.OpenText(filePath))
@@ -107,7 +111,7 @@ namespace i18n.Domain.Concrete
                 _nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
                 {
 				    AddNewTemplateItem(
-                        filePath, 
+                        referencePath, 
                         i_entity.LineFromPos(pos), 
                         nugget, 
                         templateItems);
