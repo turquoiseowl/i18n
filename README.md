@@ -353,7 +353,7 @@ The PAL for the request is determined by the first of the following conditions t
 
 4. The request contains an Accept-Language header with a language that matches (exactly or loosely) one of the application languages.
 
-5. The default application language is selected.
+5. The default application language is selected (see also [Per-Request Default Language Determination](#per-request-default-language-determination)).
 
 Where a *loose* match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
@@ -371,6 +371,38 @@ the current langue to the user:
         </p>
     </div>
 ```
+
+### Per-Request Default Language Determination
+
+When the PAL algorithm falls back on the default language for the application, i18n supports a
+simple delegate-based hook for providing the default language based on the current request,
+typically based on the URL.
+
+For example, suppose you wish the default language to vary as follows:
+
+1. mydomain.co.uk -> 'en'
+2. mydomain.fr -> 'fr'
+
+This can be achieved as follows:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        i18n.LocalizedApplication.Current.DefaultLanguage = "en";
+        i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;
+        i18n.UrlLocalizer.DetermineDefaultLanguageFromRequest = delegate(HttpContextBase context)
+        {
+            if (context != null && context.Request.Url.Host.EndsWith(".fr", StringComparison.OrdinalIgnoreCase)) {
+                return i18n.LanguageTag.GetCachedInstance("fr"); }
+            return i18n.LocalizedApplication.Current.DefaultLanguageTag;
+        };
+    }
+```
+
+Notice how the URL localization scheme has been switched to Scheme2 which allows the URL
+to be without any language tag. The default scheme (Scheme1) would enforce a redirection
+so that the URL always contains the current language tag.
 
 ### Explicit User Language Selection
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace i18n
 {
@@ -16,10 +17,13 @@ namespace i18n
         /// and redirected, whether or not the language is the app-default.
         /// </summary>
         /// <remarks>
-        /// E.g. if selected language for the request is en then
+        /// E.g. if selected language for the request is 'fr' then
         /// <para>
-        /// example.com -> example.com/fr
-        /// example.com/fr -> example.com/fr
+        /// example.com    -> example.com/fr<br/>
+        /// example.com/fr -> example.com/fr<br/>
+        /// </para>
+        /// <para>
+        /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
         Scheme1,
@@ -28,10 +32,13 @@ namespace i18n
         /// Everything to be explicit except the default language which MAY be implicit.
         /// </summary>
         /// <remarks>
-        /// E.g. if selected language for the request is en then
+        /// E.g. if selected language for the request is 'fr' then
         /// <para>
-        /// example.com -> example.com/fr
-        /// example.com/fr -> example.com/fr
+        /// example.com    -> example.com<br/>
+        /// example.com/fr -> example.com/fr<br/>
+        /// </para>
+        /// <para>
+        /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
         Scheme2,
@@ -40,10 +47,13 @@ namespace i18n
         /// Everything to be explicit except the default language which MUST be implicit.
         /// </summary>
         /// <remarks>
-        /// E.g. if selected language for the request is en then
+        /// E.g. if selected language for the request is 'fr' then
         /// <para>
-        /// example.com -> example.com
-        /// example.com/fr -> example.com
+        /// example.com    -> example.com<br/>
+        /// example.com/fr -> example.com<br/>
+        /// </para>
+        /// <para>
+        /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
         Scheme3,
@@ -110,6 +120,42 @@ namespace i18n
         /// </remarks>
         public static OutgoingUrlFilter OutgoingUrlFilters { get; set; }
 
+        /// <summary>
+        /// Describes a procedure for determining the default language tag for the current request.
+        /// </summary>
+        /// <param name="context">
+        /// Describes the current request.
+        /// </param>
+        /// <returns>The language tag to be considered as the default for the current request.</returns>
+        /// <remarks>
+        /// <see cref="UrlLocalizer.DetermineDefaultLanguageFromRequest"/>
+        /// </remarks>
+        public delegate LanguageTag DetermineDefaultLanguageFromRequestProc(HttpContextBase context);
+
+        /// <summary>
+        /// Registers the procedure used by instances of this class for determining the 
+        /// default language tag for the current request.
+        /// </summary>
+        /// <remarks>
+        /// This deleagate is part of facilitating a level of indirection over simply reading 
+        /// LocalizedApplication.Current.DefaultLanguage when wanting the default language,
+        /// thereby allowing for the default language to be varied per URL e.g. per domain extension.
+        /// <br/>
+        /// The default implementation is set in the static constructor and simply returns
+        /// LocalizedApplication.Current.DefaultLanguageTag.
+        /// </remarks>
+        public static DetermineDefaultLanguageFromRequestProc DetermineDefaultLanguageFromRequest { get; set; }
+
+        static UrlLocalizer()
+        {
+            // Register default per-class method for deriving the default langtag
+            // for the current request.
+            DetermineDefaultLanguageFromRequest = delegate(HttpContextBase context)
+            {
+                return LocalizedApplication.Current.DefaultLanguageTag;
+            };
+        }
+
     #region [IUrlLocalizer]
 
         public bool FilterIncoming(Uri url)
@@ -153,7 +199,7 @@ namespace i18n
             return true;
         }
         
-        public string ExtractLangTagFromUrl(string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
+        public string ExtractLangTagFromUrl(HttpContextBase context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
         {
             string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url, uriKind);
 
@@ -169,7 +215,7 @@ namespace i18n
                 {
                     // If the URL is nonlocalized incoming URL, this implies default language.
                     if (result == null && incomingUrl) {
-                        result = LocalizedApplication.Current.DefaultLanguage;
+                        result = DetermineDefaultLanguageFromRequest(context).ToString();
                         urlPatched = url;
                     }
                     break;
@@ -188,13 +234,13 @@ namespace i18n
 
             return result;
         }
-        public string SetLangTagInUrlPath(string url, UriKind uriKind, string langtag)
+        public string SetLangTagInUrlPath(HttpContextBase context, string url, UriKind uriKind, string langtag)
         {
             switch (UrlLocalizationScheme)
             {
                 case UrlLocalizationScheme.Scheme2:
                 {
-                    if (LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
+                    if (DetermineDefaultLanguageFromRequest(context).Equals(langtag)) {
                         return url; }
                     break;
                 }

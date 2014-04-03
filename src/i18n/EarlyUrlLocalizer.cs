@@ -32,7 +32,7 @@ namespace i18n
 
             // NO. Is request URL localized?
             string urlNonlocalized;
-            string langtag = m_urlLocalizer.ExtractLangTagFromUrl(context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
+            string langtag = m_urlLocalizer.ExtractLangTagFromUrl(context, context.Request.RawUrl, UriKind.Relative, true, out urlNonlocalized);
             if (langtag == null)
             {
                 // NO.
@@ -117,7 +117,7 @@ namespace i18n
                     string hdrval = context.Response.Headers[hdr];
                     if (!hdrval.IsSet()) {
                         continue; }
-                    string urlNew = LocalizeUrl(hdrval, langtag, requestUrl, true);
+                    string urlNew = LocalizeUrl(context, hdrval, langtag, requestUrl, true);
                     if (urlNew == null) {
                         continue; }
                     context.Response.Headers[hdr] = urlNew;
@@ -131,7 +131,7 @@ namespace i18n
                 {
                     try {
                         string url = match.Groups[2].Value;
-                        string urlNew = LocalizeUrl(url, langtag, requestUrl, false);
+                        string urlNew = LocalizeUrl(context, url, langtag, requestUrl, false);
                         // If URL was not changed...leave matched token alone.
                         if (urlNew == null) {
                             return match.Groups[0].Value; } // original
@@ -177,7 +177,7 @@ namespace i18n
             IUrlLocalizer m_urlLocalizer)
         {
             // Construct localized URL.
-            string urlNew = m_urlLocalizer.SetLangTagInUrlPath(context.Request.RawUrl, UriKind.Relative, langtag);
+            string urlNew = m_urlLocalizer.SetLangTagInUrlPath(context, context.Request.RawUrl, UriKind.Relative, langtag);
 
             // Redirect user agent to new local URL.
             if (LocalizedApplication.Current.PermanentRedirects) {
@@ -204,11 +204,11 @@ namespace i18n
         /// either because it was already localized, or because it is from another host, or is explicitly
         /// excluded from localization by the filter.
         /// </returns>
-        protected string LocalizeUrl(string url, string langtag, Uri requestUrl, bool incomingUrl)
+        protected string LocalizeUrl(HttpContextBase context, string url, string langtag, Uri requestUrl, bool incomingUrl)
         {
             // If URL is already localized...leave matched token alone.
             string urlNonlocalized;
-            if (m_urlLocalizer.ExtractLangTagFromUrl(url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
+            if (m_urlLocalizer.ExtractLangTagFromUrl(context, url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
                 return null; } // original
 
             // If URL is not local (i.e. remote host)...leave matched token alone.
@@ -220,7 +220,7 @@ namespace i18n
                 return null; } // original
 
             // Localize the URL.
-            return m_urlLocalizer.SetLangTagInUrlPath(url, UriKind.RelativeOrAbsolute, langtag);
+            return m_urlLocalizer.SetLangTagInUrlPath(context, url, UriKind.RelativeOrAbsolute, langtag);
         }
     }
 }
