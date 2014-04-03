@@ -507,7 +507,7 @@ which follows:
         HttpContext.SetPrincipalAppLanguageForRequest(lt);
         // Patch in the new langtag into any return URL.
         if (returnUrl.IsSet()) {
-            returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
+            returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(HttpContext, returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
         // Redirect user agent as approp.
         return this.Redirect(returnUrl);
     }

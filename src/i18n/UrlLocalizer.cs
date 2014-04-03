@@ -124,7 +124,7 @@ namespace i18n
         /// Describes a procedure for determining the default language tag for the current request.
         /// </summary>
         /// <param name="context">
-        /// Describes the current request.
+        /// Describes the current request. May be null if called outside of any request.
         /// </param>
         /// <returns>The language tag to be considered as the default for the current request.</returns>
         /// <remarks>
