@@ -137,11 +137,11 @@ namespace i18n
         public bool PermanentRedirects { get; set; }
 
         /// <summary>
-        /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
+        /// Regular expression that controls the ContextTypes elligible for response localization.
         /// </summary>
         /// <remarks>
         /// Set to null to disable Late URL Localization.<br/>
-        /// Defaults to @"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|json))(?:\s*;.*)?)$").<br/>
+        /// Defaults to @"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$.<br/>
         /// Client may customise this member, for instance in Application_Start.<br/>
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.<br/>
         /// Explanation of the default regex:<br/>
