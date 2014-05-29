@@ -345,6 +345,8 @@ Language (PAL) for the request.
 
 The PAL for the request is determined by the first of the following conditions that is met:
 
+For i18n.UrlLocalizationScheme.Scheme1:
+
 1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
 
 2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages (see below).
@@ -354,6 +356,14 @@ The PAL for the request is determined by the first of the following conditions t
 4. The request contains an Accept-Language header with a language that matches (exactly or loosely) one of the application languages.
 
 5. The default application language is selected (see also [Per-Request Default Language Determination](#per-request-default-language-determination)).
+
+For i18n.UrlLocalizationScheme.Scheme2:
+
+1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
+
+2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages (see below).
+
+3. The default application language is selected (see also [Per-Request Default Language Determination](#per-request-default-language-determination)).
 
 Where a *loose* match is made above, the URL is updated with the matched application language tag
 and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
