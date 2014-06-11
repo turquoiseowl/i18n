@@ -524,6 +524,40 @@ which follows:
 
 ```
 
+### How to get a translation of a nugget in your C# code
+
+With i18n you can access the translation for a given nugget msgid from any of your code that is handling a request
+by using the GetText extension method to HttpContextBase in the i18n namespace. For example, you can do the following
+from within an MVC controller action:
+
+
+```
+using System;
+using System.Web.Mvc;
+using i18n;
+
+namespace MyWebSite.Controllers
+{
+    public class MyController : Controller
+    {
+        public ActionResult Welcome()
+        {
+            string welcomeMessage = HttpContext.GetText("Welcome to the my website.", "");
+
+            // Do something with the string...
+
+            return View();
+        }
+    }
+}
+
+```
+
+Essentially, anywhere you have access to an HttpContextBase or HttpContext instance, you can get a correct
+translation for a given nugget msgid / msgcomment combo. (The msgcomment is relevant only when 
+i18n.Domain.Concrete.i18nSettings.MessageContextEnabledFromComment is set to true; by default this is
+not the case.)
+
 ### Language Matching
 
 Language matching is performed when a list of one or more user-preferred languages is matched against
