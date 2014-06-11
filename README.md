@@ -526,9 +526,10 @@ which follows:
 
 ### How to get a translation of a nugget in your C# code
 
-With i18n you can access the translation for a given nugget msgid from any of your code that is handling a request
-by using the GetText extension method to HttpContextBase in the i18n namespace. For example, you can do the following
-from within an MVC controller action:
+With i18n you can access the translation for a given nugget msgid from any code that is handling an ASP.NET request.
+There is a ```GetText``` extension method to HttpContextBase provided for this.
+
+For example, you can do the following from within an MVC controller action:
 
 
 ```
@@ -554,9 +555,10 @@ namespace MyWebSite.Controllers
 ```
 
 Essentially, anywhere you have access to an HttpContextBase or HttpContext instance, you can get a correct
-translation for a given nugget msgid / msgcomment combo. (The msgcomment is relevant only when 
-i18n.Domain.Concrete.i18nSettings.MessageContextEnabledFromComment is set to true; by default this is
-not the case.)
+translation for a given nugget msgid / msgcomment combo.
+
+The msgcomment is relevant only when i18n.Domain.Concrete.i18nSettings.MessageContextEnabledFromComment is set to true;
+by default it is false and so msgcomment argument should be passed as null or empty.
 
 ### Language Matching
 
