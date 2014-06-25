@@ -152,6 +152,18 @@ namespace i18n
         ///      zero or more whitespace then ";" then any number of any chars up to end of string.
         /// </remarks>
         public Regex ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$");
+
+        /// <summary>
+        /// Regular expression that excludes certain URL paths from being localized.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to excluding all less and css files and any URLs containing the phrases i18nSkip, glimpse, trace or elmah (case-insensitive)<br/>
+        /// Clients may customise this member in Application_Start<br/>
+        /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.<br/>
+        /// </remarks>
+        public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
+
+
         public LocalizedApplication()
         {
             Container = new Container();
