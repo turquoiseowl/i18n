@@ -95,24 +95,17 @@ namespace i18n
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
-            // wire up our filter to do the processing. The entity data will be run through the filter a
-            // bit later on in the pipeline.
-            if ((LocalizedApplication.Current.ContentTypesToLocalize != null
-                    && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
-                &&
-                (LocalizedApplication.Current.UrlsToExcludeFromProcessing != null
-                    && LocalizedApplication.Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) == false) // Exclude certain URLs from being processed
-                {
+            // If the content type of the entity is eligible for processing...wire up our filter
+            // to do the processing. The entity data will be run through the filter a bit later on
+            // in the pipeline.
+            if (LocalizedApplication.Current.ContentTypesToLocalize != null
+                && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
                 context.Response.Filter = new ResponseFilter(
                     context, 
                     context.Response.Filter,
                     m_rootServices.EarlyUrlLocalizerForApp,
                     m_rootServices.NuggetLocalizerForApp);
-                }
-            else {
-                DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- No content-type match ({0}). Bypassing filter.",context.Response.ContentType);
             }
         }
     }
