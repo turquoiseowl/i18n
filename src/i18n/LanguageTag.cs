@@ -67,7 +67,7 @@ namespace i18n
         }
     // Data
         static readonly Regex m_regex_parseLangtag = new Regex(
-            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\+([a-zA-Z0-9]{4,}))?$", 
+            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", 
             RegexOptions.CultureInvariant);
             // ([a-zA-Z]{2})
             //      Matches language.
@@ -123,9 +123,9 @@ namespace i18n
         /// </summary>
         public string Region { get; private set; }
         /// <summary>
-        /// Optional Variation subtag.
+        /// Optional PrivateUse subtag.
         /// </summary>
-        public string Variation { get; private set; }        /// <summary>
+        public string PrivateUse { get; private set; }        /// <summary>
         /// Unique string per language which is suitable for using as a key in global
         /// caches such as HttpRuntime.Cache. Inited during construction.
         /// </summary>
@@ -180,13 +180,18 @@ namespace i18n
                 Language = match.Groups[1].Value;
                 Script   = match.Groups[2].Value;
                 Region   = match.Groups[3].Value;
-                Variation = match.Groups[4].Value;
+                PrivateUse = match.Groups[4].Value;
             }
            // Load any parent:
+           // l-s-r+v -> l-s-r
            //   l-s-r -> l-s
            //   l-r   -> l
            //   l-s   -> l
            //   l     -> no parent
+            if (Region.IsSet() && Script.IsSet() && PrivateUse.IsSet())
+            {
+                m_parent = GetCachedInstance(string.Format("{0}-{1}-{2}", Language, Script, Region));
+            }
             if (Region.IsSet() && Script.IsSet()) {
                 m_parent = GetCachedInstance(string.Format("{0}-{1}", Language, Script)); }
             else if (Script.IsSet() || Region.IsSet()) {
@@ -197,9 +202,9 @@ namespace i18n
             GlobalKey = string.Format("po:{0}", m_langtag).ToLowerInvariant();
            //
             try {
-                if (Variation.IsSet())
+                if (PrivateUse.IsSet())
                 {   // Strip out the variation to allow CultureInfo to be set, based on the rest of the language tag
-                    CultureInfo = new CultureInfo(langtag.Replace("+"+Variation,string.Empty));
+                    CultureInfo = new CultureInfo(langtag.Replace("-x-" + PrivateUse, string.Empty));
                 }
                 else
                 {
@@ -343,7 +348,7 @@ namespace i18n
         /// 
         /// AA. Variation match (100). This reduces all scores below.
         ///     All four subtags match, ie including variation
-        /// AA. Variation language match (100) [ en+ACME, en-GB+ACME ]. This reduces all scores below.
+        /// REMOVED because not implemented properly. Need to account for empty variation tags. AB.  Variation language match (100) [ en+ACME, en-GB+ACME ]. This reduces all scores below.
         ///     All four subtags match, ie including variation
         /// A. Exact match (100) 
         ///     All three subtags match.
@@ -373,25 +378,21 @@ namespace i18n
             if (i_rhs == null) {
                 throw new ArgumentNullException("i_rhs"); }
            // Init.
-            bool[] L = { 0 == string.Compare(Language, i_rhs.Language, true), Language.IsSet(), i_rhs.Language.IsSet() };
-            bool[] S = { 0 == string.Compare(Script  , i_rhs.Script  , true), Script  .IsSet(), i_rhs.Script  .IsSet() };
-            bool[] R = { 0 == string.Compare(Region  , i_rhs.Region  , true), Region  .IsSet(), i_rhs.Region  .IsSet() };
-            bool[] V = { 0 == string.Compare(Variation, i_rhs.Variation, true), Variation.IsSet(), i_rhs.Variation.IsSet() };
+            bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
+            bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
+            bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true), Region   .IsSet(), i_rhs.Region   .IsSet() };
+            bool[] V = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
             int score = 100;
            // Logic.
            // F.
             if (!L[0]) {
                 return 0; }
+
            // AA
             if (S[0] && R[0] && V[0]) {
                 return score; }
             --score;
-           // AB
-            if (S[0] && V[0])
-            {
-                return score;
-            }
-            --score;
+           
            // A.
             if (matchGrade != MatchGrade.ExactMatch)
             {
