@@ -67,7 +67,7 @@ namespace i18n
         }
     // Data
         static readonly Regex m_regex_parseLangtag = new Regex(
-            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\+([a-zA-Z0-9]{4,}))?$", 
+            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?$", 
             RegexOptions.CultureInvariant);
             // ([a-zA-Z]{2})
             //      Matches language.
@@ -79,9 +79,6 @@ namespace i18n
             //      Matches region.
             //      NB: The inner group is wrapped in an outer non-capturing group that
             //      prefixed the former with the '-' which is thus not captured.
-            // (?:\+[a-zA-Z0-9]{4,})?
-            //      Matches custom variation
-            //      eg en-ABCD-GB+ACMECORP
         static readonly Regex m_regex_parseUrl = new System.Text.RegularExpressions.Regex(
             @"^/([a-zA-Z]{2}(?:-[a-zA-Z]{4})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?)(?:$|/)", 
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
@@ -123,9 +120,6 @@ namespace i18n
         /// </summary>
         public string Region { get; private set; }
         /// <summary>
-        /// Optional Variation subtag.
-        /// </summary>
-        public string Variation { get; private set; }        /// <summary>
         /// Unique string per language which is suitable for using as a key in global
         /// caches such as HttpRuntime.Cache. Inited during construction.
         /// </summary>
@@ -150,7 +144,6 @@ namespace i18n
         ///     language (mandatory, 2 alphachars)
         ///     script   (optional, 4 alphachars)
         ///     region   (optional, 2 alphachars | 3 decdigits)
-        ///     variation (optional, 4+ alphachars and decdigits)
         /// Example tags supported:
         ///     "en"            [language]
         ///     "en-US"         [language + region]
@@ -159,7 +152,6 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
-        ///     "en-XXX-GB+ACMECorp" [language + script + region + variation]
         /// </param>
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public LanguageTag(string langtag)
@@ -176,11 +168,10 @@ namespace i18n
            // Parse the langtag.
             Match match = m_regex_parseLangtag.Match(m_langtag);
             if (match.Success
-                && match.Groups.Count == 5) {
+                && match.Groups.Count == 4) {
                 Language = match.Groups[1].Value;
                 Script   = match.Groups[2].Value;
                 Region   = match.Groups[3].Value;
-                Variation = match.Groups[4].Value;
             }
            // Load any parent:
            //   l-s-r -> l-s
@@ -197,18 +188,10 @@ namespace i18n
             GlobalKey = string.Format("po:{0}", m_langtag).ToLowerInvariant();
            //
             try {
-                if (Variation.IsSet())
-                {   // Strip out the variation to allow CultureInfo to be set, based on the rest of the language tag
-                    CultureInfo = new CultureInfo(langtag.Replace("+"+Variation,string.Empty));
-                }
-                else
-                {
-                    CultureInfo = new CultureInfo(langtag);
-                }
-                
+                CultureInfo = new CultureInfo(langtag);
             }
             catch(System.ArgumentException) {}
-           // 
+           //
             NativeNameTitleCase = CultureInfo != null ? CultureInfo.TextInfo.ToTitleCase(CultureInfo.NativeName) : "m_langtag";
             //Debug.Assert(ToString() == langtag);
         }
@@ -341,11 +324,7 @@ namespace i18n
         /// lang+region         |   C       D               A               D
         /// lang+script+region  |   D       B               D               A
         /// 
-        /// AA. Variation match (100). This reduces all scores below.
-        ///     All four subtags match, ie including variation
-        /// AA. Variation language match (100) [ en+ACME, en-GB+ACME ]. This reduces all scores below.
-        ///     All four subtags match, ie including variation
-        /// A. Exact match (100) 
+        /// A. Exact match (100)
         ///     All three subtags match.
         /// B. Unbalanced Region Mismatch (99) [zh, zh-HK]
         ///     Language and Script match;
@@ -376,31 +355,15 @@ namespace i18n
             bool[] L = { 0 == string.Compare(Language, i_rhs.Language, true), Language.IsSet(), i_rhs.Language.IsSet() };
             bool[] S = { 0 == string.Compare(Script  , i_rhs.Script  , true), Script  .IsSet(), i_rhs.Script  .IsSet() };
             bool[] R = { 0 == string.Compare(Region  , i_rhs.Region  , true), Region  .IsSet(), i_rhs.Region  .IsSet() };
-            bool[] V = { 0 == string.Compare(Variation, i_rhs.Variation, true), Variation.IsSet(), i_rhs.Variation.IsSet() };
             int score = 100;
            // Logic.
            // F.
             if (!L[0]) {
                 return 0; }
-           // AA
-            if (S[0] && R[0] && V[0]) {
+           // A.
+            if (S[0] && R[0]) {
                 return score; }
             --score;
-           // AB
-            if (S[0] && V[0])
-            {
-                return score;
-            }
-            --score;
-           // A.
-            if (matchGrade != MatchGrade.ExactMatch)
-            {
-                if (S[0] && R[0])
-                {
-                    return score;
-                }
-                --score;
-            }
             if (matchGrade != MatchGrade.ExactMatch) {
                // B.
                 if (S[0] && !R[0] && R[1] != R[2]) {
