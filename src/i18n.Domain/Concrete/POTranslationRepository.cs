@@ -445,6 +445,8 @@ namespace i18n.Domain.Concrete
 		/// <returns>Returns a TranslationItem with only key, id and message set</returns>
 		private TranslationItem ParseBody(TextReader fs, string line, List<string> extractedComments)
 		{
+            string originalLine = line;
+
 			if (string.IsNullOrEmpty(line)) {
                 return null; }
 
@@ -468,6 +470,10 @@ namespace i18n.Domain.Concrete
 				while ((line = fs.ReadLine()) != null)
 				{
 					line = RemoveCommentIfHistorical(line);
+                    if (String.IsNullOrEmpty(line))
+                    {
+                        Console.WriteLine("ERROR - line is empty. Original line: " + originalLine);
+                    }
 					if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)
 					{
 						sb.Append(msgid);
