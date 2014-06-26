@@ -297,10 +297,14 @@ namespace i18n
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
 <<<<<<< HEAD
+<<<<<<< HEAD
         ///     "en-GB-x-ABCD" [language + region + privateuse]
 =======
         ///     "en-GB+ACMECorp" [language + region + privateuse]
 >>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
+=======
+        ///     "en-GB-x-ABCD" [language + region + privateuse]
+>>>>>>> c4585e6... Editing comments
         /// </returns>
         public override string ToString()
         {
