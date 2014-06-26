@@ -191,10 +191,14 @@ namespace i18n
             }
            // Load any parent:
 <<<<<<< HEAD
+<<<<<<< HEAD
            // l-s-r-p -> l-s-r
 =======
            // l-s-r+v -> l-s-r
 >>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
+=======
+           // l-s-r-p -> l-s-r
+>>>>>>> b19f89a... Editing comments
            //   l-s-r -> l-s
            //   l-r   -> l
            //   l-s   -> l
@@ -414,10 +418,14 @@ namespace i18n
                 throw new ArgumentNullException("i_rhs"); }
            // Init.
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b19f89a... Editing comments
             bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true),     Language    .IsSet(), i_rhs.Language    .IsSet() };
             bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true),     Script      .IsSet(), i_rhs.Script      .IsSet() };
             bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true),     Region      .IsSet(), i_rhs.Region      .IsSet() };
             bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true),   PrivateUse  .IsSet(), i_rhs.PrivateUse  .IsSet() };
+<<<<<<< HEAD
 =======
             bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
             bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
@@ -428,11 +436,14 @@ namespace i18n
 =======
             bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
 >>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
+=======
+>>>>>>> b19f89a... Editing comments
             int score = 100;
            // Logic.
            // F.
             if (!L[0]) {
                 return 0; }
+<<<<<<< HEAD
 <<<<<<< HEAD
            // G.
             if (!P[0] && P[1] && P[2]) {
@@ -442,6 +453,11 @@ namespace i18n
             {
 =======
 
+=======
+           // G.
+            if (!P[0] && P[1] && P[2]) {
+                return 0; }
+>>>>>>> b19f89a... Editing comments
            // AA
 <<<<<<< HEAD
             if (S[0] && R[0] && V[0]) {
