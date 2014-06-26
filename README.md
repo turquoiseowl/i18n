@@ -586,6 +586,18 @@ the matching algorithm is efficient for managed code (lock-free and essentially 
 Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
 It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
 
+##### Private Use Subtag
+
+The [w3c language tag spec](http://www.w3.org/International/articles/language-tags/Overview.en.php#extension) includes 
+a provision for an additional subtag for private use. This is now supported and can be used to provide a different
+translation for specific scenarios, such as a tenant on a multi-tenant application.
+
+The format is: `en-GB-x-Tenant123`, `en-x-Tenant99` etc.
+
+Note the `-x-`, after which you can add four or more alphanumeric characters to specify your custom translation.
+There must be an exact match for all subtags for this translation to be returned. If the module can't find a 
+translation for the tenant, it will match the remaining subtags according to the algorithm described above.
+
 ##### Language Matching Update
 
 The latest refinement to the language matching algoritm:
