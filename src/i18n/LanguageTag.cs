@@ -292,7 +292,11 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
+<<<<<<< HEAD
         ///     "en-GB-x-ABCD" [language + region + privateuse]
+=======
+        ///     "en-GB+ACMECorp" [language + region + privateuse]
+>>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
         /// </returns>
         public override string ToString()
         {
@@ -362,11 +366,15 @@ namespace i18n
         /// lang+script+region+privateuse   |   D       B               D               A                           AA
         /// 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
         /// AA. Private use match (100). 
         ///     All four subtags match. To use the private use subtag, all tags must match exactly, otherwise the private use subtag will be ignored in subsequent matching.
         /// A. Exact match (99) 
         ///     All three subtags match (no private use subtag).
         /// B. Unbalanced Region Mismatch (98) [zh, zh-HK]
+<<<<<<< HEAD
 =======
         /// AA. Variation match (100). This reduces all scores below.
         ///     All four subtags match, ie including variation
@@ -376,6 +384,8 @@ namespace i18n
         ///     All three subtags match.
         /// B. Unbalanced Region Mismatch (99) [zh, zh-HK]
 >>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
+=======
+>>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
         ///     Language and Script match;
         ///     one side has Region set while the other doesn't.
         ///     Here there is the possibility that due to defaults Region matches.
@@ -412,8 +422,12 @@ namespace i18n
             bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
             bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
             bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true), Region   .IsSet(), i_rhs.Region   .IsSet() };
+<<<<<<< HEAD
             bool[] V = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
 >>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
+=======
+            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
+>>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
             int score = 100;
            // Logic.
            // F.
@@ -429,8 +443,13 @@ namespace i18n
 =======
 
            // AA
+<<<<<<< HEAD
             if (S[0] && R[0] && V[0]) {
 >>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
+=======
+            if (S[0] && R[0] && P[0])
+            {
+>>>>>>> d7701c9... Added Private Use subtag for multitenant etc. scenarios
                 return score; }
             --score;
            
