@@ -285,7 +285,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
-        ///     "en-GB+ACMECorp" [language + region + privateuse]
+        ///     "en-GB-x-ABCD" [language + region + privateuse]
         /// </returns>
         public override string ToString()
         {
