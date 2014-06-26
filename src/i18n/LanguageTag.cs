@@ -187,7 +187,7 @@ namespace i18n
                 PrivateUse = match.Groups[4].Value;
             }
            // Load any parent:
-           // l-s-r+v -> l-s-r
+           // l-s-r-p -> l-s-r
            //   l-s-r -> l-s
            //   l-r   -> l
            //   l-s   -> l
@@ -376,6 +376,8 @@ namespace i18n
         ///     Here there is NO possibility that Script matches.
         /// F. Language Mismatch (0)
         ///     Language doesn't match.
+        /// G. Private use mismatch (0)
+        ///     Private use tags are different.
         /// </remarks>
         /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public int Match(LanguageTag i_rhs, MatchGrade matchGrade = MatchGrade.LanguageMatch)
@@ -384,16 +386,18 @@ namespace i18n
             if (i_rhs == null) {
                 throw new ArgumentNullException("i_rhs"); }
            // Init.
-            bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
-            bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
-            bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true), Region   .IsSet(), i_rhs.Region   .IsSet() };
-            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
+            bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true),     Language    .IsSet(), i_rhs.Language    .IsSet() };
+            bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true),     Script      .IsSet(), i_rhs.Script      .IsSet() };
+            bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true),     Region      .IsSet(), i_rhs.Region      .IsSet() };
+            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true),   PrivateUse  .IsSet(), i_rhs.PrivateUse  .IsSet() };
             int score = 100;
            // Logic.
            // F.
             if (!L[0]) {
                 return 0; }
-
+           // G.
+            if (!P[0] && P[1] && P[2]) {
+                return 0; }
            // AA
             if (S[0] && R[0] && P[0])
             {
