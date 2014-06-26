@@ -19,6 +19,7 @@ namespace i18n
     ///     language (mandatory, 2 alphachars)
     ///     script   (optional, 4 alphachars)
     ///     region   (optional, 2 alphachars | 3 decdigits)
+    ///     private use (optional, -x- followed by 4 or more alphanumericchars )
     /// Example tags supported:
     ///     "en"            [language]
     ///     "en-US"         [language + region]
@@ -27,6 +28,7 @@ namespace i18n
     ///     "zh-123"        [language + region]
     ///     "zh-Hant"       [language + script]
     ///     "zh-Hant-HK"    [language + script + region]
+    ///     "zh-Hant-HK-x-AAAA"    [language + script + region + private use]
     /// </remarks>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
     public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>
@@ -40,9 +42,10 @@ namespace i18n
         public enum MatchGrade
         {
             /// <summary>
-            /// Only consider a match where language and script and region parts match.
+            /// Only consider a match where language and script and region and private use parts match.
             /// E.g. fr matches fr
             /// E.g. zh-Hans-HK matches zh-Hans-HK
+            /// E.g. fr-FR-x-AAAA matches fr-FR-x-AAAA
             /// </summary>
             ExactMatch = 0,
             /// <summary>
@@ -80,16 +83,17 @@ namespace i18n
             //      NB: The inner group is wrapped in an outer non-capturing group that
             //      prefixed the former with the '-' which is thus not captured.
             // (?:\+[a-zA-Z0-9]{4,})?
-            //      Matches custom variation
-            //      eg en-ABCD-GB+ACMECORP
+            //      Matches private use subtag
+            //      eg en-ABCD-GB-x-AAAA
         static readonly Regex m_regex_parseUrl = new System.Text.RegularExpressions.Regex(
-            @"^/([a-zA-Z]{2}(?:-[a-zA-Z]{4})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?)(?:$|/)", 
+            @"^/([a-zA-Z]{2}(?:-[a-zA-Z]{4})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/)", 
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
                 // ^/
                 // (                                # begin 1st and only capture group
                 // [a-zA-Z]{2}                      # 2-letter country code
                 // (?:-[a-zA-Z]{4})?                # optional script code - not a capture group itself
                 // (?:-(?:[a-zA-Z]{2}|[0-9]{3}))?   # optional region code (2-letter or 3-digit) - not a capture group itself
+                // (?:\-x-([a-zA-Z0-9]{4,}))?       # optional private use tag (-x- followed by 4+ alphanumericcharacters) - not a capture group itself
                 // )                                # end 1st and only capture group
                 // (?:$|/)                          # match end of string or fwd-slash char - not a capture group itself
         private static ConcurrentDictionary<string, LanguageTag> s_cache = new ConcurrentDictionary<string, LanguageTag>();
@@ -150,7 +154,7 @@ namespace i18n
         ///     language (mandatory, 2 alphachars)
         ///     script   (optional, 4 alphachars)
         ///     region   (optional, 2 alphachars | 3 decdigits)
-        ///     variation (optional, 4+ alphachars and decdigits)
+        ///     privateuse (optional, 4+ alphanumericchars)
         /// Example tags supported:
         ///     "en"            [language]
         ///     "en-US"         [language + region]
@@ -159,7 +163,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
-        ///     "en-XXX-GB+ACMECorp" [language + script + region + variation]
+        ///     "en-GB+ACMECorp" [language + region + privateuse]
         /// </param>
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public LanguageTag(string langtag)
@@ -234,6 +238,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
+        ///     "en-GB+ACMECorp" [language + region + privateuse]
         /// </param>
         /// <returns>Either new or pre-exisiting instance, or null if langtag is invalid.</returns>
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
@@ -280,6 +285,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
+        ///     "en-GB+ACMECorp" [language + region + privateuse]
         /// </returns>
         public override string ToString()
         {
@@ -327,6 +333,7 @@ namespace i18n
         ///         zh-TW -> Chinese (Traditional) i.e. zh-Hant
         ///     In these cases we normalize all legacy langtags to their new values
         ///     before matching. E.g. zh-CH is normalized to zh-Hans.
+        ///   · If using the private use subtag, all subtags must match exactly.  
         /// «LX113»
         /// </summary>
         /// <param name="i_rhs"></param>
@@ -338,33 +345,32 @@ namespace i18n
         /// </returns>
         /// <remarks>
         /// Matching values:
-        ///                                              RHS
-        /// this                    lang    lang+script     lang+region     lang+script+region
-        /// ----------------------------------------------------------------------------------
-        /// lang                |   A       D               C               D
-        /// lang+script         |   D       A               D               B
-        /// lang+region         |   C       D               A               D
-        /// lang+script+region  |   D       B               D               A
+        ///                                                             RHS
+        /// this                              lang    lang+script     lang+region     lang+script+region    lang+script+region+privateuse
+        /// ------------------------------------------------------------------------------------------------------------------------------
+        /// lang                            |   A       D               C               D                           D
+        /// lang+script                     |   D       A               D               B                           B
+        /// lang+region                     |   C       D               A               D                           D
+        /// lang+script+region              |   D       B               D               A                           A
+        /// lang+script+region+privateuse   |   D       B               D               A                           AA
         /// 
-        /// AA. Variation match (100). This reduces all scores below.
-        ///     All four subtags match, ie including variation
-        /// REMOVED because not implemented properly. Need to account for empty variation tags. AB.  Variation language match (100) [ en+ACME, en-GB+ACME ]. This reduces all scores below.
-        ///     All four subtags match, ie including variation
-        /// A. Exact match (100) 
-        ///     All three subtags match.
-        /// B. Unbalanced Region Mismatch (99) [zh, zh-HK]
+        /// AA. Private use match (100). 
+        ///     All four subtags match. To use the private use subtag, all tags must match exactly, otherwise the private use subtag will be ignored in subsequent matching.
+        /// A. Exact match (99) 
+        ///     All three subtags match (no private use subtag).
+        /// B. Unbalanced Region Mismatch (98) [zh, zh-HK]
         ///     Language and Script match;
         ///     one side has Region set while the other doesn't.
         ///     Here there is the possibility that due to defaults Region matches.
-        /// C. Balanced Region Mismatch (98) [zh-IK, zh-HK]
+        /// C. Balanced Region Mismatch (97) [zh-IK, zh-HK]
         ///     Language and Script match;
         ///     both sides have Region set but to different values.
         ///     Here there is NO possibility that Region matches.
-        /// D. Unbalanced Script Mismatch (97) [zh-HK, zh-Hant-HK]
+        /// D. Unbalanced Script Mismatch (96) [zh-HK, zh-Hant-HK]
         ///     Language matches, Region may match;
         ///     one side has Script set while the other doesn't.
         ///     Here there is the possibility that due to defaults Script matches.
-        /// E. Balanced Script Mismatch (96)
+        /// E. Balanced Script Mismatch (95)
         ///     Language matches, Region may match;
         ///     both sides have Script set but to different values.
         ///     Here there is NO possibility that Script matches.
@@ -381,7 +387,7 @@ namespace i18n
             bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
             bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
             bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true), Region   .IsSet(), i_rhs.Region   .IsSet() };
-            bool[] V = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
+            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
             int score = 100;
            // Logic.
            // F.
@@ -389,7 +395,8 @@ namespace i18n
                 return 0; }
 
            // AA
-            if (S[0] && R[0] && V[0]) {
+            if (S[0] && R[0] && P[0])
+            {
                 return score; }
             --score;
            
@@ -561,6 +568,20 @@ namespace i18n
             LanguageTag.Trace_Match("zh-Hant-HK", "zh-HK");
             LanguageTag.Trace_Match("zh-Hant-HK", "zh-Hant");
             LanguageTag.Trace_Match("zh-Hant-HK", "zh-Hant-HK");
+
+            // Private use:
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-Hant-HK-x-ABCD");
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-Hant-HK-x-ZZZZ");
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-Hant-HK");
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-HK");
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh");
+            //Wrong subtags:
+            LanguageTag.Trace_Match("zh-Iant-HK-x-ABCD", "zh-Hant-HK-x-ABCD");
+            LanguageTag.Trace_Match("zh-Hant-GB-x-ABCD", "zh-Hant-HK-x-ABCD");            
+            //Invalid private use tag:
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-Hant-HK-x-ZZZ");
+            LanguageTag.Trace_Match("zh-Hant-HK-x-ABCD", "zh-Hant-HK-ABCD");
+            
 
             LanguageTag.Trace_Match("dh", "zh");
             LanguageTag.Trace_Match("dh", "zh-HK");
