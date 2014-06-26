@@ -333,7 +333,6 @@ true if the URL is to be localized, otherwise false. For example:
             return true;
         };
     }
-<<<<<<< HEAD
 ```
 
 ### Principal Application Language
@@ -376,40 +375,6 @@ PAL of the current request. For example, it may be called in a Razor view as fol
 the current langue to the user:
 
 ```xml
-=======
-```
-
-### Principal Application Language
-
-During startup of your ASP.NET application, i18n determines the set of application 
-languages for which one or more translated messages exist.
-
-Then, on each request, one of these languages is selected as the Principal Application 
-Language (PAL) for the request.
-
-The PAL for the request is determined by the first of the following conditions that is met:
-
-1. The path component of the URL is prefixed with a language tag that matches *exactly* one of the application languages. E.g. "example.com/fr/account/signup".
-
-2. The path component of the URL is prefixed with a language tag that matches *loosely* one of the application languages (see below).
-
-3. The request contains a cookie called "i18n.langtag" with a language tag that matches (exactly or loosely) one of the application languages.
-
-4. The request contains an Accept-Language header with a language that matches (exactly or loosely) one of the application languages.
-
-5. The default application language is selected (see also [Per-Request Default Language Determination](#per-request-default-language-determination)).
-
-Where a *loose* match is made above, the URL is updated with the matched application language tag
-and a redirect is issued. E.g. "example.com/fr-CA/account/signup" -> "example.com/fr/account/signup".
-By default this is a temporary 302 redirect, but you can choose for it to be a permanent 301 one
-by setting `i18n.LocalizedApplication.Current.PermanentRedirects = true` in Application_Start.
-
-The `GetPrincipalAppLanguageForRequest` extension method to HttpContext can be called to access the
-PAL of the current request. For example, it may be called in a Razor view as follows to display
-the current langue to the user:
-
-```xml
->>>>>>> multitenant
     <div>
         <p id="lang_cur" title="@Context.GetPrincipalAppLanguageForRequest()">
             @Context.GetPrincipalAppLanguageForRequest().GetNativeNameTitleCase()
@@ -556,7 +521,6 @@ which follows:
         // Redirect user agent as approp.
         return this.Redirect(returnUrl);
     }
-<<<<<<< HEAD
 
 ```
 
@@ -627,42 +591,6 @@ It is still safe to use zh-CN and zh-TW, but internally they will be treated as 
 The latest refinement to the language matching algoritm:
 
 ```csharp
-=======
-
-```
-
-### Language Matching
-
-Language matching is performed when a list of one or more user-preferred languages is matched against
-a list of one or more application laguages, the goal being to choose the application languages
-which the user is most likely to understand. The algorithm for this is multi-facted and multi-pass and takes the Language, 
-Script and Region subtags into account.
-
-Matching is performed once per-request to determine the [Principal Application Language](#principal-application-language)
-for the request, and also once per message to be translated (aka GetText call). 
-The multi-pass approach ensures a thorough attempt is made at matching a user's list of preferred 
-languages (from their Accept-Language HTTP header). E.g. in the context of the following request:
-
-```
-User Languages: fr-CH, fr-CA  
-Application Languages: fr-CA, fr, en
-```
-
-*fr-CA* will be matched first, and if no resource exists for that language, *fr* is tried, and failing
-that, the default language *en* is fallen back on.
-
-In recognition of the potential bottleneck of the GetText call (which typically is called many times per-request),
-the matching algorithm is efficient for managed code (lock-free and essentially heap-allocation free).
-
-Note that the following Chinese languages tags are normalized: zh-CN to zh-Hans, and zh-TW to zh-Hant.
-It is still safe to use zh-CN and zh-TW, but internally they will be treated as equivalent to their new forms.
-
-##### Language Matching Update
-
-The latest refinement to the language matching algoritm:
-
-```csharp
->>>>>>> multitenant
         // Principle Application Language (PAL) Prioritization:
         //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
         //   Their browser is set to languages en-US, en, zh-Hans.
@@ -677,12 +605,6 @@ The latest refinement to the language matching algoritm:
         //   i.e. loop through all the languages first at the strictest match grade before loosening 
         //   to the next match grade, and so on.
 ```
-
-##### Private Use subtag
-
-The [w3c language tag spec](http://www.w3.org/International/articles/language-tags/Overview.en.php#extension) includes a provision for an additional subtag for private use . This is now supported and can be used to provide a different translation for specific scenarios, such as a tenant on a multi-tenant application.
-
-The format is: `en-GB-x-Tenant123`, `en-x-Tenant99` etc. Note the `-x-`, after which you can add four or more alphanumeric characters to specify your custom translation. There must be an exact match for all subtags for this translation to be returned. If the module can't find a translation for the tenant, it will match the remaining subtags according to the algorithm described above.
 
 ### A reminder about folders in a web application
 
