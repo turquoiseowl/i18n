@@ -204,7 +204,7 @@ namespace i18n
            //
             try {
                 if (PrivateUse.IsSet())
-                {   // Strip out the variation to allow CultureInfo to be set, based on the rest of the language tag
+                {   // Strip out the private use subtag to allow CultureInfo to be set, based on the rest of the language tag
                     CultureInfo = new CultureInfo(langtag.Replace("-x-" + PrivateUse, string.Empty));
                 }
                 else
