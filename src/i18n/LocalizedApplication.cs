@@ -67,6 +67,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
+        ///     "zh-Hant-HK-x-ABCD"    [language + script + region + private use]
         /// </remarks>
         public string DefaultLanguage { 
             get {
