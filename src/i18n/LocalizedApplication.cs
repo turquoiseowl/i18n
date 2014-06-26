@@ -67,6 +67,7 @@ namespace i18n
         ///     "zh-123"        [language + region]
         ///     "zh-Hant"       [language + script]
         ///     "zh-Hant-HK"    [language + script + region]
+        ///     "zh-Hant-HK-x-ABCD"    [language + script + region + private use]
         /// </remarks>
         public string DefaultLanguage { 
             get {
@@ -137,11 +138,11 @@ namespace i18n
         public bool PermanentRedirects { get; set; }
 
         /// <summary>
-        /// Regular expression that controls the ContextTypes elligible for response localization.
+        /// Regular expression that controls the ContextTypes elligible for Late URL Localization.
         /// </summary>
         /// <remarks>
         /// Set to null to disable Late URL Localization.<br/>
-        /// Defaults to @"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$.<br/>
+        /// Defaults to @"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|json))(?:\s*;.*)?)$").<br/>
         /// Client may customise this member, for instance in Application_Start.<br/>
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.<br/>
         /// Explanation of the default regex:<br/>
@@ -157,11 +158,11 @@ namespace i18n
         /// Regular expression that excludes certain URL paths from being localized.
         /// </summary>
         /// <remarks>
-        /// Defaults to excluding all less and css files and any URLs containing the phrases i18nSkip, glimpse, trace or elmah (case-insensitive)<br/>
+        /// Defaults to ...<br/>
         /// Clients may customise this member in Application_Start<br/>
         /// This feature requires the LocalizedModule HTTP module to be intalled in web.config.<br/>
         /// </remarks>
-        public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
+        public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:axd|less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
 
 
         public LocalizedApplication()
