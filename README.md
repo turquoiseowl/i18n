@@ -560,6 +560,12 @@ The latest refinement to the language matching algoritm:
         //   to the next match grade, and so on.
 ```
 
+##### Private Use subtag
+
+The [w3c language tag spec](http://www.w3.org/International/articles/language-tags/Overview.en.php#extension) includes a provision for an additional subtag for private use . This is now supported and can be used to provide a different translation for specific scenarios, such as a tenant on a multi-tenant application.
+
+The format is: `en-GB-x-Tenant123`, `en-x-Tenant99` etc. Note the `-x-`, after which you can add four or more alphanumeric characters to specify your custom translation. There must be an exact match for all subtags for this translation to be returned. If the module can't find a translation for the tenant, it will match the remaining subtags according to the algorithm described above.
+
 ### A reminder about folders in a web application
 
 Your `locale` folder is exposed to HTTP requests as-is, just like a typical log directory, so remember to block all requests
