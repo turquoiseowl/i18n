@@ -69,9 +69,7 @@ namespace i18n
             _MaxMatch = LanguageMatch,
         }
     // Data
-        static readonly Regex m_regex_parseLangtag = new Regex(
-            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", 
-            RegexOptions.CultureInvariant);
+        static readonly Regex m_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
             // ([a-zA-Z]{2})
             //      Matches language.
             // (?:-([a-zA-Z]{4}))?
@@ -143,7 +141,6 @@ namespace i18n
         /// the language suitable for user display, otherwise it is the language tag string.
         /// </summary>
         public string NativeNameTitleCase { get; private set; }
-    // Con
         /// <summary>
         /// Constructs a new instance based on a language tag string.
         /// If successful, then the Language property is set to a valid language subtag.
