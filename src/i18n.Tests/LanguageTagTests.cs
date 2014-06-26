@@ -99,5 +99,47 @@ namespace i18n.Tests
             ExtractLangTagFromUrlHelper("/zh-Hans-12-x-ABCD", null);
             ExtractLangTagFromUrlHelper("/zh-Hans-12-x-ABCDEFG123", null);
         }
+
+        private int MatchTagHelper(string lhs, string rhs)
+        {
+            return (new i18n.LanguageTag(lhs).Match(new i18n.LanguageTag(rhs)));
+        }
+
+        [TestMethod]
+        public void MatchTags()
+        {
+
+            // Test language tag matching and priority score
+            //100 
+            Assert.AreEqual(MatchTagHelper("en-aaaa-us-x-abcd","en-aaaa-us-x-abcd"),100);
+            Assert.AreEqual(MatchTagHelper("en-us-x-abcd","en-us-x-abcd"),100);
+            Assert.AreEqual(MatchTagHelper("en-x-abcd","en-x-abcd"),100);
+            //99
+            Assert.AreEqual(MatchTagHelper("en-aaaa-us-x-abcd","en-aaaa-us"),99);
+            Assert.AreEqual(MatchTagHelper("en-aaaa-us","en-aaaa-us"),99);
+            Assert.AreEqual(MatchTagHelper("en-us","en-us"),99);
+            Assert.AreEqual(MatchTagHelper("en","en"),99);
+            //98
+            Assert.AreEqual(MatchTagHelper("en-aaaa-x-abcd","en-aaaa-us"),98);
+            Assert.AreEqual(MatchTagHelper("en-aaaa","en-aaaa-us"),98);
+            Assert.AreEqual(MatchTagHelper("en","en-us"),98);
+            //97
+            Assert.AreEqual(MatchTagHelper("en-aaaa-gb-x-abcd","en-aaaa-us"),97);
+            Assert.AreEqual(MatchTagHelper("en-aaaa-gb","en-aaaa-us"),97);
+            Assert.AreEqual(MatchTagHelper("en-gb","en-us"),97);
+            //96
+            Assert.AreEqual(MatchTagHelper("en-us-x-abcd","en-aaaa-us-x-abcd"),96);
+            Assert.AreEqual(MatchTagHelper("en-us-x-abcd","en-aaaa-us"),96);
+            Assert.AreEqual(MatchTagHelper("en-us","en-aaaa-us"),96);
+            //95
+            Assert.AreEqual(MatchTagHelper("en-bbbb-x-abcd","en-aaaa-us"),95);
+            Assert.AreEqual(MatchTagHelper("en-bbbb","en-aaaa-us"),95);
+            //0
+            Assert.AreEqual(MatchTagHelper("en","de"),0);
+            Assert.AreEqual(MatchTagHelper("en-GB","de-GB"),0);
+            Assert.AreEqual(MatchTagHelper("en-x-abcd","de-x-abcd"),0);
+            Assert.AreEqual(MatchTagHelper("en-x-abcd","en-x-xxxx"),0);
+
+        }
     }
 }

@@ -354,7 +354,7 @@ namespace i18n
         /// AA. Private use match (100). 
         ///     All four subtags match. To use the private use subtag, all tags must match exactly, otherwise the private use subtag will be ignored in subsequent matching.
         /// A. Exact match (99) 
-        ///     All three subtags match (no private use subtag).
+        ///     All three subtags match (no private use subtag match).
         /// B. Unbalanced Region Mismatch (98) [zh, zh-HK]
         ///     Language and Script match;
         ///     one side has Region set while the other doesn't.
@@ -396,7 +396,7 @@ namespace i18n
             if (!P[0] && P[1] && P[2]) {
                 return 0; }
            // AA
-            if (S[0] && R[0] && P[0])
+            if (S[0] && R[0] && P[0] && P[1])
             {
                 return score; }
             --score;
