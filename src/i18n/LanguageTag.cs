@@ -503,7 +503,7 @@ namespace i18n
             System.Text.RegularExpressions.Match match = m_regex_parseUrl.Match(url);
            // If successful
             if (match.Success
-                && match.Groups.Count == 2) {
+                && match.Groups.Count == 3) {
                // Extract the langtag value.
                 string langtag = match.Groups[1].Value;
                // Patch the url.
