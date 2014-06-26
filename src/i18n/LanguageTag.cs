@@ -69,7 +69,13 @@ namespace i18n
             _MaxMatch = LanguageMatch,
         }
     // Data
+<<<<<<< HEAD
         static readonly Regex m_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
+=======
+        static readonly Regex m_regex_parseLangtag = new Regex(
+            @"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", 
+            RegexOptions.CultureInvariant);
+>>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
             // ([a-zA-Z]{2})
             //      Matches language.
             // (?:-([a-zA-Z]{4}))?
@@ -184,7 +190,11 @@ namespace i18n
                 PrivateUse = match.Groups[4].Value;
             }
            // Load any parent:
+<<<<<<< HEAD
            // l-s-r-p -> l-s-r
+=======
+           // l-s-r+v -> l-s-r
+>>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
            //   l-s-r -> l-s
            //   l-r   -> l
            //   l-s   -> l
@@ -351,11 +361,21 @@ namespace i18n
         /// lang+script+region              |   D       B               D               A                           A
         /// lang+script+region+privateuse   |   D       B               D               A                           AA
         /// 
+<<<<<<< HEAD
         /// AA. Private use match (100). 
         ///     All four subtags match. To use the private use subtag, all tags must match exactly, otherwise the private use subtag will be ignored in subsequent matching.
         /// A. Exact match (99) 
         ///     All three subtags match (no private use subtag).
         /// B. Unbalanced Region Mismatch (98) [zh, zh-HK]
+=======
+        /// AA. Variation match (100). This reduces all scores below.
+        ///     All four subtags match, ie including variation
+        /// REMOVED because not implemented properly. Need to account for empty variation tags. AB.  Variation language match (100) [ en+ACME, en-GB+ACME ]. This reduces all scores below.
+        ///     All four subtags match, ie including variation
+        /// A. Exact match (100) 
+        ///     All three subtags match.
+        /// B. Unbalanced Region Mismatch (99) [zh, zh-HK]
+>>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
         ///     Language and Script match;
         ///     one side has Region set while the other doesn't.
         ///     Here there is the possibility that due to defaults Region matches.
@@ -383,21 +403,34 @@ namespace i18n
             if (i_rhs == null) {
                 throw new ArgumentNullException("i_rhs"); }
            // Init.
+<<<<<<< HEAD
             bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true),     Language    .IsSet(), i_rhs.Language    .IsSet() };
             bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true),     Script      .IsSet(), i_rhs.Script      .IsSet() };
             bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true),     Region      .IsSet(), i_rhs.Region      .IsSet() };
             bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true),   PrivateUse  .IsSet(), i_rhs.PrivateUse  .IsSet() };
+=======
+            bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true), Language .IsSet(), i_rhs.Language .IsSet() };
+            bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true), Script   .IsSet(), i_rhs.Script   .IsSet() };
+            bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true), Region   .IsSet(), i_rhs.Region   .IsSet() };
+            bool[] V = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
+>>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
             int score = 100;
            // Logic.
            // F.
             if (!L[0]) {
                 return 0; }
+<<<<<<< HEAD
            // G.
             if (!P[0] && P[1] && P[2]) {
                 return 0; }
            // AA
             if (S[0] && R[0] && P[0])
             {
+=======
+
+           // AA
+            if (S[0] && R[0] && V[0]) {
+>>>>>>> ff6aad7... Revert "Revert "- Changed wording around LanguageTag to support the official PrivateUse subtag""
                 return score; }
             --score;
            
