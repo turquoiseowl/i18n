@@ -127,7 +127,8 @@ namespace i18n
         /// <summary>
         /// Optional PrivateUse subtag.
         /// </summary>
-        public string PrivateUse { get; private set; }        /// <summary>
+        public string PrivateUse { get; private set; }
+        /// <summary>
         /// Unique string per language which is suitable for using as a key in global
         /// caches such as HttpRuntime.Cache. Inited during construction.
         /// </summary>
@@ -184,16 +185,14 @@ namespace i18n
                 PrivateUse = match.Groups[4].Value;
             }
            // Load any parent:
-           // l-s-r-p -> l-s-r
-           //   l-s-r -> l-s
-           //   l-r   -> l
-           //   l-s   -> l
-           //   l     -> no parent
-            if (Region.IsSet() && Script.IsSet() && PrivateUse.IsSet())
-            {
-                m_parent = GetCachedInstance(string.Format("{0}-{1}-{2}", Language, Script, Region));
-            }
-            if (Region.IsSet() && Script.IsSet()) {
+           //   l-s-r-p -> l-s-r
+           //   l-s-r   -> l-s
+           //   l-r     -> l
+           //   l-s     -> l
+           //   l       -> no parent
+            if (Region.IsSet() && Script.IsSet() && PrivateUse.IsSet()) {
+                m_parent = GetCachedInstance(string.Format("{0}-{1}-{2}", Language, Script, Region)); }
+            else if (Region.IsSet() && Script.IsSet()) {
                 m_parent = GetCachedInstance(string.Format("{0}-{1}", Language, Script)); }
             else if (Script.IsSet() || Region.IsSet()) {
                 m_parent = GetCachedInstance(Language); }
