@@ -125,7 +125,8 @@ namespace i18n
         /// </summary>
         public string Region { get; private set; }
         /// <summary>
-        /// Optional PrivateUse subtag.
+        /// Optional PrivateUse subtag, excluding the "x-" part. 
+        /// E.g. for a langtag of "en-GB-x-ACMECorp" this property is "ACMECorp".
         /// </summary>
         public string PrivateUse { get; private set; }
         /// <summary>
@@ -154,14 +155,14 @@ namespace i18n
         ///     region   (optional, 2 alphachars | 3 decdigits)
         ///     privateuse (optional, 4+ alphanumericchars)
         /// Example tags supported:
-        ///     "en"            [language]
-        ///     "en-US"         [language + region]
-        ///     "zh"            [language]
-        ///     "zh-HK"         [language + region]
-        ///     "zh-123"        [language + region]
-        ///     "zh-Hant"       [language + script]
-        ///     "zh-Hant-HK"    [language + script + region]
-        ///     "en-GB+ACMECorp" [language + region + privateuse]
+        ///     "en"               [language]
+        ///     "en-US"            [language + region]
+        ///     "zh"               [language]
+        ///     "zh-HK"            [language + region]
+        ///     "zh-123"           [language + region]
+        ///     "zh-Hant"          [language + script]
+        ///     "zh-Hant-HK"       [language + script + region]
+        ///     "en-GB-x-ACMECorp" [language + region + privateuse]
         /// </param>
         /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
         public LanguageTag(string langtag)
