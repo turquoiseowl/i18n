@@ -560,6 +560,14 @@ translation for a given nugget msgid / msgcomment combo.
 The msgcomment is relevant only when i18n.Domain.Concrete.i18nSettings.MessageContextEnabledFromComment is set to true;
 by default it is false and so msgcomment argument should be passed as null or empty.
 
+Furthermore, you can access the translation of a complete body of text containing zero or more nuggets
+that require parsing using the ```ParseAndTranslate``` extension method to HttpContextBase, as follows:
+
+```
+    string entity = HttpContext.ParseAndTranslate("Hi - [[[Sign in]]]");
+```
+
+
 ### Language Matching
 
 Language matching is performed when a list of one or more user-preferred languages is matched against

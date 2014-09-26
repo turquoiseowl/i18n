@@ -33,7 +33,7 @@ namespace i18n
         }
 
         /// <summary>
-        /// Returns any translation for the passed message.
+        /// Returns any translation for the passed individual message.
         /// </summary>
         /// <remarks>
         /// This this the main entry point into i18n library for translating strings.
@@ -42,7 +42,7 @@ namespace i18n
         /// Should no translation exist, the msgid string is returned.
         /// </remarks>
         /// <param name="context">Describes the current request.</param>
-        /// <param name="msgid">Specifies the message to be translated.</param>
+        /// <param name="msgid">Specifies the individual message to be translated (the first part inside of a nugget). E.g. if the nugget is [[[Sign in]] then this param is "Sign in".</param>
         /// <param name="msgcomment">Specifies the optional message comment value of the subject resource, or null/empty.</param>
         /// <returns>Localized string, or msgid if no translation exists.</returns>
         public static string GetText(this HttpContextBase context, string msgid, string msgcomment)
@@ -56,6 +56,38 @@ namespace i18n
         {
             return context.GetHttpContextBase().GetText(msgid, msgcomment);
         }
+
+        /// <summary>
+        /// Returns the translation of the passed string entity which may contain zero or more fully-formed nugget.
+        /// </summary>
+        /// <param name="context">Describes the current request.</param>
+        /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
+        /// <returns>Localized (translated) entity.</returns>
+        public static string ParseAndTranslate(this HttpContextBase context, string entity)
+        {
+        // For impl. notes see ResponseFilter.Flush().
+        //
+            var nuggetLocalizer = LocalizedApplication.Current.NuggetLocalizerForApp;
+            var earlyUrlLocalizer = LocalizedApplication.Current.EarlyUrlLocalizerForApp;
+           //
+            if (nuggetLocalizer != null) {
+                entity = LocalizedApplication.Current.NuggetLocalizerForApp.ProcessNuggets(
+                    entity,
+                    context.GetRequestUserLanguages()); }
+           //
+            if (earlyUrlLocalizer != null) {
+                entity = earlyUrlLocalizer.ProcessOutgoing(
+                    entity, 
+                    context.GetPrincipalAppLanguageForRequest().ToString(),
+                    context); }
+           //
+            return entity;
+        }
+        public static string ParseAndTranslate(this HttpContext context, string entity)
+        {
+            return context.GetHttpContextBase().ParseAndTranslate(entity);
+        }
+
 
         /// <summary>
         /// Helper for caching a per-request value that identifies the principal language
