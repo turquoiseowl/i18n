@@ -654,6 +654,7 @@ The i18n project at present targets Visual Studio 2012 and requires Visual Studi
 installed to build.
 
 To build the project in Visual Studio 2013:
+
 1. install the Visual Studio 2013 SDK is not already installed
 2. upgrade the i18n project to 2013
 3. remove the reference to Microsoft.VisualStudio.Shell.11 and replace it with a reference to Microsoft.VisualStudio.Shell.12.
