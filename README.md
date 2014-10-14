@@ -560,6 +560,14 @@ translation for a given nugget msgid / msgcomment combo.
 The msgcomment is relevant only when i18n.Domain.Concrete.i18nSettings.MessageContextEnabledFromComment is set to true;
 by default it is false and so msgcomment argument should be passed as null or empty.
 
+Furthermore, you can access the translation of a complete body of text containing zero or more nuggets
+that require parsing using the ```ParseAndTranslate``` extension method to HttpContextBase, as follows:
+
+```
+    string entity = HttpContext.ParseAndTranslate("Hi - [[[Sign in]]]");
+```
+
+
 ### Language Matching
 
 Language matching is performed when a list of one or more user-preferred languages is matched against
@@ -639,6 +647,19 @@ to this folder by adding a `Web.config` file.
         </system.webServer>
     </configuration>
 ```
+
+### Build Notes
+
+The i18n project at present targets Visual Studio 2012 / .NET Framework 4 and requires the Visual Studio 2012 SDK libraries
+installed to build.
+
+To build the project in Visual Studio 2013 / .NET Framework 4.5:
+
+1. Install the Visual Studio 2013 SDK if not already installed.
+2. Upgrade the i18n project to 2013.
+3. Remove the reference to Microsoft.VisualStudio.Shell.11 and replace it with a reference to Microsoft.VisualStudio.Shell.12.
+
+See [Issue #117](https://github.com/turquoiseowl/i18n/issues/117#issuecomment-57867637) for more information on building with VS 2013.
 
 ### Contributing
 
