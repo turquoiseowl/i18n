@@ -100,46 +100,102 @@ namespace i18n.Tests
             ExtractLangTagFromUrlHelper("/zh-Hans-12-x-ABCDEFG123" , null);
         }
 
-        private int MatchTagHelper(string lhs, string rhs)
+        private void MatchTagHelper1(
+            int expected, 
+            string lhs, 
+            string rhs, 
+            i18n.LanguageTag.MatchGrade matchGrade = i18n.LanguageTag.MatchGrade.LanguageMatch)
         {
-            return (new i18n.LanguageTag(lhs).Match(new i18n.LanguageTag(rhs)));
+            Assert.AreEqual(expected, (new i18n.LanguageTag(lhs).Match(new i18n.LanguageTag(rhs), matchGrade)));
+            Assert.AreEqual(expected, (new i18n.LanguageTag(rhs).Match(new i18n.LanguageTag(lhs), matchGrade)));
+        }
+        private void MatchTagHelper(
+            int expected, 
+            string lhs, 
+            string rhs, 
+            i18n.LanguageTag.MatchGrade matchGrade = i18n.LanguageTag.MatchGrade.LanguageMatch)
+        {
+            MatchTagHelper1(expected, lhs, rhs, matchGrade);
+           // If PrivateUse subtag not present in either tag...append such a subtag equally to both sides
+           // and test again. This should have no effect on the result.
+            if (-1 == lhs.IndexOf("-x-", StringComparison.OrdinalIgnoreCase) && -1 == rhs.IndexOf("-x-", StringComparison.OrdinalIgnoreCase)) {
+                MatchTagHelper1(expected, lhs + "-x-abcd", rhs + "-x-abcd", matchGrade); }
         }
 
         [TestMethod]
         public void MatchTags()
         {
-
             // Test language tag matching and priority score
-            //100 
-            Assert.AreEqual(MatchTagHelper("en-aaaa-us-x-abcd","en-aaaa-us-x-abcd"),100);
-            Assert.AreEqual(MatchTagHelper("en-us-x-abcd"     ,"en-us-x-abcd"     ),100);
-            Assert.AreEqual(MatchTagHelper("en-x-abcd"        ,"en-x-abcd"        ),100);
-            //99
-            Assert.AreEqual(MatchTagHelper("en-aaaa-us-x-abcd","en-aaaa-us"       ),99);
-            Assert.AreEqual(MatchTagHelper("en-aaaa-us"       ,"en-aaaa-us"       ),99);
-            Assert.AreEqual(MatchTagHelper("en-us"            ,"en-us"            ),99);
-            Assert.AreEqual(MatchTagHelper("en"               ,"en"               ),99);
-            //98
-            Assert.AreEqual(MatchTagHelper("en-aaaa-x-abcd"   ,"en-aaaa-us"       ),98);
-            Assert.AreEqual(MatchTagHelper("en-aaaa"          ,"en-aaaa-us"       ),98);
-            Assert.AreEqual(MatchTagHelper("en"               ,"en-us"            ),98);
-            //97
-            Assert.AreEqual(MatchTagHelper("en-aaaa-gb-x-abcd","en-aaaa-us"       ),97);
-            Assert.AreEqual(MatchTagHelper("en-aaaa-gb"       ,"en-aaaa-us"       ),97);
-            Assert.AreEqual(MatchTagHelper("en-gb"            ,"en-us"            ),97);
-            //96
-            Assert.AreEqual(MatchTagHelper("en-us-x-abcd"     ,"en-aaaa-us-x-abcd"),96);
-            Assert.AreEqual(MatchTagHelper("en-us-x-abcd"     ,"en-aaaa-us"       ),96);
-            Assert.AreEqual(MatchTagHelper("en-us"            ,"en-aaaa-us"       ),96);
-            //95
-            Assert.AreEqual(MatchTagHelper("en-bbbb-x-abcd"   ,"en-aaaa-us"       ),95);
-            Assert.AreEqual(MatchTagHelper("en-bbbb"          ,"en-aaaa-us"       ),95);
-            //0
-            Assert.AreEqual(MatchTagHelper("en"               ,"de"               ),0);
-            Assert.AreEqual(MatchTagHelper("en-GB"            ,"de-GB"            ),0);
-            Assert.AreEqual(MatchTagHelper("en-x-abcd"        ,"de-x-abcd"        ),0);
-            Assert.AreEqual(MatchTagHelper("en-x-abcd"        ,"en-x-xxxx"        ),0);
 
+            // 100 (A)
+            MatchTagHelper(100, "zh-Hans-HK", "zh-Hans-HK");
+            MatchTagHelper(100, "zh-Hans"   , "zh-Hans");
+            MatchTagHelper(100, "zh-HK"     , "zh-HK");
+            MatchTagHelper(100, "zh"        , "zh");
+
+            // 99 (B)
+            MatchTagHelper(99 , "zh"        , "zh-HK");
+            MatchTagHelper(99 , "zh-Hans"   , "zh-Hans-HK");
+
+            // 98 (C)
+            MatchTagHelper(98 , "zh-IK"     , "zh-HK");
+            MatchTagHelper(98 , "zh-Hans-IK", "zh-Hans-HK");
+
+            // 97 (D)
+            MatchTagHelper(97 , "zh-HK"     , "zh-Hant-HK");
+            MatchTagHelper(97 , "zh-HK"     , "zh-Hant-IK");
+            MatchTagHelper(97 , "zh"        , "zh-Hant");
+            MatchTagHelper(97 , "zh-HK"     , "zh-Hant");
+            MatchTagHelper(97 , "zh"        , "zh-Hant-HK");
+
+            // 96 (E)
+            MatchTagHelper(96 , "zh-Hans-HK", "zh-Hant-HK");
+            MatchTagHelper(96 , "zh-Hans-HK", "zh-Hant-IK");
+            MatchTagHelper(96 , "zh-Hans"   , "zh-Hant");
+            MatchTagHelper(96 , "zh-Hans-HK", "zh-Hant");
+            MatchTagHelper(96 , "zh-Hans"   , "zh-Hant-HK");
+
+            // 0 (F)
+            MatchTagHelper(0  , "en-Hans-HK", "zh-Hans-HK");
+            MatchTagHelper(0  , "en-Hans"   , "zh-Hans");
+            MatchTagHelper(0  , "en-HK"     , "zh-HK");
+            MatchTagHelper(0  , "en"        , "zh");
+            MatchTagHelper(0  , "en"        , "zh-HK");
+            MatchTagHelper(0  , "en-Hans"   , "zh-Hans-HK");
+            MatchTagHelper(0  , "en-IK"     , "zh-HK");
+            MatchTagHelper(0  , "en-Hans-IK", "zh-Hans-HK");
+            MatchTagHelper(0  , "en-HK"     , "zh-Hant-HK");
+            MatchTagHelper(0  , "en-HK"     , "zh-Hant-IK");
+            MatchTagHelper(0  , "en"        , "zh-Hant");
+            MatchTagHelper(0  , "en-HK"     , "zh-Hant");
+            MatchTagHelper(0  , "en"        , "zh-Hant-HK");
+            MatchTagHelper(0  , "en-Hans-HK", "zh-Hant-HK");
+            MatchTagHelper(0  , "en-Hans-HK", "zh-Hant-IK");
+            MatchTagHelper(0  , "en-Hans"   , "zh-Hant");
+            MatchTagHelper(0  , "en-Hans-HK", "zh-Hant");
+                // 
+
+            // 0 (G)
+            MatchTagHelper(0  , "zh"               , "zh-x-efgh");
+            MatchTagHelper(0  , "zh-HK"            , "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-HK"       , "zh-Hans-HK-x-efgh");
+            MatchTagHelper(0  , "zh-x-abcd"        , "zh-x-efgh");
+            MatchTagHelper(0  , "zh-HK-x-abcd"     , "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-HK-x-abcd", "zh-Hans-HK-x-efgh");
+                // PrivateUse subtag mismatch, but other tags match.
+            MatchTagHelper(0  , "zh-x-abcd"        , "zh-x-efgh");
+            MatchTagHelper(0  , "zh-IK-x-abcd"     , "zh-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-x-abcd"   , "zh-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-HK-x-abcd", "zh-x-efgh");
+            MatchTagHelper(0  , "zh-x-abcd"        , "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-IK-x-abcd"     , "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-x-abcd"   , "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-HK-x-abcd", "zh-HK-x-efgh");
+            MatchTagHelper(0  , "zh-x-abcd"        , "zh-Hant-x-efgh");
+            MatchTagHelper(0  , "zh-IK-x-abcd"     , "zh-Hant-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-x-abcd"   , "zh-Hant-x-efgh");
+            MatchTagHelper(0  , "zh-Hans-HK-x-abcd", "zh-Hant-x-efgh");
+                // Mismatch in PrivateUse and other subtags.
         }
     }
 }
