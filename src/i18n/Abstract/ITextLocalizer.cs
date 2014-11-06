@@ -8,10 +8,9 @@
     public interface ITextLocalizer
     {
         /// <summary>
-        /// Obtains collection of language tags describing the set of Po-valid languages, that
-        /// is the languages for which one or more resource are defined.
-        /// Note that the AppLanguages collection is unordered; this is because there is no innate 
-        /// precedence at the resource level: precedence is only relevant to UserLanguages.
+        /// Obtains dictionary of language tags (key = langtag string, value = LanguageTag instance)
+        /// describing the set of Po-valid languages, that is the languages for which one or more 
+        /// resource are defined.
         /// </summary>
         ConcurrentDictionary<string, LanguageTag> GetAppLanguages();
 
