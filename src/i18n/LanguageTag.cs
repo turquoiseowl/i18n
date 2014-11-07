@@ -330,7 +330,6 @@ namespace i18n
         ///         zh-TW -> Chinese (Traditional) i.e. zh-Hant
         ///     In these cases we normalize all legacy langtags to their new values
         ///     before matching. E.g. zh-CH is normalized to zh-Hans.
-        ///   · If using the private use subtag, all subtags must match exactly.  
         /// «LX113»
         /// </summary>
         /// <param name="i_rhs"></param>
@@ -342,39 +341,36 @@ namespace i18n
         /// </returns>
         /// <remarks>
         /// Matching values:
-        ///                                                             RHS
-        /// this                              lang    lang+script     lang+region     lang+script+region    lang+script+region+privateuse
-        /// ------------------------------------------------------------------------------------------------------------------------------
-        /// lang                            |   A       D               C               D                           D
-        /// lang+script                     |   D       A               D               B                           B
-        /// lang+region                     |   C       D               A               D                           D
-        /// lang+script+region              |   D       B               D               A                           A
-        /// lang+script+region+privateuse   |   D       B               D               A                           AA
+        ///                                              RHS
+        /// this                    lang    lang+script     lang+region     lang+script+region
+        /// ----------------------------------------------------------------------------------
+        /// lang                |   A       D               C               D
+        /// lang+script         |   D       A               D               B
+        /// lang+region         |   C       D               A               D
+        /// lang+script+region  |   D       B               D               A
         /// 
-        /// AA. Private use match (100). 
-        ///     All four subtags match. To use the private use subtag, all tags must match exactly, otherwise the private use subtag will be ignored in subsequent matching.
-        /// A. Exact match (99) 
-        ///     All three subtags match (no private use subtag match).
-        /// B. Unbalanced Region Mismatch (98) [zh, zh-HK]
+        /// NB: For the purposes of the logic above, lang incorporates Language + PrivateUse subtags.
+        /// 
+        /// A. Exact match (100)
+        ///     All three subtags match.
+        /// B. Unbalanced Region Mismatch (99) [zh, zh-HK] [zh-Hans, zh-Hans-HK]
         ///     Language and Script match;
         ///     one side has Region set while the other doesn't.
         ///     Here there is the possibility that due to defaults Region matches.
-        /// C. Balanced Region Mismatch (97) [zh-IK, zh-HK]
+        /// C. Balanced Region Mismatch (98) [zh-IK, zh-HK] [zh-Hans-IK, zh-Hans-HK]
         ///     Language and Script match;
         ///     both sides have Region set but to different values.
         ///     Here there is NO possibility that Region matches.
-        /// D. Unbalanced Script Mismatch (96) [zh-HK, zh-Hant-HK]
+        /// D. Unbalanced Script Mismatch (97) [zh-HK, zh-Hant-HK]
         ///     Language matches, Region may match;
         ///     one side has Script set while the other doesn't.
         ///     Here there is the possibility that due to defaults Script matches.
-        /// E. Balanced Script Mismatch (95)
+        /// E. Balanced Script Mismatch (96)
         ///     Language matches, Region may match;
         ///     both sides have Script set but to different values.
         ///     Here there is NO possibility that Script matches.
         /// F. Language Mismatch (0)
         ///     Language doesn't match.
-        /// G. Private use mismatch (0)
-        ///     Private use tags are different.
         /// </remarks>
         /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public int Match(LanguageTag i_rhs, MatchGrade matchGrade = MatchGrade.LanguageMatch)
@@ -383,33 +379,23 @@ namespace i18n
             if (i_rhs == null) {
                 throw new ArgumentNullException("i_rhs"); }
            // Init.
-            bool[] L = { 0 == string.Compare(Language , i_rhs.Language , true),     Language    .IsSet(), i_rhs.Language    .IsSet() };
-            bool[] S = { 0 == string.Compare(Script   , i_rhs.Script   , true),     Script      .IsSet(), i_rhs.Script      .IsSet() };
-            bool[] R = { 0 == string.Compare(Region   , i_rhs.Region   , true),     Region      .IsSet(), i_rhs.Region      .IsSet() };
-            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true),   PrivateUse  .IsSet(), i_rhs.PrivateUse  .IsSet() };
-            int score = 100;
+            bool[] L = { 0 == string.Compare(Language  , i_rhs.Language  , true), Language  .IsSet(), i_rhs.Language  .IsSet() };
+            bool[] S = { 0 == string.Compare(Script    , i_rhs.Script    , true), Script    .IsSet(), i_rhs.Script    .IsSet() };
+            bool[] R = { 0 == string.Compare(Region    , i_rhs.Region    , true), Region    .IsSet(), i_rhs.Region    .IsSet() };
+            bool[] P = { 0 == string.Compare(PrivateUse, i_rhs.PrivateUse, true), PrivateUse.IsSet(), i_rhs.PrivateUse.IsSet() };
+           // Language incorporates Language + PrivateUse subtags for our logic here.
+            L[0] = L[0] && P[0];
+            L[1] = L[1] || P[1];
+            L[2] = L[2] || P[2];
            // Logic.
+            int score = 100;
            // F.
             if (!L[0]) {
                 return 0; }
-           // G.
-            if (!P[0] && P[1] && P[2]) {
-                return 0; }
-           // AA
-            if (S[0] && R[0] && P[0] && P[1])
-            {
+           // A.
+            if (S[0] && R[0] && P[0]) {
                 return score; }
             --score;
-           
-           // A.
-            if (matchGrade != MatchGrade.ExactMatch)
-            {
-                if (S[0] && R[0])
-                {
-                    return score;
-                }
-                --score;
-            }
             if (matchGrade != MatchGrade.ExactMatch) {
                // B.
                 if (S[0] && !R[0] && R[1] != R[2]) {
