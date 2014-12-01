@@ -7,7 +7,10 @@ namespace i18n.Domain.Tests
     [TestClass]
     public class NuggetParserTests
     {
-        private void CompareNugget(string nuggetString, Nugget rhs, bool equal = true)
+
+    #region Helpers
+
+        private void ParseAndComp(string nuggetString, Nugget rhs, bool equal = true)
         {
            // Arrange.
             NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
@@ -21,25 +24,50 @@ namespace i18n.Domain.Tests
                 Assert.AreNotEqual(nugget, rhs); }
         }
 
+        private void CanParseEntity_CustomNuggetTokens_Act(string entity, NuggetParser nuggetParser)
+        {
+           // Act.
+            int i = 0;
+            nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget1, string entity1)
+            {
+                switch (i++) {
+                    case 0: {
+                        Assert.AreEqual(nugget1, new Nugget { MsgId = "hello", FormatItems = new string[] { "{0}" } });
+                        break;
+                    }
+                    case 1: {
+                        Assert.AreEqual(nugget1, new Nugget { MsgId = "there", FormatItems = new string[] { "{0}", "{1}" }, Comment = "comment comment comment" });
+                        break;
+                    }
+                    default:
+                        Assert.Fail();
+                        break;
+                }
+                return null;
+            });
+        }
+
+    #endregion
+
         [TestMethod]
         public void NuggetParser_CanBreakdownNugget()
         {
-            CompareNugget("[[[msgid]]]", new Nugget { MsgId = "msgid" });
-            CompareNugget("[[[msgid|||{0}]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" } });
-            CompareNugget("[[[msgid|||{0}|||{1}]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}" } });
-            CompareNugget("[[[msgid|||{0}|||{1}]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{0}" } }, false);
-            CompareNugget("[[[msgid|||{0}|||{1}]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{1}", "{0}" } }, false);
-            CompareNugget("[[[msgid|||{0}|||{1}|||{3}|||{4}|||{2}|||{5}]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}", "{3}", "{4}", "{2}", "{5}" } });
-            CompareNugget("[[[msgid|||{0}///comment]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = "comment" });
-            CompareNugget("[[[msgid|||{0}/// comment]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = "comment" }, false);
-            CompareNugget("[[[msgid|||{0}/// comment]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = " comment" });
-            CompareNugget("[[[msgid|||{0}|||{1}|||{3}|||{4}|||{2}|||{5}/// comment ]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}", "{3}", "{4}", "{2}", "{5}" }, Comment = " comment " });
-            CompareNugget("[[[msgid/// comment ]]]", new Nugget { MsgId = "msgid", Comment = " comment " });
-            CompareNugget("[[[msgid// comment ]]]", new Nugget { MsgId = "msgid", Comment = " comment " }, false);
-            CompareNugget("[[[msgid// comment ]]]", new Nugget { MsgId = "msgid// comment ", Comment = " comment " }, false);
-            CompareNugget("[[[msgid// comment ]]]", new Nugget { MsgId = "msgid// comment " });
-            CompareNugget("[[[msgid|| comment ]]]", new Nugget { MsgId = "msgid|| comment " });
-            CompareNugget("[[[msgid|||| comment ]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "| comment " } });
+            ParseAndComp("[[[msgid]]]"                                            , new Nugget { MsgId = "msgid" });
+            ParseAndComp("[[[msgid|||{0}]]]"                                      , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" } });
+            ParseAndComp("[[[msgid|||{0}|||{1}]]]"                                , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}" } });
+            ParseAndComp("[[[msgid|||{0}|||{1}]]]"                                , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{0}" } }, false);
+            ParseAndComp("[[[msgid|||{0}|||{1}]]]"                                , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{1}", "{0}" } }, false);
+            ParseAndComp("[[[msgid|||{0}|||{1}|||{3}|||{4}|||{2}|||{5}]]]"        , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}", "{3}", "{4}", "{2}", "{5}" } });
+            ParseAndComp("[[[msgid|||{0}///cmt]]]"                                , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = "cmt" });
+            ParseAndComp("[[[msgid|||{0}/// cmt]]]"                               , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = "cmt" }, false);
+            ParseAndComp("[[[msgid|||{0}/// cmt]]]"                               , new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}" }, Comment = " cmt" });
+            ParseAndComp("[[[msgid|||{0}|||{1}|||{3}|||{4}|||{2}|||{5}/// cmt ]]]", new Nugget { MsgId = "msgid", FormatItems = new string[] { "{0}", "{1}", "{3}", "{4}", "{2}", "{5}" }, Comment = " cmt " });
+            ParseAndComp("[[[msgid/// cmt ]]]"                                    , new Nugget { MsgId = "msgid", Comment = " cmt " });
+            ParseAndComp("[[[msgid// cmt ]]]"                                     , new Nugget { MsgId = "msgid", Comment = " cmt " }, false);
+            ParseAndComp("[[[msgid// cmt ]]]"                                     , new Nugget { MsgId = "msgid// cmt ", Comment = " cmt " }, false);
+            ParseAndComp("[[[msgid// cmt ]]]"                                     , new Nugget { MsgId = "msgid// cmt " });
+            ParseAndComp("[[[msgid|| cmt ]]]"                                     , new Nugget { MsgId = "msgid|| cmt " });
+            ParseAndComp("[[[msgid|||| cmt ]]]"                                   , new Nugget { MsgId = "msgid", FormatItems = new string[] { "| cmt " } });
         }
 
         [TestMethod]
@@ -98,29 +126,6 @@ namespace i18n.Domain.Tests
                     Assert.AreEqual(nugget1, new Nugget { MsgId = "there", FormatItems = new string[] { "{0}", "{1}" }, Comment = "comment comment comment" }); }
                 else {
                     Assert.Fail(); }
-                return null;
-            });
-        }
-
-        private void CanParseEntity_CustomNuggetTokens_Act(string entity, NuggetParser nuggetParser)
-        {
-           // Act.
-            int i = 0;
-            nuggetParser.ParseString(entity, delegate(string nuggetString, int pos, Nugget nugget1, string entity1)
-            {
-                switch (i++) {
-                    case 0: {
-                        Assert.AreEqual(nugget1, new Nugget { MsgId = "hello", FormatItems = new string[] { "{0}" } });
-                        break;
-                    }
-                    case 1: {
-                        Assert.AreEqual(nugget1, new Nugget { MsgId = "there", FormatItems = new string[] { "{0}", "{1}" }, Comment = "comment comment comment" });
-                        break;
-                    }
-                    default:
-                        Assert.Fail();
-                        break;
-                }
                 return null;
             });
         }

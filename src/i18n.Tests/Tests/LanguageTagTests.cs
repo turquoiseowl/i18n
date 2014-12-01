@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace i18n.Tests
 {
     [TestClass]
-    public class LanguageTag
+    public class LanguageTagTests
     {
         private void ExtractLangTagFromUrlHelper(string url, string expectedLangTag, string expectedUrlPatched)
         {

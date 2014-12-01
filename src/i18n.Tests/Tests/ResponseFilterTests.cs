@@ -13,19 +13,6 @@ namespace i18n.Tests
     public class ResponseFilterTests
     {
         [TestMethod]
-        public void ResponseFilter_can_process_nuggets()
-        {
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), null);
-
-            //string pre = "«««123»»» «««123»»»";
-            string pre = "[[[123]]] [[[123]]]";
-            string post = obj.ProcessNuggets(pre, null);
-            Assert.AreEqual("test.message test.message", post);
-
-            //#37 TODO -- more tests.
-        }
-
-        [TestMethod]
         public void ResponseFilter_can_patch_html_urls()
         {
             // One attribute.
