@@ -228,6 +228,13 @@ namespace i18n
                 messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
 			}
 
+           // Normalize any CRLF in the msgid i.e. to just LF.
+           // PO only support LF so we expect strings to be stored in the repo in that form.
+           // NB: we test Contains before doing Replace in case string.Replace allocs a new
+           // string even on no change. (This method is called very often.)
+            if (msgkey.Contains("\r\n")) {
+                msgkey = msgkey.Replace("\r\n", "\n"); }
+
             if (messages == null
                 || !messages.TryGetValue(msgkey, out message)
                 || !message.Message.IsSet())
