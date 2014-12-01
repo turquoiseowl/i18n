@@ -163,6 +163,7 @@ namespace i18n.Domain.Concrete
 
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
+                Console.WriteLine("Writing file: {0}", filePath);
                // Establish ordering of items in PO file.
                 var orderedItems = translation.Items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
@@ -222,7 +223,7 @@ namespace i18n.Domain.Concrete
                         WriteString(stream, hasReferences, "msgctxt", item.ExtractedComments.First());
                     }
 
-                    WriteString(stream, hasReferences, "msgid", item.MsgId);
+                    WriteString(stream, hasReferences, "msgid", escape(item.MsgId));
                     WriteString(stream, hasReferences, "msgstr", escape(item.Message));
 
                     stream.WriteLine("");
@@ -266,6 +267,7 @@ namespace i18n.Domain.Concrete
 
             using (StreamWriter stream = new StreamWriter(filePath))
 			{
+                Console.WriteLine("Writing file: {0}", filePath);
                // Establish ordering of items in PO file.
                 var orderedItems = items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
@@ -295,8 +297,9 @@ namespace i18n.Domain.Concrete
 						stream.WriteLine("#: " + reference);
 					}
 
-					stream.WriteLine("msgid \"" + escape(item.MsgId) + "\"");
-					stream.WriteLine("msgstr \"\""); // enable loading of POT file into editor e.g. PoEdit.
+                    WriteString(stream, true, "msgid", escape(item.MsgId));
+                    WriteString(stream, true, "msgstr", ""); // enable loading of POT file into editor e.g. PoEdit.
+
 					stream.WriteLine("");
 				}
 			}
@@ -338,6 +341,7 @@ namespace i18n.Domain.Concrete
 			string path = GetPathForLanguage(langtag);
 
             if (File.Exists(path)) {
+                Console.WriteLine("Reading file: {0}", path);
 
 			    using (var fs = File.OpenText(path))
 			    {
@@ -380,10 +384,9 @@ namespace i18n.Domain.Concrete
 						    } while ((line = fs.ReadLine()) != null && line.StartsWith("#"));
 					    }
 
-					    if (itemStarted || line.StartsWith("#~"))
+					    if (line != null && (itemStarted || line.StartsWith("#~")))
 					    {
 						    TranslationItem item = ParseBody(fs, line, extractedComments);
-
                             if (item != null) {
                                //
 					            item.TranslatorComments = translatorComments;
@@ -425,7 +428,8 @@ namespace i18n.Domain.Concrete
 		{
 			if (string.IsNullOrWhiteSpace(line))
 			{
-				return null;
+				//return null;
+                return line;
 			}
 
 			if (line.StartsWith("#~"))
@@ -473,6 +477,7 @@ namespace i18n.Domain.Concrete
                     if (String.IsNullOrEmpty(line))
                     {
                         Console.WriteLine("ERROR - line is empty. Original line: " + originalLine);
+                        continue;
                     }
 					if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)
 					{
@@ -522,30 +527,39 @@ namespace i18n.Domain.Concrete
         // Logic for outputting multi-line msgid.
         //
         // IN : a<LF>b
-        // OUT: msgid "a\n"
-        //      msgid "b"
+        // OUT: msgid ""
+        //      "a\n"
+        //      "b"
         //
         // IN : a<LF>b<LF>
-        // OUT: msgid "a\n"
-        //      msgid "b\n"
+        // OUT: msgid ""
+        // OUT: "a\n"
+        //      "b\n"
         //
-			string prefix = hasReferences ? "" : prefix = "#~ ";
 			value = value ?? "";
             value = value.Replace("\r\n", "\n");
-            string[] lines = value.Split('\n');
-            if (lines.Length > 1) {
-                stream.WriteLine(string.Format("{0}{1} \"\"", prefix, type));
-                for (int i = 0; i < lines.Length; ++i) {
-                    string m = lines[i];
-                    bool last = i == lines.Length -1;
-                    if (m.Length != 0) {
-                        stream.WriteLine(string.Format("\"{0}{1}\"", m, last ? "" : "\\n"));
-                    }
-                }
+            StringBuilder sb = new StringBuilder(100);
+           // If multi-line
+            if (value.Contains('\n')) {
+               // · msgid ""
+                sb.AppendFormat("{0} \"\"\r\n", type);
+               // · following lines
+                sb.Append("\"");
+                string s1 = value.Replace("\n", "\\n\"\r\n\"");
+                sb.Append(s1);
+                sb.Append("\"");
             }
+           // If single-line
             else {
-                stream.WriteLine(string.Format("{0}{1} \"{2}\"", prefix, type, value));
+                sb.AppendFormat("{0} \"{1}\"", type, value); }
+           // If noref...prefix each line with "#~ ".
+			if (!hasReferences) {
+                sb.Insert(0, "#~ ");
+                sb.Replace("\r\n", "\r\n#~ ");
             }
+           //
+            string s = sb.ToString();
+            stream.WriteLine(s);
         }
 
 		#region quoting and escaping
