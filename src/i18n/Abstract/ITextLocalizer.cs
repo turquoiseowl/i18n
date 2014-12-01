@@ -9,8 +9,8 @@
     {
         /// <summary>
         /// Obtains dictionary of language tags (key = langtag string, value = LanguageTag instance)
-        /// describing the set of Po-valid languages, that is the languages for which one or more 
-        /// resource are defined.
+        /// describing the set of Po-valid languages (that is, the languages for which one or more 
+        /// resource are defined).
         /// </summary>
         ConcurrentDictionary<string, LanguageTag> GetAppLanguages();
 
@@ -26,7 +26,7 @@
         /// Specifies the optional message comment value of the subject resource, or null/empty.
         /// </param>
         /// <param name="languages">
-        /// A list of language preferences, sorted in order or preference (most preferred first).
+        /// A list of language preferences, sorted in order of preference (most preferred first).
         /// </param>
         /// <param name="o_langtag">
         /// On success, outputs a description of the language from which the resource was selected.
@@ -40,9 +40,9 @@
         /// -1 to set to most tolerant (i.e. 4).
         /// </param>
         /// <returns>
-        /// When key is set to non-null, returns either the sucessully-looked up localized string, or 
+        /// When <paramref name="msgid"/> is set to non-null, returns either the sucessully-looked up localized string, or 
         /// null if the lookup failed.
-        /// When key is set to null, returns "" to indicate a match to a PO-valid language was made
+        /// When <paramref name="msgid"/> is set to null, returns "" to indicate a match to a PO-valid language was made
         /// (PO-valid meaning that one or more messages/resources are defined for that language),
         /// or null if no match was made.
         /// </returns>
