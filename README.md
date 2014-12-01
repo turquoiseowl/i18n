@@ -242,6 +242,21 @@ by default. To enable this feature:
 Note that note all PO editors support msgctxt and indeed may be thrown by the value
 when present in .PO files. See Issue #90 for more details.
 
+#### Multi-line messages
+
+The PO spec supports messages that span multiple lines. i18n provides full support for these, simply by
+spreading the nugget over several lines.
+
+For example, the following nugget is perfectly legal and should appear in your PO editor
+as a multi-line message:
+
+
+```
+[[[This is a
+message spread over
+three lines]]]
+```
+
 ### Building PO databases
 
 To set up automatic PO database building, add the following post-build task to your project, after
