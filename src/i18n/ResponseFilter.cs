@@ -3,6 +3,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Web;
+using System.Web.UI;
 using i18n.Helpers;
 
 namespace i18n
@@ -87,9 +88,29 @@ namespace i18n
             // Translate any embedded messages aka 'nuggets'.
             if (m_nuggetLocalizer != null)
             {
-                entity = m_nuggetLocalizer.ProcessNuggets(
-                    entity,
-                    m_httpContext.GetRequestUserLanguages());
+                var page = m_httpContext.Handler as Page;
+                //if webforms and postback
+                if (page != null && page.IsPostBack) {
+                    var postbackParser = new PostbackParser(entity);
+                    // not quite sure only those 2 types should be translated (any help ?)
+                    var types = new[]
+                    {
+                        "updatePanel",
+                        "scriptStartupBlock"
+                    };
+                    foreach (var type in types) {
+                        postbackParser.GetSections(type).ForEach(section => {
+                            section.Content = m_nuggetLocalizer.ProcessNuggets(
+                                section.Content,
+                                m_httpContext.GetRequestUserLanguages());
+                        });
+                    }
+                    entity = postbackParser.ToString();
+                } else {
+                    entity = m_nuggetLocalizer.ProcessNuggets(
+                        entity,
+                        m_httpContext.GetRequestUserLanguages());
+                }
             }
 
             // If Early Localization is enabled, we balance that here with Late URL Localization.
