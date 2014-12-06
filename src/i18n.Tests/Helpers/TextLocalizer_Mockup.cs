@@ -19,13 +19,20 @@ namespace i18n.Tests
 
         readonly ConcurrentDictionary<string, LanguageTag> m_appLanguages = new ConcurrentDictionary<string,LanguageTag>();
 
+        readonly string prefix;
+        readonly string suffix;
+
         public void AddAppLanguage(string langtag)
         {
             m_appLanguages[langtag] = LanguageTag.GetCachedInstance(langtag);
         }
 
-        public TextLocalizer_Mockup()
+        public TextLocalizer_Mockup(
+            string prefix = "",
+            string suffix = "")
         {
+            this.prefix = prefix;
+            this.suffix = suffix;
             AddAppLanguage("en");
         }
 
@@ -49,7 +56,7 @@ namespace i18n.Tests
            //
             o_langtag = lt;
             if (lt.IsValid()) {
-                return string.Format("xxx{0}yyy", msgid); }
+                return string.Format("{0}{1}{2}", prefix, msgid, suffix); }
             return null;
         }
 

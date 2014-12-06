@@ -30,7 +30,7 @@ namespace i18n
 			    _settings.NuggetEndToken,
 			    _settings.NuggetDelimiterToken,
 			    _settings.NuggetCommentToken),
-                NuggetParser.Context.SourceProcessing);
+                NuggetParser.Context.ResponseProcessing);
         }
 
     #region [INuggetLocalizer]

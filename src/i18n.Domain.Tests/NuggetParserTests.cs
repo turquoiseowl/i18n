@@ -220,5 +220,33 @@ namespace i18n.Domain.Tests
 
             Assert.AreEqual("Title: %0|||", result);
         }
+
+        [TestMethod]
+        [Description("Issue #165: Parsing a nugget with empty parameter in Response should not give format exception.")]
+        public void NuggetParser_ResponseMode_CanParseEntity_TwoParams_FirstEmpty_SecondNonEmpty() {
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
+            var input = "[[[Title: %0, %1||||||X]]]";
+            var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
+                Assert.IsTrue(nugget.IsFormatted);
+                return nugget.MsgId;
+            });
+
+            Assert.AreEqual("Title: %0, %1", result);
+        }
+
+        [TestMethod]
+        [Description("Issue #165: Parsing a nugget with empty parameter in Response should not give format exception.")]
+        public void NuggetParser_ResponseMode_CanParseEntity_TwoParams_FirstNonEmpty_SecondEmpty() {
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
+            var input = "[[[Title: %0, %1|||X|||]]]";
+            var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
+                Assert.IsTrue(nugget.IsFormatted);
+                return nugget.MsgId;
+            });
+
+            Assert.AreEqual("Title: %0, %1", result);
+        }
     }
 }
