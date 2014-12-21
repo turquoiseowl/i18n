@@ -2,13 +2,67 @@ using System;
 using System.Threading;
 using System.Web;
 using System.Text.RegularExpressions;
-using container;
 using i18n.Domain.Helpers;
 using i18n.Domain.Abstract;
 using i18n.Domain.Concrete;
 
 namespace i18n
 {
+    public class DefaultRootServices : IRootServices
+    {
+        public ITranslationRepository translationRepository;
+        public IUrlLocalizer urlLocalizer;
+        public ITextLocalizer textLocalizer;
+        public IEarlyUrlLocalizer earlyUrlLocalizer;
+        public INuggetLocalizer nuggetLocalizer;
+
+        public DefaultRootServices()
+        {
+            translationRepository = new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null)));
+            urlLocalizer = new UrlLocalizer();
+            textLocalizer = new TextLocalizer(new i18nSettings(new WebConfigSettingService(null)), translationRepository);
+            earlyUrlLocalizer = new EarlyUrlLocalizer(urlLocalizer);
+            nuggetLocalizer = new NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+        }
+
+    #region [IRootServices]
+
+        public ITranslationRepository TranslationRepositoryForApp
+        {
+            get
+            {
+                return translationRepository;
+            }
+        }
+        public IUrlLocalizer UrlLocalizerForApp
+        {
+            get {
+                return urlLocalizer;
+            }
+        }
+        public ITextLocalizer TextLocalizerForApp
+        {
+            get {
+                return textLocalizer;
+            }
+        }
+        public IEarlyUrlLocalizer EarlyUrlLocalizerForApp
+        {
+            get {
+                return earlyUrlLocalizer;
+            }
+        }
+        public INuggetLocalizer NuggetLocalizerForApp
+        {
+            get {
+                return nuggetLocalizer;
+            }
+        }
+
+    #endregion
+
+    }
+
     /// <summary>
     /// Manages the configuration of the i18n features of your localized application.
     /// </summary>
@@ -17,30 +71,11 @@ namespace i18n
 
     #region [IRootServices]
 
-        public IUrlLocalizer UrlLocalizerForApp
-        {
-            get {
-                return m_cached_urlLocalizer.Get(() => UrlLocalizerService);
-            }
-        }
-        public ITextLocalizer TextLocalizerForApp
-        {
-            get {
-                return m_cached_textLocalizer.Get(() => TextLocalizerService);
-            }
-        }
-        public IEarlyUrlLocalizer EarlyUrlLocalizerForApp
-        {
-            get {
-                return m_cached_earlyUrlLocalizer.Get(() => EarlyUrlLocalizerService);
-            }
-        }
-        public INuggetLocalizer NuggetLocalizerForApp
-        {
-            get {
-                return m_cached_nuggetLocalizer.Get(() => NuggetLocalizerService);
-            }
-        }
+        public ITranslationRepository TranslationRepositoryForApp { get { return RootServices.TranslationRepositoryForApp; } }
+        public IUrlLocalizer UrlLocalizerForApp                   { get { return RootServices.UrlLocalizerForApp;          } }
+        public ITextLocalizer TextLocalizerForApp                 { get { return RootServices.TextLocalizerForApp;         } }
+        public IEarlyUrlLocalizer EarlyUrlLocalizerForApp         { get { return RootServices.EarlyUrlLocalizerForApp;     } }
+        public INuggetLocalizer NuggetLocalizerForApp             { get { return RootServices.NuggetLocalizerForApp;       } }
 
     #endregion
 
@@ -164,10 +199,8 @@ namespace i18n
         /// </remarks>
         public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
 
-
         public LocalizedApplication()
         {
-            Container = new Container();
 
             // Default settings.
             DefaultLanguage = ("en");
@@ -187,20 +220,9 @@ namespace i18n
             if (String.IsNullOrWhiteSpace(ApplicationPath)) {
                 ApplicationPath = "/"; }
 
-            // Register default services.
-            // The client app may subsequerntly override any of these.
-            // NB: we are registering the factory functions/delegates here, not actually
-            // creating the services instances.
-            Container.Register<ITranslationRepository>(r => new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null)))); 
-            Container.Register<IUrlLocalizer>(r => new UrlLocalizer());
-            Container.Register<ITextLocalizer>(r => new TextLocalizer(new i18nSettings(new WebConfigSettingService(null)), TranslationRepositoryService)); 
-            Container.Register<IEarlyUrlLocalizer>(r => new EarlyUrlLocalizer(UrlLocalizerService));
-            Container.Register<INuggetLocalizer>(r => new NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), TextLocalizerForApp));
-                // TextLocalizerForApp = re-use any cached TextLocalizer already instantiated.
-                // This prevents NuggetLocalizer using a different TextLocalizer instance from
-                // a client which calls TextLocalizerForApp directly. While it is dangerous to do this
-                // from a DI perspective, it should be okay because any service factory change resets/clears any
-                // cached service instances.
+            // Use default package of root services.
+            // Host app may override this.
+            RootServices = new DefaultRootServices();
 
             // Install default handler for Set-PAL event.
             // The default handler applies the setting to both the CurrentCulture and CurrentUICulture
@@ -217,124 +239,11 @@ namespace i18n
         /// </summary>
         public static LocalizedApplication Current = new LocalizedApplication();
         
-        private Container Container { get; set; }
-        private LockFreeProperty<IUrlLocalizer     > m_cached_urlLocalizer      = new LockFreeProperty<IUrlLocalizer>();
-        private LockFreeProperty<ITextLocalizer    > m_cached_textLocalizer     = new LockFreeProperty<ITextLocalizer>();
-        private LockFreeProperty<IEarlyUrlLocalizer> m_cached_earlyUrlLocalizer = new LockFreeProperty<IEarlyUrlLocalizer>();
-        private LockFreeProperty<INuggetLocalizer  > m_cached_nuggetLocalizer   = new LockFreeProperty<INuggetLocalizer>();
-
         /// <summary>
-        /// Helper for clearing the cached-allocated per-appdomain services maintained by this class.
-        /// Typically we want to do this when changing the type of one or more of the dependents of these services.
+        /// This object relays its implementaion of IRootServices onto the object set here.
+        /// Host app may override with its own implementation.
+        /// By default, this property is set to an instance of DefaultRootServices.
         /// </summary>
-        private void ResetCachedServices()
-        {
-            m_cached_textLocalizer.Reset();
-            m_cached_earlyUrlLocalizer.Reset();
-            m_cached_nuggetLocalizer.Reset();
-        }
-
-        /// <summary>
-        /// Gets or sets an instance to use for the namesake service type.
-        /// </summary>
-        /// <remarks>
-        /// Setting this interface implicity enables or disables the respective feacture.
-        /// This feature depends on the LocalizedModule HTTP module being enabled in web.config.
-        /// By default, the interface is set to the default implementation.
-        /// </remarks>
-        public ITranslationRepository TranslationRepositoryService
-        {
-            get { return Container.Resolve<ITranslationRepository>(); }
-            set
-            {
-               // Reset/clear any antecendents that may be using the previous service.
-                ResetCachedServices();
-               //
-                Container.Remove<ITranslationRepository>();
-                Container.Register(r => value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets an instance to use for the namesake service type.
-        /// </summary>
-        /// <remarks>
-        /// By default, the interface is set to the default implementation.
-        /// </remarks>
-        public ITextLocalizer TextLocalizerService
-        {
-            get { return Container.Resolve<ITextLocalizer>(); }
-            set
-            {
-               // Reset/clear any antecendents that may be using the previous service.
-                ResetCachedServices();
-                //
-                Container.Remove<ITextLocalizer>();
-                Container.Register(r => value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets an instance to use for the namesake service type.
-        /// </summary>
-        /// <remarks>
-        /// Setting this interface implicity enables or disables the respective feature.
-        /// This feature depends on the LocalizedModule HTTP module being enabled in web.config.
-        /// By default, the interface is set to the default implementation.
-        /// </remarks>
-        public IEarlyUrlLocalizer EarlyUrlLocalizerService
-        {
-            get { return Container.Resolve<IEarlyUrlLocalizer>(); }
-            set
-            {
-               // Reset/clear any antecendents that may be using the previous service.
-                ResetCachedServices();
-               //
-                Container.Remove<IEarlyUrlLocalizer>();
-                Container.Register(r => value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets an instance to use for the namesake service type.
-        /// </summary>
-        /// <remarks>
-        /// Setting this interface implicity enables or disables the respective feature.
-        /// This feature depends on the LocalizedModule HTTP module being enabled in web.config.
-        /// By default, the interface is set to the default implementation.
-        /// </remarks>
-        public INuggetLocalizer NuggetLocalizerService
-        {
-            get { return Container.Resolve<INuggetLocalizer>(); }
-            set
-            {
-               // Reset/clear any antecendents that may be using the previous service.
-                ResetCachedServices();
-               //
-                Container.Remove<INuggetLocalizer>();
-                Container.Register(r => value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets an instance to use for the namesake service type.
-        /// </summary>
-        /// <remarks>
-        /// This interface is used by the default EarlyUrlLocalizer and NuggetLocalizer implementations.
-        /// [Deprecated] It is also used by the MVC RouteLocalization implementation.
-        /// By default, the interface is set to the default implementation.
-        /// </remarks>
-        public IUrlLocalizer UrlLocalizerService
-        {
-            get { return Container.Resolve<IUrlLocalizer>(); }
-            set
-            {
-               // Reset/clear any antecendents that may be using the previous service.
-                ResetCachedServices();
-               //
-                Container.Remove<IUrlLocalizer>();
-                Container.Register(r => value);
-            }
-        }
+        public IRootServices RootServices { get; set; }
     }
 }

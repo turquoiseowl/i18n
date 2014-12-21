@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using i18n.Domain.Abstract;
 
 namespace i18n
 {
@@ -12,6 +13,7 @@ namespace i18n
     /// </summary>
     public interface IRootServices
     {
+        ITranslationRepository TranslationRepositoryForApp { get; }
         IUrlLocalizer UrlLocalizerForApp { get; }
         ITextLocalizer TextLocalizerForApp { get; }
         IEarlyUrlLocalizer EarlyUrlLocalizerForApp { get; }
