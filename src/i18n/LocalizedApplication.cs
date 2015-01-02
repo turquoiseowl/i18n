@@ -199,7 +199,7 @@ namespace i18n
         /// </remarks>
         public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
 
-        public LocalizedApplication()
+        public LocalizedApplication(IRootServices i_RootServices = null)
         {
 
             // Default settings.
@@ -222,7 +222,7 @@ namespace i18n
 
             // Use default package of root services.
             // Host app may override this.
-            RootServices = new DefaultRootServices();
+            RootServices = i_RootServices ?? new DefaultRootServices();
 
             // Install default handler for Set-PAL event.
             // The default handler applies the setting to both the CurrentCulture and CurrentUICulture
