@@ -17,7 +17,6 @@
     <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
     <tags>i18n localization globalization</tags>
     <dependencies>
-      <dependency id="container" version="0.0.4" />      
     </dependencies>
   </metadata>
 </package>
