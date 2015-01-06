@@ -36,14 +36,18 @@ HttpModule called i18n.LocalizingModule which should be enabled in your web.conf
       <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" />
     </httpModules>
   </system.web>
-  <system.webServer> <!-- IIS7 'Integrated Mode'-specific config stuff -->
+  <system.webServer> <!-- IIS7 'Integrated Mode'-specific config -->
     <modules>
       <add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" />
     </modules>
   </system.webServer>
 ```
 
-Note: The ```<system.webServer>``` element is added for completeness and may not be required.
+Note: The ```<system.web>``` element is added for completeness and may not be required.
+
+Note: i18n requires static compression to be disabled for localized content. Refer to 
+[Issue #163](https://github.com/turquoiseowl/i18n/issues/163#issuecomment-68811808) 
+for more on IIS compression settings.
 
 The following ```<appSettings>``` are then required to specify the type and location 
 of your application's source files:
@@ -55,7 +59,7 @@ of your application's source files:
   </appSettings>
 ```
 
-Finally, certain behaviours of i18n may be altered at runtime on application startup. The following
+Certain behaviours of i18n may be altered at runtime on application startup. The following
 code shows the most common options:
 
 ```csharp
