@@ -10,56 +10,63 @@ namespace i18n
 {
     public class DefaultRootServices : IRootServices
     {
-        public ITranslationRepository translationRepository;
-        public IUrlLocalizer urlLocalizer;
-        public ITextLocalizer textLocalizer;
-        public IEarlyUrlLocalizer earlyUrlLocalizer;
-        public INuggetLocalizer nuggetLocalizer;
+        private static object syncRoot = new object();
+        private Lazy<POTranslationRepository> translationRepository;
+        private IUrlLocalizer urlLocalizer;
+        private Lazy<TextLocalizer> textLocalizer;
+        private IEarlyUrlLocalizer earlyUrlLocalizer;
+        private Lazy<NuggetLocalizer> nuggetLocalizer;
 
         public DefaultRootServices()
         {
-            translationRepository = new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null)));
+            // Use Lazy to delay the creation of objects to when a request is being processed.
+            // When initializing the app thehi may throw "Request is not available in this context" from WebConfigService 
+            translationRepository = new Lazy<POTranslationRepository>(() => new POTranslationRepository(new i18nSettings(new WebConfigSettingService(null))));
             urlLocalizer = new UrlLocalizer();
-            textLocalizer = new TextLocalizer(new i18nSettings(new WebConfigSettingService(null)), translationRepository);
+            textLocalizer = new Lazy<TextLocalizer>(() => new TextLocalizer(new i18nSettings(new WebConfigSettingService(null)), TranslationRepositoryForApp));
             earlyUrlLocalizer = new EarlyUrlLocalizer(urlLocalizer);
-            nuggetLocalizer = new NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+            nuggetLocalizer = new Lazy<NuggetLocalizer>(() => new NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), TextLocalizerForApp));
         }
 
-    #region [IRootServices]
+        #region [IRootServices]
 
         public ITranslationRepository TranslationRepositoryForApp
         {
             get
             {
-                return translationRepository;
+                return translationRepository.Value;
             }
         }
         public IUrlLocalizer UrlLocalizerForApp
         {
-            get {
+            get
+            {
                 return urlLocalizer;
             }
         }
         public ITextLocalizer TextLocalizerForApp
         {
-            get {
-                return textLocalizer;
+            get
+            {
+                return textLocalizer.Value;
             }
         }
         public IEarlyUrlLocalizer EarlyUrlLocalizerForApp
         {
-            get {
+            get
+            {
                 return earlyUrlLocalizer;
             }
         }
         public INuggetLocalizer NuggetLocalizerForApp
         {
-            get {
-                return nuggetLocalizer;
+            get
+            {
+                return nuggetLocalizer.Value;
             }
         }
 
-    #endregion
+        #endregion
 
     }
 
@@ -69,15 +76,15 @@ namespace i18n
     public class LocalizedApplication : IRootServices
     {
 
-    #region [IRootServices]
+        #region [IRootServices]
 
         public ITranslationRepository TranslationRepositoryForApp { get { return RootServices.TranslationRepositoryForApp; } }
-        public IUrlLocalizer UrlLocalizerForApp                   { get { return RootServices.UrlLocalizerForApp;          } }
-        public ITextLocalizer TextLocalizerForApp                 { get { return RootServices.TextLocalizerForApp;         } }
-        public IEarlyUrlLocalizer EarlyUrlLocalizerForApp         { get { return RootServices.EarlyUrlLocalizerForApp;     } }
-        public INuggetLocalizer NuggetLocalizerForApp             { get { return RootServices.NuggetLocalizerForApp;       } }
+        public IUrlLocalizer UrlLocalizerForApp { get { return RootServices.UrlLocalizerForApp; } }
+        public ITextLocalizer TextLocalizerForApp { get { return RootServices.TextLocalizerForApp; } }
+        public IEarlyUrlLocalizer EarlyUrlLocalizerForApp { get { return RootServices.EarlyUrlLocalizerForApp; } }
+        public INuggetLocalizer NuggetLocalizerForApp { get { return RootServices.NuggetLocalizerForApp; } }
 
-    #endregion
+        #endregion
 
         /// <summary>
         /// The language to be used as the default for the application where no
@@ -104,11 +111,14 @@ namespace i18n
         ///     "zh-Hant-HK"    [language + script + region]
         ///     "zh-Hant-HK-x-ABCD"    [language + script + region + private use]
         /// </remarks>
-        public string DefaultLanguage { 
-            get {
+        public string DefaultLanguage
+        {
+            get
+            {
                 return DefaultLanguageTag.ToString();
             }
-            set {
+            set
+            {
                 DefaultLanguageTag = LanguageTag.GetCachedInstance(value);
             }
         }
@@ -211,14 +221,17 @@ namespace i18n
             // NB: if this method being called outside of a request handler, HttpContext.Current
             // fails. Normally, this results in a null being returned; however it has been observed
             // that it can also throw.
-            try {
+            try
+            {
                 var mycontext = HttpContext.Current;
-                if(mycontext!=null && mycontext.Request.ApplicationPath != null)
+                if (mycontext != null && mycontext.Request.ApplicationPath != null)
                     ApplicationPath = mycontext.Request.ApplicationPath.TrimEnd('/');
             }
-            catch(Exception) {}
-            if (String.IsNullOrWhiteSpace(ApplicationPath)) {
-                ApplicationPath = "/"; }
+            catch (Exception) { }
+            if (String.IsNullOrWhiteSpace(ApplicationPath))
+            {
+                ApplicationPath = "/";
+            }
 
             // Use default package of root services.
             // Host app may override this.
@@ -229,16 +242,24 @@ namespace i18n
             // settings of the thread.
             SetPrincipalAppLanguageForRequestHandlers = delegate(HttpContextBase context, ILanguageTag langtag)
             {
-                if (langtag != null) {
-                    Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = langtag.GetCultureInfo(); }
+                if (langtag != null)
+                {
+                    Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = langtag.GetCultureInfo();
+                }
             };
         }
+
+        private static LocalizedApplication current;
 
         /// <summary>
         /// Instance of the this LocalizedApplication class for the current AppDomain.
         /// </summary>
-        public static LocalizedApplication Current = new LocalizedApplication();
-        
+        public static LocalizedApplication Current
+        {
+            get { return current ?? (current = new LocalizedApplication()); }
+            set { current = value; }
+        }
+
         /// <summary>
         /// This object relays its implementaion of IRootServices onto the object set here.
         /// Host app may override with its own implementation.
