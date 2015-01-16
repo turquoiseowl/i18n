@@ -98,7 +98,7 @@ namespace i18n
         /// <remarks>
         /// This filtering in performed in addition to any custom IncomingUrlFilters/OutgoingUrlFilters filters.
         /// </remarks>
-        public static Regex QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.jpg|\.png|\.svg|\.woff|\.eot)$");
+        public static Regex QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.jpg|\.png|\.svg|\.woff|\.eot)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Filters that examines the request URL during Early URL Localization
