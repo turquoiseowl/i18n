@@ -81,6 +81,7 @@ namespace i18n
         /// </para>
         /// </remarks>
         string ExtractLangTagFromUrl(HttpContextBase context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched);
+        string ExtractLangTagFromUrl(HttpContext context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched);
 
         /// <summary>
         /// Patches in the langtag into the passed url path part, replacing any extant langtag 
@@ -102,6 +103,7 @@ namespace i18n
         /// <para>"/zh-Hans/account/signup" , null -> "/account/signup"</para>
         /// </remarks>
         string SetLangTagInUrlPath(HttpContextBase context, string url, UriKind uriKind, string langtag);
+        string SetLangTagInUrlPath(HttpContext context, string url, UriKind uriKind, string langtag);
 
         /// <summary>
         /// Method for injecting a language tag into a route's virtual path.

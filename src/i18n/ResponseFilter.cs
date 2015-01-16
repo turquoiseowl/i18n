@@ -90,7 +90,7 @@ namespace i18n
             {
                 var page = m_httpContext.Handler as Page;
                 //if webforms and postback
-                if (page != null && page.IsPostBack) {
+                if (page != null && page.IsPostBack && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r","").Split('\n')[0])) {
                     var postbackParser = new PostbackParser(entity);
                     // not quite sure only those 2 types should be translated (any help ?)
                     var types = new[]
