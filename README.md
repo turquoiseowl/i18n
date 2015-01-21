@@ -72,9 +72,15 @@ code shows the most common options:
 
             // Change from the of temporary redirects during URL localization
             i18n.LocalizedApplication.Current.PermanentRedirects = true;
+			
+            // Blacklist content types from being nuggets 'processed'. This is defaults
+			//LocalizedApplication.Current.ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$");
+
+            // Blacklist certain URLs from being nuggets 'processed'. This is defaults
+            //LocalizedApplication.Current.UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
 
             // This line can be used to disable URL Localization.
-            //i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null;
+            //((DefaultRootServices)LocalizedApplication.Current.RootServices).earlyUrlLocalizer = null;
 
             // Change the URL localization scheme from Scheme1.
             i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;

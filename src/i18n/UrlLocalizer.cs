@@ -65,7 +65,7 @@ namespace i18n
     public class UrlLocalizer : IUrlLocalizer
     {
 
-    // Implementation
+        // Implementation
 
         /// <summary>
         /// Specifies the URL localization used by ALL instances of UrlLocalizer.
@@ -156,22 +156,28 @@ namespace i18n
             };
         }
 
-    #region [IUrlLocalizer]
+        #region [IUrlLocalizer]
 
         public bool FilterIncoming(Uri url)
         {
             // Run through any quick exclusion filter.
-            if (QuickUrlExclusionFilter != null) {
-                if (QuickUrlExclusionFilter.Match(url.LocalPath).Success) {
-                    return false; }
+            if (QuickUrlExclusionFilter != null)
+            {
+                if (QuickUrlExclusionFilter.Match(url.LocalPath).Success)
+                {
+                    return false;
+                }
             }
 
             // Run through any filters installed.
-            if (IncomingUrlFilters != null) {
+            if (IncomingUrlFilters != null)
+            {
                 foreach (IncomingUrlFilter filter in IncomingUrlFilters.GetInvocationList())
                 {
-                    if (!filter(url)) {
-                        return false; }
+                    if (!filter(url))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -179,26 +185,38 @@ namespace i18n
         public bool FilterOutgoing(string url, Uri currentRequestUrl)
         {
             // Run through any quick exclusion filter.
-            if (QuickUrlExclusionFilter != null) {
+            if (QuickUrlExclusionFilter != null)
+            {
                 Uri uri;
                 if (Uri.TryCreate(url, UriKind.Absolute, out uri)
-                    || Uri.TryCreate(currentRequestUrl, url, out uri)) {
-                    if (QuickUrlExclusionFilter.Match(uri.LocalPath).Success) {
-                        return false; }
+                    || Uri.TryCreate(currentRequestUrl, url, out uri))
+                {
+                    if (QuickUrlExclusionFilter.Match(uri.LocalPath).Success)
+                    {
+                        return false;
+                    }
                 }
             }
 
             // Run through any filters installed.
-            if (OutgoingUrlFilters != null) {
+            if (OutgoingUrlFilters != null)
+            {
                 foreach (OutgoingUrlFilter filter in OutgoingUrlFilters.GetInvocationList())
                 {
-                    if (!filter(url, currentRequestUrl)) {
-                        return false; }
+                    if (!filter(url, currentRequestUrl))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
         }
-        
+
+        public string ExtractLangTagFromUrl(HttpContext context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
+        {
+            return ExtractLangTagFromUrl(context.GetHttpContextBase(), url, uriKind, incomingUrl, out urlPatched);
+        }
+
         public string ExtractLangTagFromUrl(HttpContextBase context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
         {
             string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url, uriKind);
@@ -208,55 +226,68 @@ namespace i18n
             switch (UrlLocalizationScheme)
             {
                 case UrlLocalizationScheme.Scheme1:
-                {
-                    break;
-                }
-                case UrlLocalizationScheme.Scheme2:
-                {
-                    // If the URL is nonlocalized incoming URL, this implies default language.
-                    if (result == null && incomingUrl) {
-                        result = DetermineDefaultLanguageFromRequest(context).ToString();
-                        urlPatched = url;
+                    {
+                        break;
                     }
-                    break;
-                }
+                case UrlLocalizationScheme.Scheme2:
+                    {
+                        // If the URL is nonlocalized incoming URL, this implies default language.
+                        if (result == null && incomingUrl)
+                        {
+                            result = DetermineDefaultLanguageFromRequest(context).ToString();
+                            urlPatched = url;
+                        }
+                        break;
+                    }
                 case UrlLocalizationScheme.Scheme3:
                 default:
-                {
-                    throw new InvalidOperationException();
-                }
+                    {
+                        throw new InvalidOperationException();
+                    }
             }
 
-           // If site root path was trimmed from the URL above, add it back on now.
+            // If site root path was trimmed from the URL above, add it back on now.
             if (siteRootPath != null
-                && urlPatched != null) {
-                PatchSiteRootPathIntoUrl(siteRootPath, ref urlPatched, uriKind); }
+                && urlPatched != null)
+            {
+                PatchSiteRootPathIntoUrl(siteRootPath, ref urlPatched, uriKind);
+            }
 
             return result;
         }
+
+        public string SetLangTagInUrlPath(HttpContext context, string url, UriKind uriKind, string langtag)
+        {
+            return SetLangTagInUrlPath(context.GetHttpContextBase(), url, uriKind, langtag);
+        }
+
         public string SetLangTagInUrlPath(HttpContextBase context, string url, UriKind uriKind, string langtag)
         {
             switch (UrlLocalizationScheme)
             {
                 case UrlLocalizationScheme.Scheme2:
-                {
-                    if (DetermineDefaultLanguageFromRequest(context).Equals(langtag)) {
-                        return url; }
-                    break;
-                }
+                    {
+                        if (DetermineDefaultLanguageFromRequest(context).Equals(langtag))
+                        {
+                            return url;
+                        }
+                        break;
+                    }
                 case UrlLocalizationScheme.Scheme3:
-                {
-                    throw new InvalidOperationException();
-                }
+                    {
+                        throw new InvalidOperationException();
+                    }
             }
 
             string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url, uriKind);
 
             url = LanguageTag.SetLangTagInUrlPath(url, uriKind, langtag);
 
-           // If site root path was trimmed from the URL above, add it back on now.
-            if (siteRootPath != null) {
-                PatchSiteRootPathIntoUrl(siteRootPath, ref url, uriKind); }
+            // If site root path was trimmed from the URL above, add it back on now.
+            if (siteRootPath != null)
+            {
+                PatchSiteRootPathIntoUrl(siteRootPath, ref url, uriKind);
+            }
 
             return url;
         }
@@ -268,9 +299,9 @@ namespace i18n
             return virtualPath.IsSet() ? string.Format("{0}/{1}", langtag, virtualPath) : langtag;
         }
 
-    #endregion
+        #endregion
 
-    // Helpers
+        // Helpers
 
         /// <summary>
         /// Helper for detecting and extracting any site root path string from a URL.
@@ -282,35 +313,41 @@ namespace i18n
         /// </returns>
         protected string ExtractAnySiteRootPathFromUrl(ref string url, UriKind uriKind)
         {
-           // If site root path is '\' then nothing to do.
-            if (LocalizedApplication.Current.ApplicationPath == "/") {
-                return null; }
+            // If site root path is '\' then nothing to do.
+            if (LocalizedApplication.Current.ApplicationPath == "/")
+            {
+                return null;
+            }
 
-           // If url is possibly absolute
-            if (uriKind != UriKind.Relative) {
-               // If absolute url (include host and optionally scheme)
+            // If url is possibly absolute
+            if (uriKind != UriKind.Relative)
+            {
+                // If absolute url (include host and optionally scheme)
                 Uri uri;
-                if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
+                if (Uri.TryCreate(url, UriKind.Absolute, out uri))
+                {
                     UriBuilder ub = new UriBuilder(url);
                     string path = ub.Path;
                     string siteRootPath = ExtractAnySiteRootPathFromUrl(ref path, UriKind.Relative);
-                   // Match?
-                    if (siteRootPath != null) {
+                    // Match?
+                    if (siteRootPath != null)
+                    {
                         ub.Path = path;
                         url = ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
                         return siteRootPath;
                     }
-                   // No match.
+                    // No match.
                     return null;
                 }
             }
 
-           // If url is prefixed with the site root path, trim it from the url.
-           // E.g. for site root path of "/XYZ"
-           //     /XYZ/Home/Index -> /Home/Index and we return /XYZ
-            if (url.IndexOf(LocalizedApplication.Current.ApplicationPath, 0, StringComparison.OrdinalIgnoreCase) == 0) {
+            // If url is prefixed with the site root path, trim it from the url.
+            // E.g. for site root path of "/XYZ"
+            //     /XYZ/Home/Index -> /Home/Index and we return /XYZ
+            if (url.IndexOf(LocalizedApplication.Current.ApplicationPath, 0, StringComparison.OrdinalIgnoreCase) == 0)
+            {
                 int len = LocalizedApplication.Current.ApplicationPath.Length;
-                url = url.Substring(len, url.Length -len);
+                url = url.Substring(len, url.Length - len);
                 return LocalizedApplication.Current.ApplicationPath;
             }
             return null;
@@ -318,11 +355,13 @@ namespace i18n
 
         protected void PatchSiteRootPathIntoUrl(string siteRootPath, ref string url, UriKind uriKind)
         {
-           // If url is possibly absolute
-            if (uriKind != UriKind.Relative) {
-               // If absolute url (include host and optionally scheme)
+            // If url is possibly absolute
+            if (uriKind != UriKind.Relative)
+            {
+                // If absolute url (include host and optionally scheme)
                 Uri uri;
-                if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
+                if (Uri.TryCreate(url, UriKind.Absolute, out uri))
+                {
                     UriBuilder ub = new UriBuilder(url);
                     string path = ub.Path;
                     PatchSiteRootPathIntoUrl(siteRootPath, ref path, UriKind.Relative);
@@ -331,8 +370,8 @@ namespace i18n
                     return;
                 }
             }
-    
-           // Url is relative so just prefix path.
+
+            // Url is relative so just prefix path.
             url = siteRootPath + url;
         }
     }
