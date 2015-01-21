@@ -252,7 +252,7 @@ To enable this feature:
     ...
   </appSettings>
 ```
-When VisualizeMessages is active the NuggetVisualizeToken will be appended at start and end of
+When VisualizeMessages is active the NuggetVisualizeToken will be inserted at start and end of
 each translated message.   
 
 #### Message Context Support
