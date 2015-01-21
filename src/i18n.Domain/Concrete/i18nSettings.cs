@@ -266,22 +266,17 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
-        private const string NuggetParameterBeginTokenDefault = "(((";
-        public virtual string NuggetParameterBeginToken
         {
             get
             {
-                string prefixedString = GetPrefixedString("NuggetParameterBeginToken");
                 string setting = _settingService.GetSetting(prefixedString);
                 if (setting != null)
                 {
                     return setting;
                 }
-                return NuggetParameterBeginTokenDefault;
             }
             set
             {
-                string prefixedString = GetPrefixedString("NuggetParameterBeginToken");
                 _settingService.SetSetting(prefixedString, value);
             }
         }
@@ -306,9 +301,28 @@ namespace i18n.Domain.Concrete
             }
         }
 
+        private const string NuggetVisualizeTokenDefault = "!";
+        public virtual string NuggetVisualizeToken
+        {
+            get
+            {
+                string prefixedString = GetPrefixedString("NuggetVisualizeToken");
+                string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null)
+                {
+                    return setting;
+                }
+                return NuggetVisualizeTokenDefault;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("NuggetVisualizeToken");
+                _settingService.SetSetting(prefixedString, value);
+            }
+        }
+
 		#endregion
-
-
+        
 		#region DirectoriesToScan
 
 		private const string _directoriesToScan = ".";
@@ -359,8 +373,7 @@ namespace i18n.Domain.Concrete
 		}
 
 		#endregion
-
-
+        
 		#region Available Languages
 
 		//If empty string is returned the repository can if it choses enumerate languages in a different way (like enumerating directories in the case of PO files)
@@ -417,6 +430,36 @@ namespace i18n.Domain.Concrete
 		}
 
 		#endregion
+
+        #region VisualizeMessages
+
+        private bool? _cached_visualizeMessages;
+        public virtual bool VisualizeMessages
+        {
+            get
+            {
+                // NB: this is not particularly thread-safe, but not seen as dangerous
+                // if done concurrently as modification is one-way.
+                if (_cached_visualizeMessages != null)
+                {
+                    return _cached_visualizeMessages.Value;
+                }
+
+                string prefixedString = GetPrefixedString("VisualizeMessages");
+                string setting = _settingService.GetSetting(prefixedString);
+                bool result = !string.IsNullOrEmpty(setting) && setting == "true";
+                _cached_visualizeMessages = result;
+                return _cached_visualizeMessages.Value;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("VisualizeMessages");
+                _settingService.SetSetting(prefixedString, value ? "true" : "false");
+                _cached_visualizeMessages = value;
+            }
+        }
+
+        #endregion
 
 	}
 }

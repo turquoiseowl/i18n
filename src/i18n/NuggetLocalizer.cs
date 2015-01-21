@@ -92,6 +92,9 @@ namespace i18n
                 }
                // Output modified message (to be subsituted for original in the source entity).
                 DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", nugget.MsgId, message);
+
+                if (_settings.VisualizeMessages)
+                    message = string.Format("{0}{1}{0}", _settings.NuggetVisualizeToken, message);
                 return HttpUtility.HtmlDecode(message);
             });
            // Return modified entity.

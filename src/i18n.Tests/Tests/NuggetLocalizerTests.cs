@@ -66,6 +66,7 @@ namespace i18n.Tests
             Assert.AreEqual("Will occur April every  years", post);
         }
 
+
         [TestMethod]
         [Description("Issue #169: Translate parameter.")]
         public void NuggetLocalizer_can_translate_parameter()
@@ -77,6 +78,23 @@ namespace i18n.Tests
             // Value for second variable is missing.
             string post = obj.ProcessNuggets(pre, languages);
             Assert.AreEqual("!!ZipCode! is required!", post);
+        }
+
+		
+		[TestMethod]
+        public void NuggetLocalizer_can_visualize_nugget()
+        {
+            ITextLocalizer textLocalizer = new TextLocalizer_Mockup("xxx", "yyy");
+            var settings = new i18nSettings(new WebConfigSettingService(null))
+            {
+                VisualizeMessages = true
+            };
+
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(settings, textLocalizer);
+
+            string pre = "[[[123]]] [[[456]]]";
+            string post = obj.ProcessNuggets(pre, languages);
+            Assert.AreEqual("!xxx123yyy! !xxx456yyy!", post);
         }
 
     }
