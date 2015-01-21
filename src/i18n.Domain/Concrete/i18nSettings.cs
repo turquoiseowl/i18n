@@ -266,6 +266,41 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+        {
+            get
+            {
+                string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null)
+                {
+                    return setting;
+                }
+            }
+            set
+            {
+                _settingService.SetSetting(prefixedString, value);
+            }
+        }
+
+        private const string NuggetParameterEndTokenDefault = ")))";
+        public virtual string NuggetParameterEndToken
+        {
+            get
+            {
+                string prefixedString = GetPrefixedString("NuggetParameterEndToken");
+                string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null)
+                {
+                    return setting;
+                }
+                return NuggetParameterEndTokenDefault;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("NuggetParameterEndToken");
+                _settingService.SetSetting(prefixedString, value);
+            }
+        }
+
         private const string NuggetVisualizeTokenDefault = "!";
         public virtual string NuggetVisualizeToken
         {
