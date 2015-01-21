@@ -180,10 +180,18 @@ Nugget markup supports formated messages as follows:
 ```
 string.Format("[[[welcome %1, today is %0|||{0}|||{1}]]]", day, name)
 ```
-
 where the %0 and %1 tokens are replaced by the strings that replace the {0} and {1} items, respectively.
 (The reason for the extra level of redirection here is to facilitate the translator rearranging the order of
 the tokens for different languages.)
+
+Nugget transformation also support translation of parameters like  
+```
+[DisplayName("[[[CountryCode]]]")]
+[MaxLength(20, ErrorMessage="[[[%0 must be %1 characters or less|||(((CountryCode)))|||20]]]")]
+public string CountryCode { get; set; }
+```
+Where the Nugget markup will first replace (((CountryCode)) with the translated text and then merge the 
+translated value into the main message. 
 
 Nugget markup also supports comments (_extracted comments_ in PO parlance) to be passed to the translator like so:
 
@@ -209,7 +217,7 @@ replace the GetText / _() style of marking-up messages.
 
 #### Nugget markup customization
 
-The character sequences for marking-up nuggets ([[[, ]]], ||| and ///) were chosen on the basis that they were unlikely to clash with
+The character sequences for marking-up nuggets ([[[, ]]], |||, (((, ))) and ///) were chosen on the basis that they were unlikely to clash with
 common character sequences in HTML markup while at the same time being convenient for the programmer
 to enter (on most keyboards).
 
@@ -224,9 +232,28 @@ which you know are not going to clash. You can configure these in web.config as 
     <add key="i18n.NuggetEndToken" value="]&]" />
     <add key="i18n.NuggetDelimiterToken" value="||||" />
     <add key="i18n.NuggetCommentToken" value="////" />
+    <add key="i18n.NuggetParameterBeginToken" value="(((" />
+    <add key="i18n.NuggetParameterEndToken" value=")))" />
     ...
   </appSettings>
 ```
+
+#### Message Visualization
+
+i18n can be configured to visualize all processed messages. This is useful when testing your 
+app to verify that all messages are tagged correctly.
+To enable this feature:
+
+```xml
+  <appSettings>
+    ...
+    <add key="i18n.VisualizeMessages" value="true" />
+    <add key="i18n.NuggetVisualizeToken" value="!" />
+    ...
+  </appSettings>
+```
+When VisualizeMessages is active the NuggetVisualizeToken will be appended at start and end of
+each translated message.   
 
 #### Message Context Support
 

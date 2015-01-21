@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -68,8 +69,22 @@ namespace i18n
                    // Convert any identifies in a formatted nugget: %0 -> {0}
                     message = ConvertIdentifiersInMsgId(message);
                    // Format the message.
+                    var formatItems = new List<string>(nugget.FormatItems);
+
                     try {
-                        message = string.Format(message, nugget.FormatItems); }
+                        // translate nuggets in parameters 
+                        for (int i = 0; i < formatItems.Count; i++)
+                        {
+                            // if formatItem (parameter) is null or does not contain NuggetParameterBegintoken then continue
+                            if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
+
+                            // replace parameter tokens with nugget tokens 
+                            var fItem = formatItems[i].Replace(_settings.NuggetParameterBeginToken, _settings.NuggetBeginToken).Replace(_settings.NuggetParameterEndToken, _settings.NuggetEndToken);
+                            // and process nugget 
+                            formatItems[i] = ProcessNuggets(fItem, languages);
+                        }
+
+                        message = string.Format(message, formatItems.ToArray()); }
                     catch (FormatException /*e*/) {
                         //message += string.Format(" [FORMAT EXCEPTION: {0}]", e.Message);
                         message += "[FORMAT EXCEPTION]";
