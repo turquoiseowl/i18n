@@ -266,17 +266,22 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+        private const string NuggetParameterBeginTokenDefault = "(((";
+        public virtual string NuggetParameterBeginToken
         {
             get
             {
+                string prefixedString = GetPrefixedString("NuggetParameterBeginToken");
                 string setting = _settingService.GetSetting(prefixedString);
                 if (setting != null)
                 {
                     return setting;
                 }
+                return NuggetParameterBeginTokenDefault;
             }
             set
             {
+                string prefixedString = GetPrefixedString("NuggetParameterBeginToken");
                 _settingService.SetSetting(prefixedString, value);
             }
         }
