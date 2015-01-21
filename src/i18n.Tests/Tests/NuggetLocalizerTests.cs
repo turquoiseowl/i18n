@@ -65,5 +65,21 @@ namespace i18n.Tests
             string post = obj.ProcessNuggets(pre, languages);
             Assert.AreEqual("Will occur April every  years", post);
         }
+
+        [TestMethod]
+        public void NuggetLocalizer_can_visualize_nugget()
+        {
+            ITextLocalizer textLocalizer = new TextLocalizer_Mockup("xxx", "yyy");
+            var settings = new i18nSettings(new WebConfigSettingService(null))
+            {
+                VisualizeMessages = true
+            };
+
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(settings, textLocalizer);
+
+            string pre = "[[[123]]] [[[456]]]";
+            string post = obj.ProcessNuggets(pre, languages);
+            Assert.AreEqual("!xxx123yyy! !xxx456yyy!", post);
+        }
     }
 }
