@@ -396,7 +396,7 @@ namespace i18n.Domain.Concrete
 
 		#endregion
 
-        #region VisualizeTokens
+        #region VisualizeMessages
 
         private bool? _cached_visualizeMessages;
         public virtual bool VisualizeMessages
