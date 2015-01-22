@@ -36,7 +36,7 @@ namespace i18n.PostBuild
 	        }
 
 			//todo: this assumes PO files, if not using po files then other solution needed.
-			i18nSettings settings = new i18nSettings(new WebConfigSettingService(configPath));
+			i18nSettings settings = new i18nSettings(new WebConfigSettingService(configPath, true));
 			POTranslationRepository rep = new POTranslationRepository(settings);
 
 			FileNuggetFinder nugget = new FileNuggetFinder(settings);

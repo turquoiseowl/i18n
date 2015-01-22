@@ -19,7 +19,7 @@ namespace i18n.Tests
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mockup("xxx", "yyy");
 
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService()), textLocalizer);
 
             string pre = "[[[123]]] [[[456]]]";
             string post = obj.ProcessNuggets(pre, languages);
@@ -31,7 +31,7 @@ namespace i18n.Tests
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mockup("xxx", "yyy");
 
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService()), textLocalizer);
 
             string pre = "[[[1\r\n2]]] [[[\r\n3]]]";
             string post = obj.ProcessNuggets(pre, languages);
@@ -44,7 +44,7 @@ namespace i18n.Tests
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mockup();
 
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService()), textLocalizer);
 
             string pre = "[[[Will occur %0 every %1 years||||||10///First variable is a month]]]";
                 // Value for first variable is missing.
@@ -58,7 +58,7 @@ namespace i18n.Tests
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mockup();
 
-            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService()), textLocalizer);
 
             string pre = "[[[Will occur %0 every %1 years|||April|||///First variable is a month]]]";
                 // Value for second variable is missing.
@@ -70,7 +70,7 @@ namespace i18n.Tests
         public void NuggetLocalizer_can_visualize_nugget()
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mockup("xxx", "yyy");
-            var settings = new i18nSettings(new WebConfigSettingService(null))
+            var settings = new i18nSettings(new WebConfigSettingService())
             {
                 VisualizeMessages = true
             };

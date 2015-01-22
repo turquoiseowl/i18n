@@ -126,7 +126,7 @@ namespace VSPackage.i18n_POTGenerator
                     throw new Exception("Project does not have a web.config file");
                 }
 
-                var settings = new i18nSettings(new WebConfigSettingService(configPath));
+                var settings = new i18nSettings(new WebConfigSettingService(configPath, true));
                 var rep = new POTranslationRepository(settings);
 
                 var nugget = new FileNuggetFinder(settings);
