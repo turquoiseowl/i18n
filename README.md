@@ -257,7 +257,7 @@ each translated message.
 
 #### Message Context Support
 
-i18n allows you to assign a ```msgctxt``` value to each message. Teh value of the msgctxt is
+i18n allows you to assign a ```msgctxt``` value to each message. The value of the msgctxt is
 taken from any comment you have defined in the nugget. This feature is optional and disabled
 by default. To enable this feature:
 
