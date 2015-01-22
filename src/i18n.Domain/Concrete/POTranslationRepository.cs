@@ -131,9 +131,13 @@ namespace i18n.Domain.Concrete
 		/// <param name="translation">The translation you wish to save. Must have Language shortag filled out.</param>
 		public void SaveTranslation(Translation translation)
 		{
+            var templateFilePath = GetAbsoluteLocaleDir() + "/messages.pot";
+            var POTDate = DateTime.Now;
+            if (File.Exists(templateFilePath)) {
+                POTDate = File.GetLastWriteTime(templateFilePath); }
+
 			string filePath = GetPathForLanguage(translation.LanguageInformation.LanguageShortTag);
 			string backupPath = GetPathForLanguage(translation.LanguageInformation.LanguageShortTag) + ".backup";
-
 			if (File.Exists(filePath)) //we backup one version. more advanced backup solutions could be added here.
 			{
 				if (File.Exists(backupPath))
@@ -176,7 +180,14 @@ namespace i18n.Domain.Concrete
 				stream.WriteLine("msgid \"\"");
 				stream.WriteLine("msgstr \"\"");
 				stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\\n\"");
-				stream.WriteLine();
+                stream.WriteLine("\"Project-Id-Version: \n\"");
+                stream.WriteLine("\"POT-Creation-Date: " + POTDate.ToString("yyyy-MM-dd HH:mmzzz") + "\n\"");
+                stream.WriteLine("\"PO-Revision-Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mmzzz") + "\n\"");
+                stream.WriteLine("\"MIME-Version: 1.0\n\"");
+                stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\n\"");
+                stream.WriteLine("\"Content-Transfer-Encoding: 8bit\n\"");
+                stream.WriteLine("\"X-Generator: i18n.POTGenerator\n\"");
+                stream.WriteLine();
 
 				foreach (var item in orderedItems)
 				{
@@ -280,7 +291,13 @@ namespace i18n.Domain.Concrete
 				stream.WriteLine("msgid \"\"");
 				stream.WriteLine("msgstr \"\"");
 				stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\\n\"");
-				stream.WriteLine();
+                stream.WriteLine("\"Project-Id-Version: \n\"");
+                stream.WriteLine("\"POT-Creation-Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mmzzz") + "\n\"");
+                stream.WriteLine("\"MIME-Version: 1.0\n\"");
+                stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\n\"");
+                stream.WriteLine("\"Content-Transfer-Encoding: 8bit\n\"");
+                stream.WriteLine("\"X-Generator: i18n.POTGenerator\n\"");
+                stream.WriteLine();
 
 				foreach (var item in orderedItems)
 				{
