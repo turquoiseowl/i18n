@@ -90,7 +90,13 @@ namespace i18n.Domain.Concrete
 			}
 
 			//save to apply changes
-			_configuration.Save(ConfigurationSaveMode.Modified);
+            //_configuration.Save(ConfigurationSaveMode.Modified);
+                // This call will persist changes in the source .config file.
+                // Do we really want to do that?
+                // Specifically, this caused problems in Unit Tests, when a non-default setting
+                // made in test A carried over to a subsequent run of another test B that
+                // intended to load the default value for the setting, while in fact got the
+                // value from the previous run of test A.
 		}
 
 		public override void RemoveSetting(string key)
