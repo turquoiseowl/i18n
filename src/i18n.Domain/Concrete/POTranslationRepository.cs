@@ -179,7 +179,6 @@ namespace i18n.Domain.Concrete
 				//This is required for poedit to read the files correctly if they contains for instance swedish characters
 				stream.WriteLine("msgid \"\"");
 				stream.WriteLine("msgstr \"\"");
-				stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\\n\"");
                 stream.WriteLine("\"Project-Id-Version: \\n\"");
                 stream.WriteLine("\"POT-Creation-Date: " + POTDate.ToString("yyyy-MM-dd HH:mmzzz") + "\\n\"");
                 stream.WriteLine("\"PO-Revision-Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mmzzz") + "\\n\"");
@@ -290,7 +289,6 @@ namespace i18n.Domain.Concrete
 				//This is required for poedit to read the files correctly if they contains for instance swedish characters
 				stream.WriteLine("msgid \"\"");
 				stream.WriteLine("msgstr \"\"");
-				stream.WriteLine("\"Content-Type: text/plain; charset=utf-8\\n\"");
                 stream.WriteLine("\"Project-Id-Version: \\n\"");
                 stream.WriteLine("\"POT-Creation-Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mmzzz") + "\\n\"");
                 stream.WriteLine("\"MIME-Version: 1.0\\n\"");
