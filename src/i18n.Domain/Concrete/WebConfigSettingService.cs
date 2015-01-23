@@ -16,27 +16,27 @@ namespace i18n.Domain.Concrete
 		private Configuration _configuration;
 		private AppSettingsSection _settings;
 
-        public WebConfigSettingService(string configLocation = null, bool isAbsolutePath = false) : base(configLocation)
+        public WebConfigSettingService(string configLocation = null, bool isVirtualPath = false) : base(configLocation)
         {
 	        //http://stackoverflow.com/questions/4738/using-configurationmanager-to-load-config-from-an-arbitrary-location/4746#4746
 	        try
 	        {   
 		        if (configLocation != null)
 		        {
-			        if (isAbsolutePath)
+                    if (isVirtualPath)
 			        {
-				        //ConfigurationFileMap fileMap = new ConfigurationFileMap(configLocation); //Path to your config file
-				        //_configuration = ConfigurationManager.OpenMappedMachineConfiguration(fileMap);
-				        ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap();
-				        fileMap.ExeConfigFilename = configLocation;
-				        _configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-				        //_settings = (AppSettingsSection)_configuration.GetSection("AppSettings");
-				        _settings = _configuration.AppSettings;
+                        _configuration = WebConfigurationManager.OpenWebConfiguration(configLocation);
+                        _settings = _configuration.AppSettings;
 			        }
 			        else
 			        {
-				        _configuration = WebConfigurationManager.OpenWebConfiguration(configLocation);
-    			        _settings = _configuration.AppSettings;
+                        //ConfigurationFileMap fileMap = new ConfigurationFileMap(configLocation); //Path to your config file
+                        //_configuration = ConfigurationManager.OpenMappedMachineConfiguration(fileMap);
+                        ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap();
+                        fileMap.ExeConfigFilename = configLocation;
+                        _configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                        //_settings = (AppSettingsSection)_configuration.GetSection("AppSettings");
+                        _settings = _configuration.AppSettings;
 			        }
 		        }
 		        else
