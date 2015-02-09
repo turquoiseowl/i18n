@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
+using i18n.Domain.Helpers;
 using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
@@ -35,6 +36,7 @@ namespace i18n.Domain.Concrete
 		{
 			IEnumerable<string> fileWhiteList = _settings.WhiteList;
 			IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
+            FileEnumerator fileEnumerator = new FileEnumerator(_settings.BlackList);
 
 			string currentFullPath;
 			bool blacklistFound = false;
@@ -44,7 +46,7 @@ namespace i18n.Domain.Concrete
 
 			foreach (var directoryPath in directoriesToSearchRecursively)
 			{
-				foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
+                foreach (string filePath in fileEnumerator.GetFiles(directoryPath))
 				{
                     if (filePath.Length >= 260)
                     {

@@ -67,19 +67,21 @@ namespace i18n
         {
         // For impl. notes see ResponseFilter.Flush().
         //
-            var nuggetLocalizer = LocalizedApplication.Current.NuggetLocalizerForApp;
-            var earlyUrlLocalizer = LocalizedApplication.Current.EarlyUrlLocalizerForApp;
            //
+            var nuggetLocalizer = LocalizedApplication.Current.NuggetLocalizerForApp;
             if (nuggetLocalizer != null) {
                 entity = LocalizedApplication.Current.NuggetLocalizerForApp.ProcessNuggets(
                     entity,
                     context.GetRequestUserLanguages()); }
            //
-            if (earlyUrlLocalizer != null) {
-                entity = earlyUrlLocalizer.ProcessOutgoing(
-                    entity, 
-                    context.GetPrincipalAppLanguageForRequest().ToString(),
-                    context); }
+            if (UrlLocalizer.UrlLocalizationScheme != UrlLocalizationScheme.Void) {
+                var earlyUrlLocalizer = LocalizedApplication.Current.EarlyUrlLocalizerForApp;
+                if (earlyUrlLocalizer != null) {
+                    entity = earlyUrlLocalizer.ProcessOutgoing(
+                        entity, 
+                        context.GetPrincipalAppLanguageForRequest().ToString(),
+                        context); }
+            }
            //
             return entity;
         }
