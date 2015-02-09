@@ -13,6 +13,11 @@ namespace i18n
     public enum UrlLocalizationScheme
     {
         /// <summary>
+        /// Url localization is disabled.
+        /// </summary>
+        Void = -1,
+
+        /// <summary>
         /// Everything is explicit, so any URLs/routes not containing a language tag are patched 
         /// and redirected, whether or not the language is the app-default.
         /// </summary>
@@ -26,7 +31,7 @@ namespace i18n
         /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
-        Scheme1,
+        Scheme1 = 0,
 
         /// <summary>
         /// Everything to be explicit except the default language which MAY be implicit.
@@ -41,7 +46,7 @@ namespace i18n
         /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
-        Scheme2,
+        Scheme2 = 1,
 
         /// <summary>
         /// Everything to be explicit except the default language which MUST be implicit.
@@ -56,7 +61,7 @@ namespace i18n
         /// where -> means 'is redirected to'.
         /// </para>
         /// </remarks>
-        Scheme3,
+        Scheme3 = 2,
     }
 
     /// <summary>

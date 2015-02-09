@@ -74,7 +74,7 @@ code shows the most common options:
             i18n.LocalizedApplication.Current.PermanentRedirects = true;
 
             // This line can be used to disable URL Localization.
-            //i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null;
+            //i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Void;
 
             // Change the URL localization scheme from Scheme1.
             i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;
@@ -326,8 +326,20 @@ While URLs from the user-agent perspective are localized, from the app's perspec
 Thus you can write your app without worrying about the language tag in the URL.
 
 The default URL Localization scheme (Scheme1) will show the language tag in the URL always; an alternative
-scheme, Scheme2, will show the language tag only if it is not the default. Alternatively, URL localization
-can be disabled by setting `i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null` in `Application_Start`.
+scheme, Scheme2, will show the language tag only if it is not the default.
+
+#### Disabling URL Localization
+
+URL localization can be disabled by setting the scheme to ```i18n.UrlLocalizationScheme.Void``` in ```Application_Start```:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        // Disable URL Localization.
+        i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Void;
+    }
+```
 
 #### Exclude URLs from being localized
 
