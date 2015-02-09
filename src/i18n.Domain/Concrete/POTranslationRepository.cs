@@ -312,6 +312,12 @@ namespace i18n.Domain.Concrete
 						stream.WriteLine("#: " + reference);
 					}
 
+                    if (_settings.MessageContextEnabledFromComment
+                        && item.Comments != null
+                        && item.Comments.Count() != 0) {
+                        WriteString(stream, true, "msgctxt", item.Comments.First());
+                    }
+
                     WriteString(stream, true, "msgid", escape(item.MsgId));
                     WriteString(stream, true, "msgstr", ""); // enable loading of POT file into editor e.g. PoEdit.
 

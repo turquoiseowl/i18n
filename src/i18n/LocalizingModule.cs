@@ -77,7 +77,8 @@ namespace i18n
             // the i18n.langtag cookie, the Accept-Language header, or failing all that the
             // default application language.
             // · If early URL localizer configured, allow it to do it.
-            if (m_rootServices.EarlyUrlLocalizerForApp != null) {
+            if (UrlLocalizer.UrlLocalizationScheme != UrlLocalizationScheme.Void
+                && m_rootServices.EarlyUrlLocalizerForApp != null) {
                 m_rootServices.EarlyUrlLocalizerForApp.ProcessIncoming(context); }
             // · Otherwise skip the URL aspect and detemrine from the other (inferred) attributes.
             else {
@@ -108,7 +109,7 @@ namespace i18n
                 context.Response.Filter = new ResponseFilter(
                     context, 
                     context.Response.Filter,
-                    m_rootServices.EarlyUrlLocalizerForApp,
+                    UrlLocalizer.UrlLocalizationScheme == UrlLocalizationScheme.Void ? null : m_rootServices.EarlyUrlLocalizerForApp,
                     m_rootServices.NuggetLocalizerForApp);
                 }
             else {

@@ -74,7 +74,7 @@ code shows the most common options:
             i18n.LocalizedApplication.Current.PermanentRedirects = true;
 
             // This line can be used to disable URL Localization.
-            //i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null;
+            //i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Void;
 
             // Change the URL localization scheme from Scheme1.
             i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;
@@ -326,8 +326,20 @@ While URLs from the user-agent perspective are localized, from the app's perspec
 Thus you can write your app without worrying about the language tag in the URL.
 
 The default URL Localization scheme (Scheme1) will show the language tag in the URL always; an alternative
-scheme, Scheme2, will show the language tag only if it is not the default. Alternatively, URL localization
-can be disabled by setting `i18n.LocalizedApplication.Current.EarlyUrlLocalizerService = null` in `Application_Start`.
+scheme, Scheme2, will show the language tag only if it is not the default.
+
+#### Disabling URL Localization
+
+URL localization can be disabled by setting the scheme to ```i18n.UrlLocalizationScheme.Void``` in ```Application_Start```:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        // Disable URL Localization.
+        i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Void;
+    }
+```
 
 #### Exclude URLs from being localized
 
@@ -709,8 +721,18 @@ See [Issue #117](https://github.com/turquoiseowl/i18n/issues/117#issuecomment-57
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
+* Input and ideas on a safe universal nugget syntax (see issue #69).
 * Plurals support.
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
-* Better parsing and handling of PO files for more general purposes / outside editors.
-* Input and ideas on a safe universal nugget syntax (see issue #69).
-* ASP.NET AJAX support in IIS Classic mode (i.e. non-integrated ASP.NET pipeline) (see issue #109).
+
+#### Line Endings
+
+The i18n project has adopted the GitHub recommendation with regard to standardized line endings in text files.
+Specifically, text files are stored in the Git index with line endings respresented by the single LF character
+(not CR/LF).
+
+That means that, for Windows clients, you will probably want Git to convert line endings 
+to CR/LF when checking text files out of the index, and converting them back to LF line endings when committing in.
+This behaviour is controlled via Git's ```core.autocrlf``` setting, which in this case would be set to ```true```.
+
+See [Dealing with line endings](https://help.github.com/articles/dealing-with-line-endings/) for more information.
