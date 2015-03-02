@@ -444,7 +444,7 @@ Similarly, the HTML ```lang``` attribute can be set as follows:
 ```xml
     @using i18n
 
-    <html lang="@Context.GetPrincipalAppLanguageForRequest().GetLanguage()">
+    <html lang="@Context.GetPrincipalAppLanguageForRequest()">
         ...
     </html>
 ```
