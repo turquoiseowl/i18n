@@ -430,11 +430,23 @@ PAL of the current request. For example, it may be called in a Razor view as fol
 the current langue to the user:
 
 ```xml
+    @using i18n
+
     <div>
         <p id="lang_cur" title="@Context.GetPrincipalAppLanguageForRequest()">
             @Context.GetPrincipalAppLanguageForRequest().GetNativeNameTitleCase()
         </p>
     </div>
+```
+
+Similarly, the HTML ```lang``` attribute can be set as follows:
+
+```xml
+    @using i18n
+
+    <html lang="@Context.GetPrincipalAppLanguageForRequest().GetLanguage()">
+        ...
+    </html>
 ```
 
 ### Per-Request Default Language Determination
@@ -471,12 +483,14 @@ so that the URL always contains the current language tag.
 
 ### Explicit User Language Selection
 
-You probably want to allow users to override their browser language settings by providing a language selection
-feature in your application. There are two parts to implementing this feature with i18n which revolve around
+You can provide a language selection feature in your application using i18n.
+There are two parts to implementing this feature which revolve around
 the setting of a cookie called `i18n.langtag`.
 
-Firstly, you need to provide HTML that displays the current language and allows the user to explicitly select
-a language (from those ApplicationLanguages available). An example of how to do that in ASP.NET MVC and Razor follows:
+Firstly, provide HTML that displays the current language and allows the user to explicitly select
+a language (from those application languages available).
+
+An example of how to do that in ASP.NET MVC and Razor follows:
 
 ```xml
 @using i18n
@@ -534,8 +548,7 @@ a language (from those ApplicationLanguages available). An example of how to do 
 </div>
 ```
 
-On selection of a language in the above code, the AccountController.SetLanguage method is called, an example of
-which follows:
+On selection of a language in the above code, the AccountController.SetLanguage method is called. For example:
 
 ```csharp
 
@@ -626,7 +639,7 @@ that require parsing using the ```ParseAndTranslate``` extension method to HttpC
 ### Language Matching
 
 Language matching is performed when a list of one or more user-preferred languages is matched against
-a list of one or more application laguages, the goal being to choose the application languages
+a list of one or more application languages, the goal being to choose the application languages
 which the user is most likely to understand. The algorithm for this is multi-facted and multi-pass and takes the Language, 
 Script and Region subtags into account.
 
