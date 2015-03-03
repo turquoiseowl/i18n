@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\TextLocalizer_Mockup.cs" />
+    <Compile Include="Tests\LanguageMatchingTests.cs" />
     <Compile Include="Tests\LanguageTagTests.cs" />
     <Compile Include="Tests\NuggetLocalizerTests.cs" />
     <Compile Include="Tests\ResponseFilterTests.cs" />

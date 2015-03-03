@@ -54,23 +54,39 @@ namespace i18n
             string key,
             Func<string, string, string> TryGetTextFor,
             out string o_text,
-            int maxPasses = -1)
+            int maxPasses = -1,
+            LanguageTag relatedTo = null)
         {
         // This method called many times per request. Every effort taken to avoid it making any heap allocations.
         //
         // Principle Application Language (PAL) Prioritization:
         //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
-        //   Their browser is set to languages en-US, en, zh-Hans.
+        //   Their browser is set to languages en-US, zh-Hans.
         //   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
         //   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
         //   We also have message in en-US and zh-Hans.
-        //   Surely, the message from fr or fr-CA is better match than en-US or zh-Hans.
+        //   We presume the message from fr or fr-CA is better match than en-US or zh-Hans.
         //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
         //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
         //   we try all match grades first. Only if there is no match whatsoever for the PAL
         //   do we move no to the other (browser) languages, where return to prioritizing match grade
         //   i.e. loop through all the languages first at the strictest match grade before loosening 
         //   to the next match grade, and so on.
+        // Refinement to PAL Prioritization:
+        //   UserLanguages (UL) = de-ch,de-at (PAL = de-ch)
+        //   AppLanguages  (AL) = de,de-at,en
+        //   There is no exact match for PAL in AppLanguages.
+        //   However:
+        //    1. the second UL (de-at) has an exact match with an AL
+        //    2. the parent of the PAL (de) has an exact match with an AL.
+        //   Normally, PAL Prioritization means that 2. takes preference.
+        //   However, that means choosing de over de-at, when the user
+        //   has said they understand de-at (it being preferable to be
+        //   more specific, esp. in the case of different scripts under 
+        //   the same language).
+        //   Therefore, as a refinement to PAL Prioritization, before selecting
+        //   'de' we run the full algorithm again (without PAL Prioritization) 
+        //   but only considering langtags related to the PAL.
         //
             int idxUserLang = 0;
             LanguageTag ltUser;
@@ -88,7 +104,8 @@ namespace i18n
             if (UserLanguages.Length != 0) {
                // First, find any match for the PAL (see PAL Prioritization notes above).
                // If a PAL has been determined for the request
-                if ((ltUser = (LanguageTag)UserLanguages[0].LanguageTag) != null) {
+                if (relatedTo == null
+                    && (ltUser = (LanguageTag)UserLanguages[0].LanguageTag) != null) {
                    // Wiz through all match grades for the Principle Application Language.
                     for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
                         LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
@@ -104,6 +121,22 @@ namespace i18n
                             }
                             else {
                                 o_text = null; }
+                           // We have a match between PAL and an AL that is NOT an exact match, 
+                           // there may be a UL that is related to the PAL but has a closer (more specific) 
+                           // match to an AL. See "Refinement to PAL Prioritization" notes above for more details.
+                            if (matchGrade != LanguageTag.MatchGrade.ExactMatch) {
+
+                                LanguageTag lt = MatchLists(
+                                    UserLanguages, 
+                                    AppLanguages,
+                                    key,
+                                    TryGetTextFor,
+                                    out o_text,
+                                    maxPasses,
+                                    langApp.Value);
+                                if (lt != null) {
+                                    return lt; }
+                            }
                            // Match.
                             ++UserLanguages[idxUserLang].UseCount;
                             return langApp.Value;
@@ -123,6 +156,11 @@ namespace i18n
                             // TODO: move the Match functionality to this class, and make it operate on ILanguageTag.
                             // Or consider making the Match logic more abstract, e.g. requesting number of passes from
                             // the object, and passing a pass value through to Match.
+                       // Apply any filter on eligible user languages.
+                        if (relatedTo != null) {
+                            if (ltUser.Match(relatedTo, LanguageTag.MatchGrade.LanguageMatch) == 0) {
+                                continue; }
+                        }
                         foreach (KeyValuePair<string, LanguageTag> langApp in AppLanguages) {
                            // If languages do not match at the current grade...goto next.
                             if (ltUser.Match(langApp.Value, matchGrade) == 0) {
