@@ -679,19 +679,34 @@ translation for the tenant, it will match the remaining subtags according to the
 The latest refinement to the language matching algoritm:
 
 ```csharp
-        // Principle Application Language (PAL) Prioritization:
-        //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
-        //   Their browser is set to languages en-US, en, zh-Hans.
-        //   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
-        //   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
-        //   We also have message in en-US and zh-Hans.
-        //   Surely, the message from fr or fr-CA is better match than en-US or zh-Hans.
-        //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
-        //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
-        //   we try all match grades first. Only if there is no match whatsoever for the PAL
-        //   do we move no to the other (browser) languages, where return to prioritizing match grade
-        //   i.e. loop through all the languages first at the strictest match grade before loosening 
-        //   to the next match grade, and so on.
+// Principle Application Language (PAL) Prioritization:
+//   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
+//   Their browser is set to languages en-US, zh-Hans.
+//   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
+//   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
+//   We also have message in en-US and zh-Hans.
+//   We presume the message from fr or fr-CA is better match than en-US or zh-Hans.
+//   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
+//   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
+//   we try all match grades first. Only if there is no match whatsoever for the PAL
+//   do we move no to the other (browser) languages, where return to prioritizing match grade
+//   i.e. loop through all the languages first at the strictest match grade before loosening 
+//   to the next match grade, and so on.
+// Refinement to PAL Prioritization:
+//   UserLanguages (UL) = de-ch,de-at (PAL = de-ch)
+//   AppLanguages  (AL) = de,de-at,en
+//   There is no exact match for PAL in AppLanguages.
+//   However:
+//    1. the second UL (de-at) has an exact match with an AL
+//    2. the parent of the PAL (de) has an exact match with an AL.
+//   Normally, PAL Prioritization means that 2. takes preference.
+//   However, that means choosing de over de-at, when the user
+//   has said they understand de-at (it being preferable to be
+//   more specific, esp. in the case of different scripts under 
+//   the same language).
+//   Therefore, as a refinement to PAL Prioritization, before selecting
+//   'de' we run the full algorithm again (without PAL Prioritization) 
+//   but only considering langtags related to the PAL.
 ```
 
 ### A reminder about folders in a web application
