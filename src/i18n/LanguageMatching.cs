@@ -8,12 +8,12 @@ namespace i18n
     public static class LanguageMatching
     {
         /// <summary>
-        /// Given a list of user-preferred languages (in order of preference) and the list of languages
+        /// Given a list of user-preferred languages (in order of precedence) and the list of languages
         /// in which an arbitrary resource is available (AppLanguages), returns the AppLanguage which
         /// the user is most likely able to understand.
         /// </summary>
         /// <param name="UserLanguages">
-        /// A list of user-preferred languages (in order of preference).
+        /// A list of user-preferred languages (in order of precedence).
         /// </param>
         /// <param name="AppLanguages">
         /// The list of languages in which an arbitrary resource is available.
@@ -41,6 +41,14 @@ namespace i18n
         /// 3 - allow exact match or default-region match or script match or language match only
         /// -1 to set to most tolerant (i.e. 4).
         /// </param>
+        /// <param name="relatedTo">
+        /// Optionally applies a filter to the user languages considered for a match.
+        /// When set, then only user languages that have a matching language to that of relatedTo
+        /// are considered.
+        /// </param>
+        /// <param name="palPrioritization">
+        /// Indicates whether PAL Prioritization is enabled.
+        /// </param>
         /// <returns>
         /// LanguageTag instance selected from AppLanguages with the best match, or null if there is no match
         /// at all (or UserLanguages and/or AppLanguages is empty).
@@ -48,6 +56,38 @@ namespace i18n
         /// matches the same of any of the tags in AppLanguages list.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">Thrown if UserLanguages or AppLanguages is null.</exception>
+        /// <remarks>
+        /// This method called many times per request. Every effort taken to avoid it making any heap allocations.<br/>
+        /// <br/>
+        /// Principle Application Language (PAL) Prioritization:<br/>
+        ///   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
+        ///   Their browser is set to languages en-US, zh-Hans.
+        ///   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
+        ///   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
+        ///   We also have message in en-US and zh-Hans.
+        ///   We presume the message from fr or fr-CA is better match than en-US or zh-Hans.
+        ///   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
+        ///   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
+        ///   we try all match grades first. Only if there is no match whatsoever for the PAL
+        ///   do we move no to the other (browser) languages, where return to prioritizing match grade
+        ///   i.e. loop through all the languages first at the strictest match grade before loosening 
+        ///   to the next match grade, and so on.
+        /// Refinement to PAL Prioritization:<br/>
+        ///   UserLanguages (UL) = de-ch,de-at (PAL = de-ch)<br/>
+        ///   AppLanguages  (AL) = de,de-at,en<br/>
+        ///   There is no exact match for PAL in AppLanguages.<br/>
+        ///   However:<br/>
+        ///    1. the second UL (de-at) has an exact match with an AL<br/>
+        ///    2. the parent of the PAL (de) has an exact match with an AL.<br/>
+        ///   Normally, PAL Prioritization means that 2. takes precedence.
+        ///   However, that means choosing de over de-at, when the user
+        ///   has said they understand de-at (it being preferable to be
+        ///   more specific, esp. in the case of different scripts under 
+        ///   the same language).<br/>
+        ///   Therefore, as a refinement to PAL Prioritization, before selecting
+        ///   'de' we run the full algorithm again (without PAL Prioritization) 
+        ///   but only considering langtags related to the PAL.
+        /// </remarks>
         public static LanguageTag MatchLists(
             LanguageItem[] UserLanguages, 
             IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages,
@@ -55,39 +95,9 @@ namespace i18n
             Func<string, string, string> TryGetTextFor,
             out string o_text,
             int maxPasses = -1,
-            LanguageTag relatedTo = null)
+            LanguageTag relatedTo = null,
+            bool palPrioritization = true)
         {
-        // This method called many times per request. Every effort taken to avoid it making any heap allocations.
-        //
-        // Principle Application Language (PAL) Prioritization:
-        //   User has selected an explicit language in the webapp e.g. fr-CH (i.e. PAL is set to fr-CH).
-        //   Their browser is set to languages en-US, zh-Hans.
-        //   Therefore, UserLanguages[] equals fr-CH, en-US, zh-Hans.
-        //   We don't have a particular message in fr-CH, but have it in fr and fr-CA.
-        //   We also have message in en-US and zh-Hans.
-        //   We presume the message from fr or fr-CA is better match than en-US or zh-Hans.
-        //   However, without PAL prioritization, en-US is returned and failing that, zh-Hans.
-        //   Therefore, for the 1st entry in UserLanguages (i.e. explicit user selection in app)
-        //   we try all match grades first. Only if there is no match whatsoever for the PAL
-        //   do we move no to the other (browser) languages, where return to prioritizing match grade
-        //   i.e. loop through all the languages first at the strictest match grade before loosening 
-        //   to the next match grade, and so on.
-        // Refinement to PAL Prioritization:
-        //   UserLanguages (UL) = de-ch,de-at (PAL = de-ch)
-        //   AppLanguages  (AL) = de,de-at,en
-        //   There is no exact match for PAL in AppLanguages.
-        //   However:
-        //    1. the second UL (de-at) has an exact match with an AL
-        //    2. the parent of the PAL (de) has an exact match with an AL.
-        //   Normally, PAL Prioritization means that 2. takes preference.
-        //   However, that means choosing de over de-at, when the user
-        //   has said they understand de-at (it being preferable to be
-        //   more specific, esp. in the case of different scripts under 
-        //   the same language).
-        //   Therefore, as a refinement to PAL Prioritization, before selecting
-        //   'de' we run the full algorithm again (without PAL Prioritization) 
-        //   but only considering langtags related to the PAL.
-        //
             int idxUserLang = 0;
             LanguageTag ltUser;
            // Validate arguments.
@@ -104,8 +114,9 @@ namespace i18n
             if (UserLanguages.Length != 0) {
                // First, find any match for the PAL (see PAL Prioritization notes above).
                // If a PAL has been determined for the request
-                if (relatedTo == null
-                    && (ltUser = (LanguageTag)UserLanguages[0].LanguageTag) != null) {
+                if (palPrioritization
+                    && (ltUser = (LanguageTag)UserLanguages[0].LanguageTag) != null
+                    && (relatedTo == null || ltUser.Match(relatedTo, LanguageTag.MatchGrade.LanguageMatch) != 0)) { // Apply any filter on eligible user languages.
                    // Wiz through all match grades for the Principle Application Language.
                     for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
                         LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
@@ -133,7 +144,8 @@ namespace i18n
                                     TryGetTextFor,
                                     out o_text,
                                     maxPasses,
-                                    langApp.Value);
+                                    langApp.Value,
+                                    false); // false = disable PAL Prioritization.
                                 if (lt != null) {
                                     return lt; }
                             }
