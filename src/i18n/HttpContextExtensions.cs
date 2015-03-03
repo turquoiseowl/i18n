@@ -89,7 +89,6 @@ namespace i18n
             return entity;
         }
 
-
         /// <summary>
         /// Helper for caching a per-request value that identifies the principal language
         /// under which the current request is to be handled.
@@ -262,6 +261,5 @@ namespace i18n
                 throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
             return lt;
         }
-
     }
 }
