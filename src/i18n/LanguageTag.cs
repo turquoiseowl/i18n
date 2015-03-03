@@ -31,7 +31,7 @@ namespace i18n
     ///     "zh-Hant-HK-x-AAAA"    [language + script + region + private use]
     /// </remarks>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
-    public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>
+    public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>, IComparable<LanguageTag>
     {
     // Decl
         public static readonly string[,] NormalizedLangTags =
@@ -106,6 +106,10 @@ namespace i18n
         /// </summary>
         private string m_langtag;
         /// <summary>
+        /// Original full language tag string passed to constructor, converted to all lowercase.
+        /// </summary>
+        private string m_langtagLC;
+        /// <summary>
         /// Reference to any parent language tag, or null if no parent determined.
         /// The parent is the the language tag with one less subtag.
         /// E.g. if all three supported subtags are set (language, script and region), the parent 
@@ -176,6 +180,7 @@ namespace i18n
                     break;
                 }
             }
+            m_langtagLC = m_langtag.ToLowerInvariant();
            // Parse the langtag.
             Match match = m_regex_parseLangtag.Match(m_langtag);
             if (match.Success
@@ -288,6 +293,39 @@ namespace i18n
         {
             return m_langtag.IsSet() ? m_langtag : "";
         }
+        public override bool Equals(object obj)
+        {
+            LanguageTag rhs = obj as LanguageTag;
+            return rhs != null && Equals(rhs);
+        }
+		public override int GetHashCode()
+        {
+            return m_langtagLC.GetHashCode();
+		}
+    // [IEquatable<ILanguageTag>]
+        public bool Equals(ILanguageTag other)
+        {
+            return 0 == string.Compare(m_langtag, other.ToString(), true);
+        }
+    // [IEquatable<LanguageTag>]
+        public bool Equals(LanguageTag other)
+        {
+            return 0 == string.Compare(m_langtagLC, other.m_langtagLC);
+        }
+        public bool Equals(string other)
+        {
+            return 0 == string.Compare(m_langtag, other, true);
+        }
+    // [IComparable<ILanguageTag>]
+        public int CompareTo(ILanguageTag other)
+        {
+            return string.Compare(m_langtag, other.ToString(), true);
+        }
+    // [IComparable<LanguageTag>]
+        public int CompareTo(LanguageTag other)
+        {
+            return string.Compare(m_langtagLC, other.m_langtagLC);
+        }
     // [ILanguageTag]
         string   ILanguageTag.GetLanguage()   { return Language; }
         string   ILanguageTag.GetExtlang()    { return null; }
@@ -300,20 +338,6 @@ namespace i18n
         int      ILanguageTag.GetMaxParents() { return 2; }
         CultureInfo ILanguageTag.GetCultureInfo()      { return CultureInfo; }
         string   ILanguageTag.GetNativeNameTitleCase() { return NativeNameTitleCase; }
-    // [IEquatable<ILanguageTag>]
-        public bool Equals(ILanguageTag other)
-        {
-            return 0 == string.Compare(m_langtag, other.ToString(), true);
-        }
-    // [IEquatable<LanguageTag>]
-        public bool Equals(LanguageTag other)
-        {
-            return 0 == string.Compare(m_langtag, other.m_langtag, true);
-        }
-        public bool Equals(string other)
-        {
-            return 0 == string.Compare(m_langtag, other, true);
-        }
     // Operations
         /// <summary>
         /// Performs 'language matching' between lang described by this (A)

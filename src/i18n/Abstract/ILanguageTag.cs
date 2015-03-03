@@ -7,7 +7,7 @@ namespace i18n
     /// Describes a language tag value, as defined in RFC 5646 (BCP 47).
     /// </summary>
     /// <seealso href="http://tools.ietf.org/html/rfc5646#section-2.1"/>
-    public interface ILanguageTag : IEquatable<ILanguageTag>
+    public interface ILanguageTag : IEquatable<ILanguageTag>, IComparable<ILanguageTag>
     {
         /// <summary>
         /// Returns the full language tag.
