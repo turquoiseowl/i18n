@@ -91,7 +91,7 @@ namespace i18n
             string text;
             o_langtag = LanguageMatching.MatchLists(
                 languages, 
-                GetAppLanguages(), 
+                GetAppLanguages().Values, 
                 msgkey, 
                 TryGetTextFor, 
                 out text, 

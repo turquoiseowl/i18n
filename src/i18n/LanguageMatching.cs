@@ -90,7 +90,7 @@ namespace i18n
         /// </remarks>
         public static LanguageTag MatchLists(
             LanguageItem[] UserLanguages, 
-            IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages,
+            IEnumerable<LanguageTag> AppLanguages,
             string key,
             Func<string, string, string> TryGetTextFor,
             out string o_text,
@@ -120,13 +120,13 @@ namespace i18n
                    // Wiz through all match grades for the Principle Application Language.
                     for (int pass = 0; pass <= (int)LanguageTag.MatchGrade._MaxMatch; ++pass) {
                         LanguageTag.MatchGrade matchGrade = (LanguageTag.MatchGrade)pass;
-                        foreach (KeyValuePair<string, LanguageTag> langApp in AppLanguages) {
+                        foreach (LanguageTag langApp in AppLanguages) {
                            // If languages do not match at the current grade...goto next.
-                            if (ltUser.Match(langApp.Value, matchGrade) == 0) {
+                            if (ltUser.Match(langApp, matchGrade) == 0) {
                                 continue; }
                            // Optionally test for a resource of the given key in the matching language.
                             if (TryGetTextFor != null) {
-                                o_text = TryGetTextFor(langApp.Key, key);
+                                o_text = TryGetTextFor(langApp.ToString(), key);
                                 if (o_text == null) {
                                     continue; }
                             }
@@ -144,14 +144,14 @@ namespace i18n
                                     TryGetTextFor,
                                     out o_text,
                                     maxPasses,
-                                    langApp.Value,
+                                    langApp,
                                     false); // false = disable PAL Prioritization.
                                 if (lt != null) {
                                     return lt; }
                             }
                            // Match.
                             ++UserLanguages[idxUserLang].UseCount;
-                            return langApp.Value;
+                            return langApp;
                         }
                     }
                 }
@@ -173,13 +173,13 @@ namespace i18n
                             if (ltUser.Match(relatedTo, LanguageTag.MatchGrade.LanguageMatch) == 0) {
                                 continue; }
                         }
-                        foreach (KeyValuePair<string, LanguageTag> langApp in AppLanguages) {
+                        foreach (LanguageTag langApp in AppLanguages) {
                            // If languages do not match at the current grade...goto next.
-                            if (ltUser.Match(langApp.Value, matchGrade) == 0) {
+                            if (ltUser.Match(langApp, matchGrade) == 0) {
                                 continue; }
                            // Optionally test for a resource of the given key in the matching language.
                             if (TryGetTextFor != null) {
-                                o_text = TryGetTextFor(langApp.Key, key);
+                                o_text = TryGetTextFor(langApp.ToString(), key);
                                 if (o_text == null) {
                                     continue; }
                             }
@@ -187,7 +187,7 @@ namespace i18n
                                 o_text = null; }
                            // Match.
                             ++UserLanguages[i].UseCount;
-                            return langApp.Value;
+                            return langApp;
                         }
                     }
                 }

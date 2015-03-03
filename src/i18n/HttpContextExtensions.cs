@@ -277,11 +277,11 @@ namespace i18n
         /// It is possible for there to be no match at all if no language subtag in the UserLanguages tags
         /// matches the same of any of the tags in AppLanguages list.
         /// </returns>
-        public static LanguageTag ChooseAppLanguage(this HttpContext context, IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages)
+        public static LanguageTag ChooseAppLanguage(this HttpContext context, IEnumerable<LanguageTag> AppLanguages)
         {
             return context.GetHttpContextBase().ChooseAppLanguage(AppLanguages);
         }
-        public static LanguageTag ChooseAppLanguage(this HttpContextBase context, IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages)
+        public static LanguageTag ChooseAppLanguage(this HttpContextBase context, IEnumerable<LanguageTag> AppLanguages)
         {
             string text;
             return LanguageMatching.MatchLists(

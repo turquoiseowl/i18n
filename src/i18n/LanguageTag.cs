@@ -375,9 +375,10 @@ namespace i18n
         /// <seealso href="http://msdn.microsoft.com/en-us/library/windows/apps/jj673578.aspx"/>
         public int Match(LanguageTag i_rhs, MatchGrade matchGrade = MatchGrade.LanguageMatch)
         {
-        //
-            if (i_rhs == null) {
-                throw new ArgumentNullException("i_rhs"); }
+            if (i_rhs == null) { throw new ArgumentNullException("i_rhs"); }
+           // Either langtag being null fails the match.
+            if (!Language.IsSet() || !i_rhs.Language.IsSet()) {
+                return 0; }
            // Init.
             bool[] L = { 0 == string.Compare(Language  , i_rhs.Language  , true), Language  .IsSet(), i_rhs.Language  .IsSet() };
             bool[] S = { 0 == string.Compare(Script    , i_rhs.Script    , true), Script    .IsSet(), i_rhs.Script    .IsSet() };

@@ -48,7 +48,7 @@ namespace i18n.Tests
             string s1;
             LanguageTag lt = LanguageMatching.MatchLists(
                 languages,
-                m_appLanguages,
+                m_appLanguages.Values,
                 msgid,
                 null,
                 out s1,

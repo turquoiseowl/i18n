@@ -15,7 +15,7 @@ namespace i18n.Tests.Tests
     {
 
         public const string AppLanguagesCsv = "de,de-at,en,en-gb,zh-cn,zh-tw";
-        static readonly IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages = AppLanguagesCsv.Split(',').Select(x => new KeyValuePair<string, LanguageTag>(x, new LanguageTag(x)));
+        static readonly IEnumerable<LanguageTag> AppLanguages = AppLanguagesCsv.Split(',').Select(x => new LanguageTag(x));
 
     #region Helpers
 
