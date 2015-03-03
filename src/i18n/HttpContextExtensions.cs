@@ -45,6 +45,10 @@ namespace i18n
         /// <param name="msgid">Specifies the individual message to be translated (the first part inside of a nugget). E.g. if the nugget is [[[Sign in]] then this param is "Sign in".</param>
         /// <param name="msgcomment">Specifies the optional message comment value of the subject resource, or null/empty.</param>
         /// <returns>Localized string, or msgid if no translation exists.</returns>
+        public static string GetText(this HttpContext context, string msgid, string msgcomment)
+        {
+            return context.GetHttpContextBase().GetText(msgid, msgcomment);
+        }
         public static string GetText(this HttpContextBase context, string msgid, string msgcomment)
         {
             // Lookup resource.
@@ -52,17 +56,16 @@ namespace i18n
             msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, msgcomment, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
-        public static string GetText(this HttpContext context, string msgid, string msgcomment)
-        {
-            return context.GetHttpContextBase().GetText(msgid, msgcomment);
-        }
-
         /// <summary>
         /// Returns the translation of the passed string entity which may contain zero or more fully-formed nugget.
         /// </summary>
         /// <param name="context">Describes the current request.</param>
         /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
         /// <returns>Localized (translated) entity.</returns>
+        public static string ParseAndTranslate(this HttpContext context, string entity)
+        {
+            return context.GetHttpContextBase().ParseAndTranslate(entity);
+        }
         public static string ParseAndTranslate(this HttpContextBase context, string entity)
         {
         // For impl. notes see ResponseFilter.Flush().
@@ -85,10 +88,6 @@ namespace i18n
            //
             return entity;
         }
-        public static string ParseAndTranslate(this HttpContext context, string entity)
-        {
-            return context.GetHttpContextBase().ParseAndTranslate(entity);
-        }
 
 
         /// <summary>
@@ -96,10 +95,14 @@ namespace i18n
         /// under which the current request is to be handled.
         /// </summary>
         /// <param name="context">Context of the request.</param>
-        /// <param name="pal">Selected AppLanguage.</param>
+        /// <param name="pal">Selected AppLanguage aka Principle Application Language (PAL).</param>
         /// <param name="updateThreadCulture">
         /// Indicates whether to also update the thread CurrentCulture/CurrentUICulture settings.
         /// </param>
+        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, ILanguageTag pal, bool updateThreadCulture = true)
+        {
+            context.GetHttpContextBase().SetPrincipalAppLanguageForRequest(pal, updateThreadCulture);
+        }
         public static void SetPrincipalAppLanguageForRequest(this HttpContextBase context, ILanguageTag pal, bool updateThreadCulture = true)
         {
         // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
@@ -116,14 +119,10 @@ namespace i18n
             }
 
         }
-        public static void SetPrincipalAppLanguageForRequest(this HttpContext context, ILanguageTag pal)
-        {
-            context.GetHttpContextBase().SetPrincipalAppLanguageForRequest(pal);
-        }
 
         /// <summary>
-        /// Returns any cached per-request value that identifies the principal language
-        /// under which the current request is to be handled. That is, the value of any
+        /// Returns any cached per-request value that identifies the Principle Application Language (PAL)
+        /// with which the current request is to be processed. That is, the value of any
         /// most-recent call to SetPrincipalAppLanguageForRequest.
         /// If SetPrincipalAppLanguageForRequest has not yet been called for the request,
         /// returns the default app language.
@@ -133,6 +132,10 @@ namespace i18n
         /// The Principal AppLanguage Language for the request, or the default app language
         /// if none previously set.
         /// </returns>
+        public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
+        {
+            return context.GetHttpContextBase().GetPrincipalAppLanguageForRequest();
+        }
         public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContextBase context)
         {
         // The PAL is stored as the first item in the UserLanguages array (with Quality set to 2).
@@ -142,20 +145,27 @@ namespace i18n
                 langtag = LocalizedApplication.Current.DefaultLanguageTag; }
             return langtag;
         }
-        public static ILanguageTag GetPrincipalAppLanguageForRequest(this HttpContext context)
-        {
-            return context.GetHttpContextBase().GetPrincipalAppLanguageForRequest();
-        }
 
         /// <summary>
-        /// Returns an ordered collection of languages supported by the user-agent.
-        /// See LanguageItem.ParseHttpLanguageHeader for more details.
-        /// This method is optimised such that the collection is built only once per request.
+        /// Returns a collection of languages supported by the user-agent, in descending order
+        /// of preference. The first item in the collection refers to any Principle Application Language (PAL)
+        /// for the request determined by EarlyUrlLocalization (which calls SetPrincipalAppLanguageForRequest),
+        /// or is null if EarlyUrlLocalization is disabled.
         /// </summary>
         /// <param name="context">Context of the current request.</param>
         /// <returns>
         /// Array of languages items sorted in order or language preference.
         /// </returns>
+        /// <remarks>
+        /// This method is optimised such that the collection is built only once per request.
+        /// </remarks>
+        /// <see>
+        /// See LanguageItem.ParseHttpLanguageHeader for more details.
+        /// </see>
+        public static LanguageItem[] GetRequestUserLanguages(this HttpContext context)
+        {
+            return context.GetHttpContextBase().GetRequestUserLanguages();
+        }
         public static LanguageItem[] GetRequestUserLanguages(this HttpContextBase context)
         {
             // Determine UserLanguages.
@@ -173,13 +183,9 @@ namespace i18n
                             // here as the second parameter i.e. to specify the PAL. However, this was
                             // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
                             // as SetPrincipalAppLanguageForRequest was not being called, that normally
-                            // overwriting the PAL set erroneoulsy here.
+                            // overwriting the PAL set erroneously here.
             }
             return UserLanguages;
-        }
-        public static LanguageItem[] GetRequestUserLanguages(this HttpContext context)
-        {
-            return context.GetHttpContextBase().GetRequestUserLanguages();
         }
 
         /// <summary>
@@ -191,6 +197,10 @@ namespace i18n
         /// true if header added; false if no languages provided content during the request and
         /// so no header was added.
         /// </returns>
+        public static bool SetContentLanguageHeader(this HttpContext context)
+        {
+            return context.GetHttpContextBase().SetContentLanguageHeader();
+        }
         public static bool SetContentLanguageHeader(this HttpContextBase context)
         {
            // Enumerate the possible user languages for the request. For any that have provided
@@ -211,10 +221,6 @@ namespace i18n
                 return false; }
             context.Response.AppendHeader("Content-Language", sb.ToString());
             return true;
-        }
-        public static bool SetContentLanguageHeader(this HttpContext context)
-        {
-            return context.GetHttpContextBase().SetContentLanguageHeader();
         }
 
         /// <summary>
@@ -237,6 +243,10 @@ namespace i18n
         /// <exception cref="System.InvalidOperationException">
         /// Expected GetRequestUserLanguages to fall back to default language.
         /// </exception>
+        public static LanguageTag GetInferredLanguage(this HttpContext context)
+        {
+            return context.GetHttpContextBase().GetInferredLanguage();
+        }
         public static LanguageTag GetInferredLanguage(this HttpContextBase context)
         {
             // langtag = best match between
@@ -251,10 +261,6 @@ namespace i18n
             if (lt == null) {
                 throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
             return lt;
-        }
-        public static LanguageTag GetInferredLanguage(this HttpContext context)
-        {
-            return context.GetHttpContextBase().GetInferredLanguage();
         }
 
     }
