@@ -314,7 +314,8 @@ namespace i18n
         }
         public bool Equals(string other)
         {
-            return 0 == string.Compare(m_langtag, other, true);
+            LanguageTag ltOther = GetCachedInstance(other);
+            return 0 == string.Compare(m_langtagLC, ltOther.m_langtagLC);
         }
     // [IComparable<ILanguageTag>]
         public int CompareTo(ILanguageTag other)
@@ -325,6 +326,11 @@ namespace i18n
         public int CompareTo(LanguageTag other)
         {
             return string.Compare(m_langtagLC, other.m_langtagLC);
+        }
+        public int CompareTo(string other)
+        {
+            LanguageTag ltOther = GetCachedInstance(other);
+            return string.Compare(m_langtagLC, ltOther.m_langtagLC);
         }
     // [ILanguageTag]
         string   ILanguageTag.GetLanguage()   { return Language; }
