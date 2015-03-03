@@ -262,5 +262,34 @@ namespace i18n
                 throw new InvalidOperationException("Expected GetRequestUserLanguages to fall back to default language."); }
             return lt;
         }
+
+        /// <summary>
+        /// Runs the Language Matching Algorithm for the UserLanguages of the current request against
+        /// the specified array of AppLanguages, returning the AppLanguage determined to be the best match.
+        /// </summary>
+        /// <param name="context">Context of the current request.</param>
+        /// <param name="AppLanguages">
+        /// The list of languages in which an arbitrary resource is available.
+        /// </param>
+        /// <returns>
+        /// LanguageTag instance selected from AppLanguages with the best match, or null if there is no match
+        /// at all (or UserLanguages and/or AppLanguages is empty).
+        /// It is possible for there to be no match at all if no language subtag in the UserLanguages tags
+        /// matches the same of any of the tags in AppLanguages list.
+        /// </returns>
+        public static LanguageTag ChooseAppLanguage(this HttpContext context, IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages)
+        {
+            return context.GetHttpContextBase().ChooseAppLanguage(AppLanguages);
+        }
+        public static LanguageTag ChooseAppLanguage(this HttpContextBase context, IEnumerable<KeyValuePair<string, LanguageTag> > AppLanguages)
+        {
+            string text;
+            return LanguageMatching.MatchLists(
+                context.GetRequestUserLanguages(),
+                AppLanguages, 
+                null, 
+                null, 
+                out text);
+        }
     }
 }
