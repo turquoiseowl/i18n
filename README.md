@@ -79,12 +79,18 @@ code shows the most common options:
             // Change the URL localization scheme from Scheme1.
             i18n.UrlLocalizer.UrlLocalizationScheme = i18n.UrlLocalizationScheme.Scheme2;
 
-            // Blacklist certain URLs from being 'localized'.
+            // Blacklist certain URLs from being 'localized' via a callback.
             i18n.UrlLocalizer.IncomingUrlFilters += delegate(Uri url) {
                 if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.OrdinalIgnoreCase)) {
                     return false; }
                 return true;
             };
+
+            // Blacklist certain URLs from being translated using a regex pattern. The default setting is:
+            //i18n.LocalizedApplication.Current.UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
+
+            // Whitelist content types to translate. The default setting is:
+            //i18n.LocalizedApplication.Current.ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$");
         }
     }
 ```
