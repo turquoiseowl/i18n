@@ -56,6 +56,7 @@ namespace i18n
             msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, msgcomment, context.GetRequestUserLanguages(), out lt) ?? msgid;
             return HttpUtility.HtmlDecode(msgid);
         }
+
         /// <summary>
         /// Returns the translation of the passed string entity which may contain zero or more fully-formed nugget.
         /// </summary>
