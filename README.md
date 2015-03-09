@@ -770,3 +770,7 @@ to CR/LF when checking text files out of the index, and converting them back to 
 This behaviour is controlled via Git's ```core.autocrlf``` setting, which in this case would be set to ```true```.
 
 See [Dealing with line endings](https://help.github.com/articles/dealing-with-line-endings/) for more information.
+
+### Acknowledgments
+
+Special thank you to Daniel Crenna who originated this project.

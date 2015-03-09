@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("i18n")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Smart internationalization for ASP.NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Conatus Creative Inc. ")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("i18n")]
-[assembly: AssemblyCopyright("Copyright © Conatus Creative Inc. 2012")]
+[assembly: AssemblyCopyright("Open Source")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: InternalsVisibleTo("i18n.MVC3")]
