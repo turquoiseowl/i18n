@@ -773,4 +773,5 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 
 ### Acknowledgments
 
-Special thank you to Daniel Crenna who originated this project.
+Among the many contributors to the i18n library, a special acknowledgement is due to Daniel Crenna 
+who originated this project.
