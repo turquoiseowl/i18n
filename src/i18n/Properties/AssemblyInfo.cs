@@ -13,8 +13,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Open Source")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: InternalsVisibleTo("i18n.MVC3")]
-[assembly: InternalsVisibleTo("i18n.MVC4")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
