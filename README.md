@@ -22,6 +22,7 @@ based on ASP.NET v4 and above, including:
 - SEO-friendly: language selection varies the URL, and `Content-Language` is set appropriately
 - Automatic: no URL/routing changes required in the app
 - High performance, minimal overhead and minimal heap allocations
+- Unit testing support
 - Smart: knows when to hold them, fold them, walk away, or run, based on i18n best practices
 
 ### Project Configuration
