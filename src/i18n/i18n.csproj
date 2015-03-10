@@ -60,28 +60,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\IRootServices.cs" />
-    <Compile Include="EarlyUrlLocalizer.cs" />
+    <Compile Include="Concrete\EarlyUrlLocalizer.cs" />
     <Compile Include="Abstract\IEarlyUrlLocalizer.cs" />
     <Compile Include="Abstract\INuggetLocalizer.cs" />
     <Compile Include="Abstract\IUrlLocalizer.cs" />
-    <Compile Include="DebugHelpers.cs" />
-    <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="Helpers\DebugHelpers.cs" />
+    <Compile Include="Helpers\HttpContextExtensions.cs" />
     <Compile Include="Abstract\ITextLocalizer.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Abstract\ILanguageTag.cs" />
-    <Compile Include="LanguageHelpers.cs" />
-    <Compile Include="LanguageItem.cs" />
-    <Compile Include="LocalizingModule.cs" />
-    <Compile Include="NuggetLocalizer.cs" />
-    <Compile Include="PostbackParser.cs" />
-    <Compile Include="ResponseFilter.cs" />
-    <Compile Include="ParseHelpers.cs" />
+    <Compile Include="Helpers\LanguageHelpers.cs" />
+    <Compile Include="Helpers\LanguageItem.cs" />
+    <Compile Include="Pipeline\LocalizingModule.cs" />
+    <Compile Include="Concrete\NuggetLocalizer.cs" />
+    <Compile Include="Helpers\PostbackParser.cs" />
+    <Compile Include="Pipeline\ResponseFilter.cs" />
+    <Compile Include="Helpers\ParseHelpers.cs" />
     <Compile Include="LocalizedApplication.cs" />
-    <Compile Include="LanguageMatching.cs" />
-    <Compile Include="LanguageTag.cs" />
-    <Compile Include="TextLocalizer.cs" />
+    <Compile Include="Helpers\LanguageMatching.cs" />
+    <Compile Include="Concrete\LanguageTag.cs" />
+    <Compile Include="Concrete\TextLocalizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UrlLocalizer.cs" />
+    <Compile Include="Concrete\UrlLocalizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
