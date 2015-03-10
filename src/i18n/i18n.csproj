@@ -59,11 +59,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstract\ITranslateSvc.cs" />
     <Compile Include="Abstract\IRootServices.cs" />
     <Compile Include="Concrete\EarlyUrlLocalizer.cs" />
     <Compile Include="Abstract\IEarlyUrlLocalizer.cs" />
     <Compile Include="Abstract\INuggetLocalizer.cs" />
     <Compile Include="Abstract\IUrlLocalizer.cs" />
+    <Compile Include="Concrete\TranslateSvc.cs" />
     <Compile Include="Helpers\DebugHelpers.cs" />
     <Compile Include="Helpers\HttpContextExtensions.cs" />
     <Compile Include="Abstract\ITextLocalizer.cs" />

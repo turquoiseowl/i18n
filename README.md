@@ -737,6 +737,25 @@ to this folder by adding a `Web.config` file.
     </configuration>
 ```
 
+### Unit Testing With i18n
+
+i18n provides the ```i18n.ITranslateSvc``` interface that abstracts the basic operation of parsing
+and translating a string entity that may contain one or more nuggets:
+
+```
+    public interface ITranslateSvc
+    {
+        string ParseAndTranslate(string entity);
+    }
+```
+
+The following stock implementations of ```i18n.ITranslateSvc``` are provided by the library:
+
+- TranslateSvc_Invariant - ITranslateSvc implementation that simply passes through the entity (useful for testing).
+- TranslateSvc_HttpContextBase - ITranslateSvc implementation based on an given HttpContextBase instance.
+- TranslateSvc_HttpContext - ITranslateSvc implementation based on an given HttpContext instance.
+- TranslateSvc_HttpContextCurrent - ITranslateSvc implementation based on the static HttpContext.Current instance (obtained at the time of calling the interface).
+
 ### Build Notes
 
 The i18n project at present targets Visual Studio 2012 / .NET Framework 4 and requires the Visual Studio 2012 SDK libraries
