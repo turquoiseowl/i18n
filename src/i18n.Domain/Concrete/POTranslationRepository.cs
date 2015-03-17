@@ -54,9 +54,17 @@ namespace i18n.Domain.Concrete
 				
 				foreach (var dir in di.EnumerateDirectories().Select(x => x.Name))
 				{
-					lang = new Language();
-					lang.LanguageShortTag = dir;
-					dirList.Add(lang);
+					try
+					{
+						System.Globalization.CultureInfo.GetCultureInfo(dir);
+						lang = new Language();
+						lang.LanguageShortTag = dir;
+						dirList.Add(lang);
+					}
+					catch (System.Globalization.CultureNotFoundException) 
+					{ 
+						//There is a directory in the locale directory that is not a valid culture so ignore it
+					}
 				}
 			}
 			else
