@@ -165,6 +165,9 @@ namespace i18n
            // Truncate any extra elements from end of array.
             if (ordinal != LanguageItems.Length) {
                 LanguageItems = LanguageItems.Where(x => x.LanguageTag.IsValid()).ToArray(); }
+            // If there was no PAL, and the header value was invalid then we will have no language items, so add the default
+            if (LanguageItems.Length == 0)
+                LanguageItems = new LanguageItem[] { new LanguageItem(LocalizedApplication.Current.DefaultLanguageTag, PalQualitySetting, 0) };
            // Rearrange items into order of precedence. This is facilitated by LanguageItem's
            // impl. of IComparable.
             Array.Sort(LanguageItems);
