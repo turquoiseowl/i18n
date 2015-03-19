@@ -318,6 +318,13 @@ are automatically merged with the template, so that new strings can be flagged f
 From here, you can use any of the widely available PO editing tools (like [POEdit](http://www.poedit.net))
 to provide locale-specific text and place them in your `locale` folder relative to the provided language, e.g. `locale/fr`. 
 If you change a PO file on the fly, i18n will update accordingly; you do _not_ need to restart your application.
+Note that the locale-specific file must be named messages.po. For example, your locale folder structure will be similar to (three languages, fr, es, and es-MX are defined):
+```
+locale/messages.pot
+locale/fr/messages.po
+locale/es/messages.po
+locale/es-MX/messages.po
+```
 
 ### URL Localization
 
