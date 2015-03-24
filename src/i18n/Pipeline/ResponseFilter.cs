@@ -89,8 +89,14 @@ namespace i18n
             if (m_nuggetLocalizer != null)
             {
                 var page = m_httpContext.Handler as Page;
+                bool isScriptManager = false;
+                if (page != null)
+                {
+                    var sm = ScriptManager.GetCurrent(page);
+                    if (sm != null && sm.IsInAsyncPostBack) isScriptManager = true;
+                }
                 //if webforms and postback
-                if (page != null && page.IsPostBack && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r","").Split('\n')[0])) { //#178
+                if (page != null && page.IsPostBack && isScriptManager && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r","").Split('\n')[0])) { //#178
                     var postbackParser = new PostbackParser(entity);
                     // not quite sure only those 2 types should be translated (any help ?)
                     var types = new[]
