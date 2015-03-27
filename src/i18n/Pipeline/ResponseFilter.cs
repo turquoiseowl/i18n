@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using i18n.Helpers;
+using i18n.Domain.Concrete;
 
 namespace i18n
 {
@@ -95,23 +96,18 @@ namespace i18n
                     var sm = ScriptManager.GetCurrent(page);
                     if (sm != null && sm.IsInAsyncPostBack) isScriptManager = true;
                 }
-                //if webforms and postback
+                //if async postback
                 if (page != null && page.IsPostBack && isScriptManager && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r","").Split('\n')[0])) { //#178
-                    var postbackParser = new PostbackParser(entity);
-                    // not quite sure only those 2 types should be translated (any help ?)
-                    var types = new[]
-                    {
-                        "updatePanel",
-                        "scriptStartupBlock"
-                    };
+                    var asyncPostbackParser = new AsyncPostbackParser(entity);
+                    var types = LocalizedApplication.Current.AsyncPostbackTypesToTranslate.Split(new char[] {','});
                     foreach (var type in types) {
-                        postbackParser.GetSections(type).ForEach(section => {
+                        asyncPostbackParser.GetSections(type).ForEach(section => {
                             section.Content = m_nuggetLocalizer.ProcessNuggets(
                                 section.Content,
                                 m_httpContext.GetRequestUserLanguages());
                         });
                     }
-                    entity = postbackParser.ToString();
+                    entity = asyncPostbackParser.ToString();
                 } else {
                     entity = m_nuggetLocalizer.ProcessNuggets(
                         entity,
