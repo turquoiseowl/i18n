@@ -684,22 +684,6 @@ Note the `-x-`, after which you can add four or more alphanumeric characters to 
 There must be an exact match for all subtags for this translation to be returned. If the module can't find a 
 translation for the tenant, it will match the remaining subtags according to the algorithm described above.
 
-### UpdatePanel / Async Postbacks / Partial Page Rendering
-
-Responses to UpdatePanel async postback requests are handled as a special case because the content of the response is a 
-set of formatted blocks, which may or may not contain partial segments of text or HTML that need to be localized. Each 
-formatted block has the following structure
-
-`length|type|id|content|`
-
-By default, only blocks with a type of **updatePanel**, **scriptStartupBlock**, or **pageTitle** get localized. You can 
-localize segments in other block types by changing the value of AsyncPostbackTypesToTranslate in Application_Start. For 
-example, to include the **hiddenField** blocks, add the following to Application_Start
-
-```
-i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle,hiddenField";
-```
-
 ##### Language Matching Update
 
 The latest refinement to the language matching algoritm:
@@ -733,6 +717,22 @@ The latest refinement to the language matching algoritm:
 //   Therefore, as a refinement to PAL Prioritization, before selecting
 //   'de' we run the full algorithm again (without PAL Prioritization) 
 //   but only considering langtags related to the PAL.
+```
+
+### UpdatePanel / Async Postbacks / Partial Page Rendering
+
+Responses to UpdatePanel async postback requests are handled as a special case because the content of the response is a 
+set of formatted blocks, which may or may not contain partial segments of text or HTML that need to be localized. Each 
+formatted block has the following structure
+
+`length|type|id|content|`
+
+By default, only blocks with a type of **updatePanel**, **scriptStartupBlock**, or **pageTitle** get localized. You can 
+localize segments in other block types by changing the value of AsyncPostbackTypesToTranslate in Application_Start. For 
+example, to include the **hiddenField** blocks, add the following to Application_Start
+
+```
+i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle,hiddenField";
 ```
 
 ### A reminder about folders in a web application
