@@ -209,6 +209,15 @@ namespace i18n
         /// </remarks>
         public Regex UrlsToExcludeFromProcessing = new Regex(@"(?:\.(?:less|css)(?:\?|$))|(?i:i18nSkip|glimpse|trace|elmah)");
 
+        /// <summary>
+        /// Comma separated value string that lists the async postback types that should be localized.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to "updatePanel,scriptStartupBlock,pageTitle"<br/>
+        /// Clients may customise this member in Application_Start.<br/>
+        /// </remarks>
+        public string AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle";
+
         public LocalizedApplication(IRootServices i_RootServices = null)
         {
 

@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace i18n {
-    public class PostbackParser {
+    public class AsyncPostbackParser {
 
         private string Data { get; set; }
 
         private List<Section> Delta { get; set; }
 
-        public PostbackParser(string data) {
+        public AsyncPostbackParser(string data) {
             Data = data;
             ParseDelta();
         }
