@@ -265,6 +265,25 @@ To enable this feature:
 When VisualizeMessages is active the NuggetVisualizeToken will be inserted at start and end of
 each translated message.   
 
+Two more optional parameters can be used to further customize the message visualization. 
+`i18n.VisualizeLanguageSeparator`
+This enables display of the language tag that was use to localize each message. The language tag will be shown before each message, separated from the message by this parameter value. If the value is a blank string or the parameter is not present then language tags are not shown in message visualizations.
+`i18n.NuggetVisualizeEndToken`
+This allows for using different start and end tokens for visualizing messages. When this value is specified then the NuggetVisualizeToken will be inserted at start of each translated message and the NuggetVisualizeEndToken will be inserted at end of each translated message.
+
+For example, to display language tags separated from messages by a colon, and add brackets to enclose the visualized messages, use the following message visualization configuration.
+
+```xml
+  <appSettings>
+    ...
+    <add key="i18n.VisualizeMessages" value="true" />
+    <add key="i18n.VisualizeLanguageSeparator" value=":" />
+    <add key="i18n.NuggetVisualizeToken" value="![" />
+    <add key="i18n.NuggetVisualizeEndToken" value="]!" />
+    ...
+  </appSettings>
+```
+
 #### Message Context Support
 
 i18n allows you to assign a ```msgctxt``` value to each message. The value of the msgctxt is

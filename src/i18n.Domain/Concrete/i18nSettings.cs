@@ -326,6 +326,25 @@ namespace i18n.Domain.Concrete
             }
         }
 
+        public virtual string NuggetVisualizeEndToken
+        {
+            get
+            {
+                string prefixedString = GetPrefixedString("NuggetVisualizeEndToken");
+                string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null)
+                {
+                    return setting;
+                }
+                return string.Empty;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("NuggetVisualizeEndToken");
+                _settingService.SetSetting(prefixedString, value);
+            }
+        }
+
 		#endregion
         
 		#region DirectoriesToScan
@@ -461,6 +480,25 @@ namespace i18n.Domain.Concrete
                 string prefixedString = GetPrefixedString("VisualizeMessages");
                 _settingService.SetSetting(prefixedString, value ? "true" : "false");
                 _cached_visualizeMessages = value;
+            }
+        }
+
+        public virtual string VisualizeLanguageSeparator
+        {
+            get
+            {
+                string prefixedString = GetPrefixedString("VisualizeLanguageSeparator");
+                string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null)
+                {
+                    return setting;
+                }
+                return string.Empty;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("VisualizeLanguageSeparator");
+                _settingService.SetSetting(prefixedString, value);
             }
         }
 
