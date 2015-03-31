@@ -94,7 +94,15 @@ namespace i18n
                 DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", nugget.MsgId, message);
 
                 if (_settings.VisualizeMessages)
-                    message = string.Format("{0}{1}{0}", _settings.NuggetVisualizeToken, message);
+                {
+                    string languageToken = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(_settings.VisualizeLanguageSeparator))
+                        languageToken = lt.ToString() + _settings.VisualizeLanguageSeparator;
+                    string endToken = _settings.NuggetVisualizeToken;
+                    if (!string.IsNullOrWhiteSpace(_settings.NuggetVisualizeEndToken))
+                        endToken = _settings.NuggetVisualizeEndToken;
+                    message = string.Format("{0}{1}{2}{3}", _settings.NuggetVisualizeToken, languageToken, message, endToken);
+                }
                 return HttpUtility.HtmlDecode(message);
             });
            // Return modified entity.
