@@ -70,7 +70,7 @@ namespace i18n
         private void OnBeginRequest(object sender, EventArgs e)
         {
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
-            DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
+            DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             // Establish the language for the request. That is, we need to call
             // context.SetPrincipalAppLanguageForRequest with a language, got from the URL,
@@ -94,26 +94,39 @@ namespace i18n
         {
         //
             HttpContextBase context = HttpContext.Current.GetHttpContextBase();
-            DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n+++>Url: {3}\n+++>RawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
+            DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
             // wire up our filter to do the processing. The entity data will be run through the filter a
             // bit later on in the pipeline.
             if ((LocalizedApplication.Current.ContentTypesToLocalize != null
                     && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
-                &&
-                (LocalizedApplication.Current.UrlsToExcludeFromProcessing != null
-                    && LocalizedApplication.Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) == false) // Exclude certain URLs from being processed
+                    )
+            {
+                if ((LocalizedApplication.Current.UrlsToExcludeFromProcessing != null
+                    && LocalizedApplication.Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) // Exclude certain URLs from being processed
+                    )
                 {
-                DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
-                context.Response.Filter = new ResponseFilter(
-                    context, 
-                    context.Response.Filter,
-                    UrlLocalizer.UrlLocalizationScheme == UrlLocalizationScheme.Void ? null : m_rootServices.EarlyUrlLocalizerForApp,
-                    m_rootServices.NuggetLocalizerForApp);
+                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, URL excluded: ({0}).", context.Request.RawUrl);
                 }
+                else if ((context.Response.Headers["Content-Encoding"] != null
+                    || context.Response.Headers["Content-Encoding"] == "gzip") // Exclude responses that have already been compressed earlier in the pipeline
+                )
+                {
+                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, response compressed.");
+                }
+                else
+                {
+                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
+                    context.Response.Filter = new ResponseFilter(
+                        context,
+                        context.Response.Filter,
+                        UrlLocalizer.UrlLocalizationScheme == UrlLocalizationScheme.Void ? null : m_rootServices.EarlyUrlLocalizerForApp,
+                        m_rootServices.NuggetLocalizerForApp);
+                }
+            }
             else {
-                DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- No content-type match ({0}). Bypassing filter.",context.Response.ContentType);
+                DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, No content-type match: ({0}).", context.Response.ContentType);
             }
         }
     }
