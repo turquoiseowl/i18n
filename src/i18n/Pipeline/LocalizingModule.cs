@@ -54,6 +54,7 @@ namespace i18n
             // Wire up our event handlers into the ASP.NET pipeline.
             application.BeginRequest        += OnBeginRequest;
             application.ReleaseRequestState += OnReleaseRequestState;
+            application.PostRequestHandlerExecute += OnPostRequestHandlerExecute;
         }
         public void Dispose() {}
 
@@ -127,6 +128,25 @@ namespace i18n
             }
             else {
                 DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, No content-type match: ({0}).", context.Response.ContentType);
+            }
+        }
+
+        private void OnPostRequestHandlerExecute(object sender, EventArgs e)
+        {
+            //Deal with an issue that causes empty responses to requests for WebResource.axd, set the internal HttpWriter to allow further writes
+            //this is not known to be necessary for any other cases, hence the hard-coded check for the WebResource.axd URL
+            var context = HttpContext.Current;
+            DebugHelpers.WriteLine("LocalizingModule::OnPostRequestHandlerExecute -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
+
+            if (context.Request.RawUrl.ToLower().StartsWith("/webresource.axd"))
+            {
+                var response = context.Response;
+                var httpWriterField = typeof(HttpResponse).GetField("_httpWriter",
+                                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var ignoringFurtherWritesField = typeof(HttpWriter).GetField("_ignoringFurtherWrites",
+                                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var httpWriter = httpWriterField.GetValue(response);
+                ignoringFurtherWritesField.SetValue(httpWriter, false);
             }
         }
     }
