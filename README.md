@@ -46,10 +46,6 @@ HttpModule called i18n.LocalizingModule which should be enabled in your web.conf
 
 Note: The ```<system.web>``` element is added for completeness and may not be required.
 
-Note: i18n requires static compression to be disabled for localized content. Refer to 
-[Issue #163](https://github.com/turquoiseowl/i18n/issues/163#issuecomment-68811808) 
-for more on IIS compression settings.
-
 The following ```<appSettings>``` are then required to specify the type and location 
 of your application's source files:
 
@@ -316,6 +312,38 @@ as a multi-line message:
 message spread over
 three lines]]]
 ```
+
+### Static File Compression and i18n
+The i18n module localizes nuggets in the HTTP response by modifying the response stream using a response filter 
+(see the .NET Framework documentation for more info about the HttpResponse.Filter property).
+If the response stream is compressed before it reaches the i18n module then the module does not modify the stream.
+Currently the module is not designed to intercept static file requests before compression happens.
+
+Two checks are implemented to ensure that the module does not modify compressed response streams:
+1. In i18n.LocalizingModule there is a check to see if the response Content-Encoding header is set to "gzip" 
+and if it is then the module does not install the response filter.
+2. In i18n.ResponseFilter the stream content is checked for the presence of the gzip file format magic number (the first
+two bytes of a gzip file are set to 1F 8B). If the magic number is found at the beginning of the stream then the content
+is passed through without modification by the filter.
+
+Because of the way that static file compression works in IIS, some responses to static files requests do not get 
+compressed, so if you have static file compression enabled (it is enabled by default) **AND** you have nuggets within the 
+content of a static file, then the response received by a client will be localized when the response is not compressed 
+and it will not be localized when the response is compressed. In order to prevent this, it is important that you decide
+whether or not you will localize static files on your site because you need to do one of the following:
+1. If you want to use nuggets and localize static files - **disable static file compression**. This means that you will not
+get the benefit of the bandwidth savings of compressing static files, but if you are localizing static files then you have
+essentially taken the decision to make the static files dynamic.
+2. If you do not need to use nuggets and localize static files - **leave static file compression enabled**. You will now get
+the benefit of the bandwidth savings of compressing static files, but it is important that you must not put nuggets in the 
+static files.
+
+Note: Refer to 
+[Issue #163](https://github.com/turquoiseowl/i18n/issues/163#issuecomment-68811808) 
+for more on IIS compression settings.
+
+Note: The Microsoft ScriptManager compresses responses to requests for ScriptResource.axd so these responses will always be 
+compressed and the script that is returned by the ScriptManager will not be localized even if you disable static file compression. 
 
 ### Building PO databases
 

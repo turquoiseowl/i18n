@@ -19,6 +19,7 @@ namespace i18n
     {
         private IEarlyUrlLocalizer m_earlyUrlLocalizer;
         private INuggetLocalizer m_nuggetLocalizer;
+        private bool m_streamIsCompressed = false;
 
         /// <remarks>
         /// We need to accumulate all written blocks into a staging buffer so that
@@ -59,16 +60,40 @@ namespace i18n
         {
             DebugHelpers.WriteLine("ResponseFilter::Write -- count: {0}", count);
 
-            m_stagingBuffer.Write(buffer, offset, count);
+            //If this is the first Write for a compressed stream and it includes the gzip magic number in the first two bytes (hex 1F 8B, dec 31 139)
+            //then set the filter flag to indicate that the stream is compressed and pass through this Write
+            //If we set the flag here then the Flush will also pass through later
+            //Note that we also have a check in LocalizingModule for the response Content-Encoding header being set to "gzip", which should prevent
+            //the filter from being installed, but this checks the actual content in the stream in case we get here for a compressed stream
+            if (m_streamIsCompressed || (m_stagingBuffer.Length == 0 && buffer.Length >= 2 && buffer[0] == 31 && buffer[1] == 139))
+            {
+                DebugHelpers.WriteLine("ResponseFilter::Write -- skipping compressed content");
+                m_streamIsCompressed = true;
+                m_outputStream.Write(buffer, offset, count);
+                return;
+            }
+            else
+            {
+                m_stagingBuffer.Write(buffer, offset, count);
+            }
         }
 
         public override void Flush()
         {
             DebugHelpers.WriteLine("ResponseFilter::Flush");
 
+            Byte[] buf = m_stagingBuffer.GetBuffer();
+
+            //If the buffer holds compressed content then we allow the original output stream to be used because we don't try to modify compressed streams
+            if (m_streamIsCompressed)
+            {
+                DebugHelpers.WriteLine("ResponseFilter::Flush -- skipping compressed content");
+                m_outputStream.Flush();
+                return;
+            }
+
             // Convert byte array into string.
             Encoding enc = m_httpContext.Response.ContentEncoding;
-            Byte[] buf = m_stagingBuffer.GetBuffer();
             string entity = enc.GetString(buf, 0, (int)m_stagingBuffer.Length);
 
             // Prep for special BOM handling.
