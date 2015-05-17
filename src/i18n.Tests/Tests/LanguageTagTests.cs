@@ -66,30 +66,31 @@ namespace i18n.Tests
             ExtractLangTagFromUrlHelper("/zh-Hans-123-x-ABCD/account/x"      , "zh-Hans-123-x-ABCD"      , "/account/x");
             ExtractLangTagFromUrlHelper("/zh-Hans-123-x-ABCDEFG123/account/x", "zh-Hans-123-x-ABCDEFG123", "/account/x");
 
-            ExtractLangTagFromUrlHelper("/azh"                      , null);
-            ExtractLangTagFromUrlHelper("/azh-HK"                   , null);
-            ExtractLangTagFromUrlHelper("/azh-123"                  , null);
-            ExtractLangTagFromUrlHelper("/azh-Hans"                 , null);
-            ExtractLangTagFromUrlHelper("/azh-Hans-HK"              , null);
-            ExtractLangTagFromUrlHelper("/azh-Hans-123"             , null);
-            ExtractLangTagFromUrlHelper("/azh-Hans-123-x-ABCD"      , null);
-            ExtractLangTagFromUrlHelper("/azh-Hans-123-x-ABCDEFG123", null);
+            ExtractLangTagFromUrlHelper("/azh"                      , "azh"                      , "/");
+            ExtractLangTagFromUrlHelper("/azh-HK"                   , "azh-HK"                   , "/");
+            ExtractLangTagFromUrlHelper("/azh-123"                  , "azh-123"                  , "/");
+            ExtractLangTagFromUrlHelper("/azh-Hans"                 , "azh-Hans"                 , "/");
+            ExtractLangTagFromUrlHelper("/azh-Hans-HK"              , "azh-Hans-HK"              , "/");
+            ExtractLangTagFromUrlHelper("/azh-Hans-123"             , "azh-Hans-123"             , "/");
+            ExtractLangTagFromUrlHelper("/azh-Hans-123-x-ABCD"      , "azh-Hans-123-x-ABCD"      , "/");
+            ExtractLangTagFromUrlHelper("/azh-Hans-123-x-ABCDEFG123", "azh-Hans-123-x-ABCDEFG123", "/");
 
-            ExtractLangTagFromUrlHelper("/zh-a"                    , null);
-            ExtractLangTagFromUrlHelper("/zh-aHK"                  , null);
-            ExtractLangTagFromUrlHelper("/zh-a123"                 , null);
-            ExtractLangTagFromUrlHelper("/zh-aHans"                , null);
-            ExtractLangTagFromUrlHelper("/zh-aHans-HK"             , null);
-            ExtractLangTagFromUrlHelper("/zh-aHans-123"            , null);
-            ExtractLangTagFromUrlHelper("/zh-aHans-123-x-ABCD"     , null);
-            ExtractLangTagFromUrlHelper("/zh-aHans-HK-x-ABCDEFG123", null);
-            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x-ABC"        , null);
-            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x-"           , null);
-            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x"            , null);
-            ExtractLangTagFromUrlHelper("/zh-Hans-HK-ABC"          , null);
-            ExtractLangTagFromUrlHelper("/zh-Hans-HK-"             , null);
 
-            ExtractLangTagFromUrlHelper("/zh-Hans-K"               , null);
+            ExtractLangTagFromUrlHelper("/zh-a"                     , null); // 1-char Script/Region subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aHK"                   , null); // 3-char Script/Region subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-a123"                  , null); // 4-char Script/Region subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aaHans"                , null); // 6-char Script/Region subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aaHans-HK"             , null); // 6-char Script subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aaHans-123"            , null); // 6-char Script subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aaHans-123-x-ABCD"     , null); // 6-char Script subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-aaHans-HK-x-ABCDEFG123", null); // 6-char Script subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x-ABC"         , null); // < 4-char Private use subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x-"            , null); // < 4-char Private use subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-Hans-HK-x"             , null); // < 4-char Private use subtag = bad
+            ExtractLangTagFromUrlHelper("/zh-Hans-HK-ABC"           , null); // Invalid subtag
+            ExtractLangTagFromUrlHelper("/zh-Hans-HK-"              , null); // Invalid subtag
+
+            ExtractLangTagFromUrlHelper("/zh-Hans-K"               , null); // Invalid Region
             ExtractLangTagFromUrlHelper("/zh-Hans-23"              , null);
             ExtractLangTagFromUrlHelper("/zh-Hans-aHK"             , null);
             ExtractLangTagFromUrlHelper("/zh-Hans-a123"            , null);

@@ -16,19 +16,22 @@ namespace i18n
     /// <remarks>
     /// Supports a subset of BCP 47 language tag spec corresponding to the Windows
     /// support for language names, namely the following subtags:
-    ///     language (mandatory, 2 alphachars)
-    ///     script   (optional, 4 alphachars)
-    ///     region   (optional, 2 alphachars | 3 decdigits)
-    ///     private use (optional, -x- followed by 4 or more alphanumericchars )
+    ///     language    (mandatory, 2 or 3 alphachars)
+    ///     script      (optional, 4 alphachars, or 5 alphachars in the special case of Microsoft Pseudo-Locales)
+    ///     region      (optional, 2 alphachars | 3 decdigits)
+    ///     private use (optional, -x- followed by 4 or more alphanumeric chars)
     /// Example tags supported:
-    ///     "en"            [language]
-    ///     "en-US"         [language + region]
-    ///     "zh"            [language]
-    ///     "zh-HK"         [language + region]
-    ///     "zh-123"        [language + region]
-    ///     "zh-Hant"       [language + script]
-    ///     "zh-Hant-HK"    [language + script + region]
-    ///     "zh-Hant-HK-x-AAAA"    [language + script + region + private use]
+    ///     "en"                [language]
+    ///     "en-US"             [language + region]
+    ///     "zh"                [language]
+    ///     "zh-HK"             [language + region]
+    ///     "zh-123"            [language + region]
+    ///     "zh-Hant"           [language + script]
+    ///     "zh-Hant-HK"        [language + script + region]
+    ///     "zh-Hant-HK-x-AAAA" [language + script + region + private use]
+    ///     "qps-ploc"          [language + script] [Microsoft pseudo-locale]
+    ///     "qps-plocm"         [language + script] [Microsoft pseudo-locale]
+    ///     "qps-ploca"         [language + script] [Microsoft pseudo-locale]
     /// </remarks>
     /// <seealso href="http://www.microsoft.com/resources/msdn/goglobal/default.mspx"/>
     public class LanguageTag : ILanguageTag, IEquatable<LanguageTag>, IComparable<LanguageTag>
@@ -69,13 +72,18 @@ namespace i18n
             _MaxMatch = LanguageMatch,
         }
     // Data
-        static readonly Regex m_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2})(?:-([a-zA-Z]{4}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
-            // ([a-zA-Z]{2})
+        static readonly Regex m_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2,3})(?:-([a-zA-Z]{4,5}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
+            // ([a-zA-Z]{2,3})
             //      Matches language.
-            // (?:-([a-zA-Z]{4}))?
+            // (?:-([a-zA-Z]{4,5}))?
             //      Matches script.
             //      NB: The inner group is wrapped in an outer non-capturing group that
             //      prefixed the former with the '-' which is thus not captured.
+            //      NB: according to BCP47, Script subtage is always 4 chars; however, we have
+            //      expanded this to allow 5 chars also so as to allow parsing all the Microsoft 
+            //      Pseudo-Locale language tags (qps-ploc, qps-plocm, qps-ploca).
+            //      If this causes a problem, consider explicitly matching (ploc|plocm|ploca).
+            //      Ref Issue https://github.com/turquoiseowl/i18n/issues/195.
             // (?:-([a-zA-Z]{2}|[0-9]{3}))?
             //      Matches region.
             //      NB: The inner group is wrapped in an outer non-capturing group that
@@ -84,12 +92,12 @@ namespace i18n
             //      Matches private use subtag
             //      eg en-ABCD-GB-x-AAAA
         static readonly Regex m_regex_parseUrl = new System.Text.RegularExpressions.Regex(
-            @"^/([a-zA-Z]{2}(?:-[a-zA-Z]{4})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/)", 
+            @"^/([a-zA-Z]{2,3}(?:-[a-zA-Z]{4,5})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/)", 
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
                 // ^/
                 // (                                # begin 1st and only capture group
-                // [a-zA-Z]{2}                      # 2-letter country code
-                // (?:-[a-zA-Z]{4})?                # optional script code - not a capture group itself
+                // [a-zA-Z]{2,3}                    # 2-letter or 3-letter country code
+                // (?:-[a-zA-Z]{4,5})?              # optional script code - not a capture group itself
                 // (?:-(?:[a-zA-Z]{2}|[0-9]{3}))?   # optional region code (2-letter or 3-digit) - not a capture group itself
                 // (?:\-x-([a-zA-Z0-9]{4,}))?       # optional private use tag (-x- followed by 4+ alphanumericcharacters) - not a capture group itself
                 // )                                # end 1st and only capture group

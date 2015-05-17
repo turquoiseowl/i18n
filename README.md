@@ -738,6 +738,17 @@ Note the `-x-`, after which you can add four or more alphanumeric characters to 
 There must be an exact match for all subtags for this translation to be returned. If the module can't find a 
 translation for the tenant, it will match the remaining subtags according to the algorithm described above.
 
+##### Microsoft Pseudo-Locales and App Testing
+
+As an aid to testing the localization of you app, Microsoft have added some
+['pseudo-locales'](https://msdn.microsoft.com/en-us/library/windows/desktop/dd319106(v=vs.85).aspx) to Windows.
+
+Specifically, these are identified by the following special language tags ```qps-ploc```, ```qps-plocm``` and
+```qps-ploa```.
+
+i18n supports the use of these special locales. See [Issue #195](https://github.com/turquoiseowl/i18n/issues/195)
+for further details.
+
 ##### Language Matching Update
 
 The latest refinement to the language matching algoritm:

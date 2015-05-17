@@ -34,8 +34,8 @@ namespace i18n.Tests
                 "<a class=\"corporate_logo\" href=\"/fr\" title=\"Home\"></a>");
             ResponseFilter_can_patch_html_urls(
                 "fr",
-                "<a class=\"corporate_logo\" href=\"/aaa\" title=\"Home\"></a>",
-                "<a class=\"corporate_logo\" href=\"/fr/aaa\" title=\"Home\"></a>");
+                "<a class=\"corporate_logo\" href=\"/aaaa\" title=\"Home\"></a>",
+                "<a class=\"corporate_logo\" href=\"/fr/aaaa\" title=\"Home\"></a>");
             ResponseFilter_can_patch_html_urls(
                 "fr",
                 "<a class=\"corporate_logo\" title=\"Home\" href=\"/\"></a>",
