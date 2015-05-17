@@ -189,7 +189,13 @@ namespace i18n
                 context.Response.Status = "302 Moved Temporarily";
             }
             context.Response.RedirectLocation = urlNew;
-            context.Response.End();
+
+            // End the request early: no further processing along the pipeline.
+            // NB: we did originally use context.Response.End(); here but that causes an
+            // unnecessary exception to be thrown (https://support.microsoft.com/en-us/kb/312629) (#195)
+            // NB: the line AFTER this line will execute, so best to return immediately here
+            // and from caller etc..
+            context.ApplicationInstance.CompleteRequest();
         }
 
         /// <summary>
