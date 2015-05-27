@@ -19,35 +19,39 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\lib\net40\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\i18n.XML</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\lib\net40\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\bin\lib\net40\i18n.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\i18n.XML</DocumentationFile>
+    <NoWarn>1591 1573</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="container">
-      <HintPath>..\packages\container.0.0.4\lib\net40\container.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,31 +59,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClonedHttpRequest.cs" />
-    <Compile Include="ClonedHttpContext.cs" />
-    <Compile Include="DataAnnotations\DataType.cs" />
-    <Compile Include="DataAnnotations\DataTypeAttribute.cs" />
-    <Compile Include="DataAnnotations\DisplayAttribute.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="HtmlString.cs" />
-    <Compile Include="DataAnnotations\LocalizingAttribute.cs" />
-    <Compile Include="DataAnnotations\StringLengthAttribute.cs" />
-    <Compile Include="DataAnnotations\ValidationAttribute.cs" />
-    <Compile Include="DefaultSettings.cs" />
-    <Compile Include="I18NMessage.cs" />
-    <Compile Include="ILocalizing.cs" />
-    <Compile Include="ILocalizingService.cs" />
-    <Compile Include="IHtmlStringFormatter.cs" />
-    <Compile Include="LocalizingService.cs" />
-    <Compile Include="PostBuildTask.cs" />
+    <Compile Include="Abstract\ITranslateSvc.cs" />
+    <Compile Include="Abstract\IRootServices.cs" />
+    <Compile Include="Concrete\EarlyUrlLocalizer.cs" />
+    <Compile Include="Abstract\IEarlyUrlLocalizer.cs" />
+    <Compile Include="Abstract\INuggetLocalizer.cs" />
+    <Compile Include="Abstract\IUrlLocalizer.cs" />
+    <Compile Include="Concrete\TranslateSvc.cs" />
+    <Compile Include="Helpers\DebugHelpers.cs" />
+    <Compile Include="Helpers\HttpContextExtensions.cs" />
+    <Compile Include="Abstract\ITextLocalizer.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Abstract\ILanguageTag.cs" />
+    <Compile Include="Helpers\LanguageHelpers.cs" />
+    <Compile Include="Helpers\LanguageItem.cs" />
+    <Compile Include="Pipeline\LocalizingModule.cs" />
+    <Compile Include="Concrete\NuggetLocalizer.cs" />
+    <Compile Include="Helpers\PostbackParser.cs" />
+    <Compile Include="Pipeline\ResponseFilter.cs" />
+    <Compile Include="Helpers\ParseHelpers.cs" />
+    <Compile Include="LocalizedApplication.cs" />
+    <Compile Include="Helpers\LanguageMatching.cs" />
+    <Compile Include="Concrete\LanguageTag.cs" />
+    <Compile Include="Concrete\TextLocalizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="I18NSession.cs" />
-    <Compile Include="DataAnnotations\RequiredAttribute.cs" />
+    <Compile Include="Concrete\UrlLocalizer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="i18n.nuspec" />
+    <None Include="Key.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\i18n.Domain\i18n.Domain.csproj">
+      <Project>{bc2104ab-dc34-45b3-ab4d-3035f11fbdb8}</Project>
+      <Name>i18n.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="readme.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
@@ -89,7 +107,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

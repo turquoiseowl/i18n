@@ -2,19 +2,20 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+[assembly: AssemblyVersion("2.1.1.0")] // picked up by nuspec $version$ identifier
+[assembly: AssemblyFileVersion("2.1.1.0")]
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("i18n")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Smart internationalization for ASP.NET.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Conatus Creative Inc. ")]
+[assembly: AssemblyCompany("Martin Connell,Daniel Crenna,contributors")] // picked up by nuspec $author$ identifier
 [assembly: AssemblyProduct("i18n")]
-[assembly: AssemblyCopyright("Copyright © Conatus Creative Inc. 2012")]
+[assembly: AssemblyCopyright("Copyright (c) 2011-2015 Martin Connell, Daniel Crenna, and contributors.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: InternalsVisibleTo("i18n.MVC3")]
-[assembly: InternalsVisibleTo("i18n.MVC4")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -23,16 +24,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("1453a162-aca1-4756-84ab-46bd2286444d")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]

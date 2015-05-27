@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using i18n.Domain.Concrete;
+using i18n.Domain.Entities;
 
 namespace i18n.PostBuild
 {
@@ -6,30 +11,43 @@ namespace i18n.PostBuild
     {
         static void Main(string[] args)
         {
-            if(args.Length == 0)
-            {
-                Console.WriteLine("This post build task requires passing in the $(ProjectDirectory) path");
-                return;
-            }
+			//TestCode
+	        //args = new string[] {@"C:\viducate2\Viducate\Viducate.WebUI\Web.config"};
 
-            var path = args[0];
-            path = path.Trim(new[] {'\"'});
+			string configPath;
+			if (args.Length == 0)
+			{
+				System.Console.WriteLine("You have to specify path to web.config.");
+				return;
+			}
 
-            string gettext = null;
-            string msgmerge = null;
-            string[] inputPaths = null;
-            for (int i = 1; i < args.Length; i++)
-            {
-                if (args[i].StartsWith("gettext:", StringComparison.InvariantCultureIgnoreCase))
-                    gettext = args[i].Substring(8);
+	        try
+	        {
+		        configPath = args[0];
+				using (FileStream fs = File.Open(configPath, FileMode.Open))
+		        {
+			        
+		        }
+	        }
+	        catch (Exception)
+	        {
+				System.Console.WriteLine("Failed to open config file at path.");
+				return;
+	        }
 
-                if (args[i].StartsWith("msgmerge:", StringComparison.InvariantCultureIgnoreCase))
-                    msgmerge = args[i].Substring(9);
-                if (args[i].StartsWith("inputpaths:", StringComparison.InvariantCultureIgnoreCase))
-                    inputPaths = args[i].Substring(11).Split(',');
-            }
+			//todo: this assumes PO files, if not using po files then other solution needed.
+			i18nSettings settings = new i18nSettings(new WebConfigSettingService(configPath));
+			POTranslationRepository rep = new POTranslationRepository(settings);
 
-            new PostBuildTask().Execute(path, gettext, msgmerge, inputPaths);
+			FileNuggetFinder nugget = new FileNuggetFinder(settings);
+	        var items = nugget.ParseAll();
+	        rep.SaveTemplate(items);
+
+			TranslationMerger ts = new TranslationMerger(rep);
+			ts.MergeAllTranslation(items);
+			
+
+            Console.WriteLine("i18n.PostBuild completed successfully.");
         }
     }
 }
