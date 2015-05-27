@@ -1,7 +1,7 @@
 # i18n (v2)
 ## Smart internationalization for ASP.NET
 ```
-    PM> Install-Package I18N
+    PM> Install-Package i18N
 ```
 ### Introduction
 
