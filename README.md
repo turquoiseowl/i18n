@@ -193,16 +193,17 @@ where the %0 and %1 tokens are replaced by the strings that replace the {0} and 
 (The reason for the extra level of redirection here is to facilitate the translator rearranging the order of
 the tokens for different languages.)
 
-Nugget transformation also support translation of parameters like  
+Nugget transformation supports translation of the arguments as follows:
+
 ```
 [DisplayName("[[[CountryCode]]]")]
 [MaxLength(20, ErrorMessage="[[[%0 must be %1 characters or less|||(((CountryCode)))|||20]]]")]
 public string CountryCode { get; set; }
 ```
-Where the Nugget markup will first replace (((CountryCode)) with the translated text and then merge the 
+where the Nugget markup will first replace (((CountryCode)) with the translated text and then merge the 
 translated value into the main message. 
 
-Nugget markup also supports comments (_extracted comments_ in PO parlance) to be passed to the translator like so:
+Nugget markup supports comments (_extracted comments_ in PO terminology) to be passed to the translator like so:
 
 ```
 [[[translate me///this is an extracted comment]]]
