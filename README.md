@@ -1,5 +1,8 @@
 # i18n (v2)
 ## Smart internationalization for ASP.NET
+```
+    PM> Install-Package I18N
+```
 ### Introduction
 
 The i18n library is designed to replace the use of .NET resources in favor 
