@@ -20,7 +20,6 @@ based on ASP.NET v4 and above, including:
 
 ### Features
 
-
 - Leverages the [GetText / PO](http://en.wikipedia.org/wiki/Gettext) ecosystem: localize like the big kids
 - Localize everything: HTML, Razor, C#, VB, JavaScript, .NET attributes and data annotations, ...
 - SEO-friendly: language selection varies the URL, and `Content-Language` is set appropriately
