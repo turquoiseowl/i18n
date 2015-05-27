@@ -1,8 +1,14 @@
-if not exist "bin" mkdir "bin"
-if not exist "bin\content" mkdir "bin\content"
-if not exist "bin\tools" mkdir "bin\tools"
-if not exist "bin\tools\gettext-0.14.4" mkdir "bin\tools\gettext-0.14.4"
-copy LICENSE.md bin
-copy README.md bin
-copy "tools\gettext-0.14.4\*.*" "bin\tools\gettext-0.14.4"
-".nuget\NuGet.exe" pack i18n.nuspec -BasePath bin
+if not exist lib                 mkdir lib
+if not exist tools               mkdir tools
+if not exist content             mkdir content
+if not exist content\controllers mkdir content\controllers
+
+:
+: i18n.PostBuild
+:
+:xcopy ..\..\bin\tools\i18n.PostBuild\net40\Release tools\i18n.PostBuild /s/e/i/y
+
+copy ..\..\bin\LICENSE.md content\i18n.LICENSE.md
+copy ..\..\bin\README.md  content\i18n.README.md
+
+nuget pack i18n.csproj -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed

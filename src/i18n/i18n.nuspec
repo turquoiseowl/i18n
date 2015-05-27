@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <owners>Martin Connell, Daniel Crenna</owners>
+    <licenseUrl>https://github.com/turquoiseowl/i18n/blob/v2.0/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/turquoiseowl/i18n</projectUrl>
+    <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	  <summary>Smart internationalization for ASP.NET. (Official i18n nuget package.)</summary>
+	  <description>Smart internationalization for ASP.NET-based web applications. The i18n library is designed to replace the use of .NET resources in favor of an easier, globally-recognized standard for localizing ASP.NET-based web applications. Supports ASP.NET MVC, ASP.NET Web API, ASP.NET WebMatrix / Web Pages and ASP.NET Web Forms.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2011-2015</copyright>
+    <tags>i18n localization globalization asp.net</tags>
+  </metadata>
+  <files>
+    <file src="..\i18n.PostBuild\bin\Release\*.*"    target="tools\i18n.PostBuild"    />
+    <file src="..\i18n.POTGenerator\bin\Release\*.*" target="tools\i18n.POTGenerator" />
+    <file src="readme.txt" target="" />
+  </files>
+</package>
