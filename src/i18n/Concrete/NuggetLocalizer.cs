@@ -103,7 +103,7 @@ namespace i18n
                         endToken = _settings.NuggetVisualizeEndToken;
                     message = string.Format("{0}{1}{2}{3}", _settings.NuggetVisualizeToken, languageToken, message, endToken);
                 }
-                return HttpUtility.HtmlDecode(message);
+                return HttpUtility.HtmlEncode(message);
             });
            // Return modified entity.
             return entityOut;
