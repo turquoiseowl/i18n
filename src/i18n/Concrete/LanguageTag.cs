@@ -72,7 +72,7 @@ namespace i18n
             _MaxMatch = LanguageMatch,
         }
     // Data
-        static readonly Regex m_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2,3})(?:-([a-zA-Z]{4,5}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
+        public static Regex s_regex_parseLangtag = new Regex(@"^([a-zA-Z]{2,3})(?:-([a-zA-Z]{4,5}))?(?:-([a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?$", RegexOptions.CultureInvariant);
             // ([a-zA-Z]{2,3})
             //      Matches language.
             // (?:-([a-zA-Z]{4,5}))?
@@ -91,7 +91,7 @@ namespace i18n
             // (?:\+[a-zA-Z0-9]{4,})?
             //      Matches private use subtag
             //      eg en-ABCD-GB-x-AAAA
-        static readonly Regex m_regex_parseUrl = new System.Text.RegularExpressions.Regex(
+        public static Regex s_regex_parseUrl = new System.Text.RegularExpressions.Regex(
             @"^/([a-zA-Z]{2,3}(?:-[a-zA-Z]{4,5})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/)", 
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
                 // ^/
@@ -190,7 +190,7 @@ namespace i18n
             }
             m_langtagLC = m_langtag.ToLowerInvariant();
            // Parse the langtag.
-            Match match = m_regex_parseLangtag.Match(m_langtag);
+            Match match = s_regex_parseLangtag.Match(m_langtag);
             if (match.Success
                 && match.Groups.Count == 5) {
                 Language = match.Groups[1].Value;
@@ -525,7 +525,7 @@ namespace i18n
             }
 
            // Url is relative. Parse it.
-            System.Text.RegularExpressions.Match match = m_regex_parseUrl.Match(url);
+            System.Text.RegularExpressions.Match match = s_regex_parseUrl.Match(url);
            // If successful
             if (match.Success
                 && match.Groups.Count == 3) {
