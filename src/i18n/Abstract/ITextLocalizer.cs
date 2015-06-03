@@ -41,7 +41,8 @@
         /// </param>
         /// <returns>
         /// When <paramref name="msgid"/> is set to non-null, returns either the sucessully-looked up localized string, or 
-        /// null if the lookup failed.
+        /// null if the lookup failed. See also LocalizedApplication.MessageKeyIsValueInDefaultLanguage which when
+        /// true can cause msgid to be returned instead of null.
         /// When <paramref name="msgid"/> is set to null, returns "" to indicate a match to a PO-valid language was made
         /// (PO-valid meaning that one or more messages/resources are defined for that language),
         /// or null if no match was made.

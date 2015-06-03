@@ -63,14 +63,29 @@ namespace i18n
                 if (_textLocalizer == null) {
                     return "test.message"; }
                // Lookup resource using canonical msgid.
-				message = _textLocalizer.GetText(HttpUtility.HtmlDecode(nugget.MsgId), HttpUtility.HtmlDecode(nugget.Comment), languages, out lt) ?? nugget.MsgId;
+               // · First try lookup with msgid as is.
+               // · Failing that, try lookup with HtmlDecoded msgid (ref Issue #105).
+               // · Failing that, use msgid as the message.
+				message = _textLocalizer.GetText(
+                    nugget.MsgId,
+                    nugget.Comment,
+                    languages,
+                    out lt);
+                if (message == null
+                    || message == nugget.MsgId) {
+    				message = _textLocalizer.GetText(
+                        HttpUtility.HtmlDecode(nugget.MsgId), 
+                        HttpUtility.HtmlDecode(nugget.Comment), 
+                        languages, 
+                        out lt); }
+                if (message == null) {
+                    message = nugget.MsgId; }
                //
                 if (nugget.IsFormatted) {
                    // Convert any identifies in a formatted nugget: %0 -> {0}
                     message = ConvertIdentifiersInMsgId(message);
                    // Format the message.
                     var formatItems = new List<string>(nugget.FormatItems);
-
                     try {
                         // translate nuggets in parameters 
                         for (int i = 0; i < formatItems.Count; i++)
@@ -92,7 +107,7 @@ namespace i18n
                 }
                // Output modified message (to be subsituted for original in the source entity).
                 DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", nugget.MsgId, message);
-
+               //
                 if (_settings.VisualizeMessages)
                 {
                     string languageToken = string.Empty;
