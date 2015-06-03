@@ -66,6 +66,7 @@ namespace i18n
                // · First try lookup with msgid as is.
                // · Failing that, try lookup with HtmlDecoded msgid (ref Issue #105).
                // · Failing that, use msgid as the message.
+               // See also unit test: NuggetLocalizer_can_process_nugget_htmlencoded.
 				message = _textLocalizer.GetText(
                     nugget.MsgId,
                     nugget.Comment,
