@@ -63,24 +63,12 @@ namespace i18n
                 if (_textLocalizer == null) {
                     return "test.message"; }
                // Lookup resource using canonical msgid.
-               // · First try lookup with msgid as is.
-               // · Failing that, try lookup with HtmlDecoded msgid (ref Issue #105).
-               // · Failing that, use msgid as the message.
-               // See also unit test: NuggetLocalizer_can_process_nugget_htmlencoded.
 				message = _textLocalizer.GetText(
+                    true, // true = try lookup with HtmlDecoded-msgid if lookup with raw msgid fails.
                     nugget.MsgId,
                     nugget.Comment,
                     languages,
                     out lt);
-                if (message == null
-                    || message == nugget.MsgId) {
-    				message = _textLocalizer.GetText(
-                        HttpUtility.HtmlDecode(nugget.MsgId), 
-                        HttpUtility.HtmlDecode(nugget.Comment), 
-                        languages, 
-                        out lt); }
-                if (message == null) {
-                    message = nugget.MsgId; }
                //
                 if (nugget.IsFormatted) {
                    // Convert any identifies in a formatted nugget: %0 -> {0}
@@ -119,7 +107,9 @@ namespace i18n
                         endToken = _settings.NuggetVisualizeEndToken;
                     message = string.Format("{0}{1}{2}{3}", _settings.NuggetVisualizeToken, languageToken, message, endToken);
                 }
-                return HttpUtility.HtmlEncode(message);
+                return message;
+                    // NB: this was originally returning HttpUtility.HtmlEncode(message).
+                    // Ref #105 and #202 as to why changed back to returning message as is.
             });
            // Return modified entity.
             return entityOut;
