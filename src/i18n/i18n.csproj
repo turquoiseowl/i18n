@@ -73,6 +73,7 @@
     <Compile Include="Abstract\ILanguageTag.cs" />
     <Compile Include="Helpers\LanguageHelpers.cs" />
     <Compile Include="Helpers\LanguageItem.cs" />
+    <Compile Include="Helpers\TextLocalizerExtensions.cs" />
     <Compile Include="Pipeline\LocalizingModule.cs" />
     <Compile Include="Concrete\NuggetLocalizer.cs" />
     <Compile Include="Helpers\PostbackParser.cs" />
