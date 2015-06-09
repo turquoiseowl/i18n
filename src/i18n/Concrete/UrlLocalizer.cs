@@ -103,7 +103,7 @@ namespace i18n
         /// <remarks>
         /// This filtering in performed in addition to any custom IncomingUrlFilters/OutgoingUrlFilters filters.
         /// </remarks>
-        public static Regex QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.jpg|\.jpeg|\.png|\.svg|\.woff|\.eot)$", RegexOptions.IgnoreCase);
+        public static Regex QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.jpg|\.jpeg|\.png|\.gif|\.svg|\.woff|\.eot)$", RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Filters that examines the request URL during Early URL Localization
