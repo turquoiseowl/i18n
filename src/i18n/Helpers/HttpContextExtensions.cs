@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using i18n.Helpers;
 
 namespace i18n
 {
@@ -44,17 +45,36 @@ namespace i18n
         /// <param name="context">Describes the current request.</param>
         /// <param name="msgid">Specifies the individual message to be translated (the first part inside of a nugget). E.g. if the nugget is [[[Sign in]] then this param is "Sign in".</param>
         /// <param name="msgcomment">Specifies the optional message comment value of the subject resource, or null/empty.</param>
+        /// <param name="allowLookupWithHtmlDecodedMsgId">
+        /// Controls whether a lookup will be attempted with HtmlDecoded-msgid should the first lookup with raw msgid fail.
+        /// Defaults to true.
+        /// </param>
         /// <returns>Localized string, or msgid if no translation exists.</returns>
-        public static string GetText(this HttpContext context, string msgid, string msgcomment)
+        public static string GetText(
+            this HttpContext context, 
+            string msgid, 
+            string msgcomment,
+            bool allowLookupWithHtmlDecodedMsgId = true)
         {
-            return context.GetHttpContextBase().GetText(msgid, msgcomment);
+            return context.GetHttpContextBase().GetText(
+                msgid, 
+                msgcomment, 
+                allowLookupWithHtmlDecodedMsgId);
         }
-        public static string GetText(this HttpContextBase context, string msgid, string msgcomment)
+        public static string GetText(
+            this HttpContextBase context, 
+            string msgid, 
+            string msgcomment,
+            bool allowLookupWithHtmlDecodedMsgId = true)
         {
-            // Lookup resource.
+           // Relay on to the current text localizer for the appdomain.
             LanguageTag lt;
-            msgid = LocalizedApplication.Current.TextLocalizerForApp.GetText(msgid, msgcomment, context.GetRequestUserLanguages(), out lt) ?? msgid;
-            return HttpUtility.HtmlDecode(msgid);
+            return LocalizedApplication.Current.TextLocalizerForApp.GetText(
+                allowLookupWithHtmlDecodedMsgId,
+                msgid, 
+                msgcomment, 
+                context.GetRequestUserLanguages(),
+                out lt);
         }
 
         /// <summary>
