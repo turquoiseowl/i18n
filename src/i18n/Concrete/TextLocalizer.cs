@@ -11,6 +11,7 @@ using System.Web.Hosting;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 using i18n.Domain.Concrete;
+using i18n.Helpers;
 
 namespace i18n
 {

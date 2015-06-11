@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,10 +57,14 @@ namespace i18n.Domain.Concrete
 				{
 					try
 					{
-						System.Globalization.CultureInfo.GetCultureInfo(dir);
-						lang = new Language();
-						lang.LanguageShortTag = dir;
-						dirList.Add(lang);
+					    var lt = new LanguageTag(dir);
+					    if (lt.CultureInfo == null)
+					        throw new CultureNotFoundException(dir);
+						lang = new Language
+						{
+						    LanguageShortTag = dir
+						};
+					    dirList.Add(lang);
 					}
 					catch (System.Globalization.CultureNotFoundException) 
 					{ 

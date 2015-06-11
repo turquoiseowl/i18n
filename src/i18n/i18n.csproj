@@ -70,7 +70,6 @@
     <Compile Include="Helpers\HttpContextExtensions.cs" />
     <Compile Include="Abstract\ITextLocalizer.cs" />
     <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="Abstract\ILanguageTag.cs" />
     <Compile Include="Helpers\LanguageHelpers.cs" />
     <Compile Include="Helpers\LanguageItem.cs" />
     <Compile Include="Helpers\TextLocalizerExtensions.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="Helpers\ParseHelpers.cs" />
     <Compile Include="LocalizedApplication.cs" />
     <Compile Include="Helpers\LanguageMatching.cs" />
-    <Compile Include="Concrete\LanguageTag.cs" />
     <Compile Include="Concrete\TextLocalizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Concrete\UrlLocalizer.cs" />
