@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstract\ILanguageTag.cs" />
     <Compile Include="Abstract\INuggetFinder.cs" />
     <Compile Include="Abstract\AbstractSettingService.cs" />
     <Compile Include="Abstract\ITranslationRepository.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Concrete\FsCacheDependency.cs" />
     <Compile Include="Concrete\i18nSettings.cs" />
     <Compile Include="Concrete\FileNuggetFinder.cs" />
+    <Compile Include="Concrete\LanguageTag.cs" />
     <Compile Include="Concrete\TranslationMerger.cs" />
     <Compile Include="Concrete\WebConfigSettingService.cs" />
     <Compile Include="Entities\Language.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Entities\TemplateItem.cs" />
     <Compile Include="Entities\TranslationItem.cs" />
     <Compile Include="Entities\Translation.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FileEnumerator.cs" />
     <Compile Include="Helpers\MiscHelpers.cs" />
     <Compile Include="Helpers\CollectionExtensions.cs" />
