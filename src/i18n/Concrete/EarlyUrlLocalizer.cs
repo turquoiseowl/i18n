@@ -46,7 +46,7 @@ namespace i18n
                 // The principle purpose of this redirection is to ensure the browser is showing the correct URL
                 // in its address field.
                 if (allowRedirect) {
-                    RedirectWithLanguage(context, lt.ToString(), m_urlLocalizer);
+                    RedirectWithLanguage(context, context.Request.RawUrl, lt.ToString(), m_urlLocalizer);
                     return;
                 }
         
@@ -82,7 +82,7 @@ namespace i18n
                 // YES. Localize URL with matching App Language.
                 // Conditionally redirect user agent to localized URL.
                 if (allowRedirect) {
-                    RedirectWithLanguage(context, appLangTag.ToString(), m_urlLocalizer);
+                    RedirectWithLanguage(context, urlNonlocalized, appLangTag.ToString(), m_urlLocalizer);
                     return;
                 }
             }
@@ -174,11 +174,12 @@ namespace i18n
 
         protected static void RedirectWithLanguage(
             HttpContextBase context, 
+            string urlNonlocalized,
             string langtag,
             IUrlLocalizer m_urlLocalizer)
         {
             // Construct localized URL.
-            string urlNew = m_urlLocalizer.SetLangTagInUrlPath(context, context.Request.RawUrl, UriKind.Relative, langtag);
+            string urlNew = m_urlLocalizer.SetLangTagInUrlPath(context, urlNonlocalized, UriKind.Relative, langtag);
 
             // Redirect user agent to new local URL.
             if (LocalizedApplication.Current.PermanentRedirects) {
