@@ -32,7 +32,7 @@ namespace i18n
         private MemoryStream m_stagingBuffer = new MemoryStream();
 
         /// <summary>
-        /// The stream onto which we pass data once processed. This will typically be set 
+        /// The stream onto which we pass data once processed. This will typically be set
         /// to the stream which was the original value of Response.Filter before we got there.
         /// </summary>
         protected Stream m_outputStream;
@@ -43,7 +43,7 @@ namespace i18n
         protected HttpContextBase m_httpContext;
 
         public ResponseFilter(
-            HttpContextBase httpContext, 
+            HttpContextBase httpContext,
             Stream outputStream,
             IEarlyUrlLocalizer earlyUrlLocalizer,
             INuggetLocalizer nuggetLocalizer)
@@ -80,105 +80,114 @@ namespace i18n
 
         public override void Flush()
         {
-            DebugHelpers.WriteLine("ResponseFilter::Flush");
-
-            Byte[] buf = m_stagingBuffer.GetBuffer();
-
-            //If the buffer holds compressed content then we allow the original output stream to be used because we don't try to modify compressed streams
-            if (m_streamIsCompressed)
+            if (m_stagingBuffer != null)
             {
-                DebugHelpers.WriteLine("ResponseFilter::Flush -- skipping compressed content");
-                m_outputStream.Flush();
-                return;
-            }
+                DebugHelpers.WriteLine("ResponseFilter::Flush");
 
-            // Convert byte array into string.
-            Encoding enc = m_httpContext.Response.ContentEncoding;
-            string entity = enc.GetString(buf, 0, (int)m_stagingBuffer.Length);
+                Byte[] buf = m_stagingBuffer.GetBuffer();
 
-            // Prep for special BOM handling.
-            // NB: at present we only support UTF-8 for this logic.
-            //bool utf8WithoutBom = enc is UTF8Encoding && !buf.IsTextWithBom_Utf8();
+                //If the buffer holds compressed content then we allow the original output stream to be used because we don't try to modify compressed streams
+                if (m_streamIsCompressed)
+                {
+                    DebugHelpers.WriteLine("ResponseFilter::Flush -- skipping compressed content");
+                    m_outputStream.Flush();
+                    return;
+                }
+
+                // Convert byte array into string.
+                Encoding enc = m_httpContext.Response.ContentEncoding;
+                string entity = enc.GetString(buf, 0, (int) m_stagingBuffer.Length);
+
+                // Prep for special BOM handling.
+                // NB: at present we only support UTF-8 for this logic.
+                //bool utf8WithoutBom = enc is UTF8Encoding && !buf.IsTextWithBom_Utf8();
                 // #86 -- disabled this BOM handling for now as it doesn't seem to help.
-                // Furthermore, it appears that the Encoding instance returned by 
+                // Furthermore, it appears that the Encoding instance returned by
                 // Response.ContentEncoding above is correctly configured to omit
                 // BOM or not from its GetByte method, depending on whether or not
                 // the response buffer has a BOM in it or not (for instance, see the
                 // ctor of UTF8Encoding that takes a bool for this).
 
-            // Buffer no longer required so release memory.
-            m_stagingBuffer.Dispose();
-            m_stagingBuffer = null;
-            buf = null;
+                // Buffer no longer required so release memory.
+                m_stagingBuffer.Dispose();
+                m_stagingBuffer = null;
+                buf = null;
 
-            // Translate any embedded messages aka 'nuggets'.
-            if (m_nuggetLocalizer != null)
-            {
-                var page = m_httpContext.Handler as Page;
-                bool isScriptManager = false;
-                if (page != null)
+                // Translate any embedded messages aka 'nuggets'.
+                if (m_nuggetLocalizer != null)
                 {
-                    var sm = ScriptManager.GetCurrent(page);
-                    if (sm != null && sm.IsInAsyncPostBack) isScriptManager = true;
-                }
-                //if async postback
-                if (page != null && page.IsPostBack && isScriptManager && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r","").Split('\n')[0])) { //#178
-                    var asyncPostbackParser = new AsyncPostbackParser(entity);
-                    var types = LocalizedApplication.Current.AsyncPostbackTypesToTranslate.Split(new char[] {','});
-                    foreach (var type in types) {
-                        asyncPostbackParser.GetSections(type).ForEach(section => {
-                            section.Content = m_nuggetLocalizer.ProcessNuggets(
-                                section.Content,
-                                m_httpContext.GetRequestUserLanguages());
-                        });
+                    var page = m_httpContext.Handler as Page;
+                    bool isScriptManager = false;
+                    if (page != null)
+                    {
+                        var sm = ScriptManager.GetCurrent(page);
+                        if (sm != null && sm.IsInAsyncPostBack) isScriptManager = true;
                     }
-                    entity = asyncPostbackParser.ToString();
-                } else {
-                    entity = m_nuggetLocalizer.ProcessNuggets(
-                        entity,
-                        m_httpContext.GetRequestUserLanguages());
+                    //if async postback
+                    if (page != null && page.IsPostBack && isScriptManager && !String.IsNullOrEmpty(entity) && !String.IsNullOrEmpty(entity.Replace("\r", "").Split('\n')[0]))
+                    {
+                        //#178
+                        var asyncPostbackParser = new AsyncPostbackParser(entity);
+                        var types = LocalizedApplication.Current.AsyncPostbackTypesToTranslate.Split(new char[] {','});
+                        foreach (var type in types)
+                        {
+                            asyncPostbackParser.GetSections(type).ForEach(section =>
+                            {
+                                section.Content = m_nuggetLocalizer.ProcessNuggets(
+                                    section.Content,
+                                    m_httpContext.GetRequestUserLanguages());
+                            });
+                        }
+                        entity = asyncPostbackParser.ToString();
+                    }
+                    else
+                    {
+                        entity = m_nuggetLocalizer.ProcessNuggets(
+                            entity,
+                            m_httpContext.GetRequestUserLanguages());
+                    }
                 }
-            }
 
-            // If Early Localization is enabled, we balance that here with Late URL Localization.
-            // The goal is to localize same-host URLs in the entity body and so save a redirect 
-            // on subsequent requests to those URLs by the user-agent (Early URL Localization).
-            // We patch all URLs in the entity which are:
-            //  1. same-host
-            //  2. are not already localized
-            //  3. pass any custom filtering
-            // Examples of attributes containing urls include:
-            //   <script src="..."> tags
-            //   <img src="..."> tags
-            //   <a href="..."> tags
-            //   <link href="..."> tags
-            if (m_earlyUrlLocalizer != null)
-            {
-                entity = m_earlyUrlLocalizer.ProcessOutgoing(
-                    entity, 
-                    m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
-                    m_httpContext);
-            }
+                // If Early Localization is enabled, we balance that here with Late URL Localization.
+                // The goal is to localize same-host URLs in the entity body and so save a redirect
+                // on subsequent requests to those URLs by the user-agent (Early URL Localization).
+                // We patch all URLs in the entity which are:
+                //  1. same-host
+                //  2. are not already localized
+                //  3. pass any custom filtering
+                // Examples of attributes containing urls include:
+                //   <script src="..."> tags
+                //   <img src="..."> tags
+                //   <a href="..."> tags
+                //   <link href="..."> tags
+                if (m_earlyUrlLocalizer != null)
+                {
+                    entity = m_earlyUrlLocalizer.ProcessOutgoing(
+                        entity,
+                        m_httpContext.GetPrincipalAppLanguageForRequest().ToString(),
+                        m_httpContext);
+                }
 
-            //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
+                //DebugHelpers.WriteLine("ResponseFilter::Write -- entity:\n{0}", entity);
 
-            // Render the string back to an array of bytes.
-            buf = enc.GetBytes(entity);
-            enc = null; // release memory asap.
-            int count = buf.Length;
+                // Render the string back to an array of bytes.
+                buf = enc.GetBytes(entity);
+                enc = null; // release memory asap.
+                int count = buf.Length;
 
-            // Prep to skip any BOM if it wasn't originally there.
-            // NB: at present we only support UTF-8 for this logic.
-            int skip = 0;
-            //if (utf8WithoutBom && buf.IsTextWithBom_Utf8()) {
-            //    skip = 3; }
+                // Prep to skip any BOM if it wasn't originally there.
+                // NB: at present we only support UTF-8 for this logic.
+                int skip = 0;
+                //if (utf8WithoutBom && buf.IsTextWithBom_Utf8()) {
+                //    skip = 3; }
                 // #86 -- see matching comment above.
 
-            // Forward data on to the original response stream.
-            m_outputStream.Write(buf, skip, count -skip);
+                // Forward data on to the original response stream.
+                m_outputStream.Write(buf, skip, count - skip);
 
-            // Complete the write.
-            m_outputStream.Flush();
+                // Complete the write.
+                m_outputStream.Flush();
+            }
         }
 
         // The following overrides may be unnecessary. Instead we could have derived this class
