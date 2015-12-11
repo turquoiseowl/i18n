@@ -118,7 +118,7 @@ namespace i18n
                     string hdrval = context.Response.Headers[hdr];
                     if (!hdrval.IsSet()) {
                         continue; }
-                    string urlNew = LocalizeUrl(context, hdrval, langtag, requestUrl, true);
+                    string urlNew = LocalizeUrl(context, hdrval, langtag, requestUrl, false);
                     if (urlNew == null) {
                         continue; }
                     context.Response.Headers[hdr] = urlNew;
