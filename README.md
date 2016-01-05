@@ -807,7 +807,7 @@ i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,s
 
 ### OWIN support
 
-Suport for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241)
+Support for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241)
 for more details.
 
 ### A reminder about folders in a web application
