@@ -807,8 +807,37 @@ i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,s
 
 ### OWIN support
 
-Support for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241)
-for more details.
+Support for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241) for more details.
+i18n is created based on `HttpContextBase` in System.Web assembly, which means the foundation was built on IIS pipeline.
+Currently we support OWIN hosted in IIS only, so it is still dependent on System.Web.  Self-hosted OWIN is not supported.
+
+Here is how to use i18n in OWIN Web API projects:
+
+- Add reference to I18N.Owin.SystemWeb (available on NuGet as well)
+- Add reference to Microsoft.Owin.Host.SystemWeb.  If you add I18n.Owin.SystemWeb from NuGet it should automatically add this for you.
+- No need for registering HttpModule in web.config file.
+- Add the following middleware registration into your startup sequence.
+
+```
+public partial class Startup
+{
+    public void Configuration(IAppBuilder app)
+    {
+        ...
+        ...
+
+        // i18n middlewares
+        app.Use(typeof(UrlLocalizationMiddleware));
+        app.Use(typeof(EntityLocalizationMiddleware));
+        // Configurations below
+        i18n.LocalizedApplication.Current.DefaultLanguage = "en";
+        // other i18n configurations
+        ...
+
+    }
+}
+```
+
 
 ### A reminder about folders in a web application
 
