@@ -34,3 +34,4 @@ Examples*/
 publish.xml
 TestResults
 *.nupkg
+/src/packages

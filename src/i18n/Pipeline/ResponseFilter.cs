@@ -80,6 +80,8 @@ namespace i18n
 
         public override void Flush()
         {
+            if (m_stagingBuffer == null) { return; } 
+
             DebugHelpers.WriteLine("ResponseFilter::Flush");
 
             Byte[] buf = m_stagingBuffer.GetBuffer();
