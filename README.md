@@ -359,7 +359,7 @@ adding `i18n.PostBuild.exe` as a project reference:
     "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)\web.config"
 ```
     
-Alternatively, you may choose to install the `i18n.POTGenerator.vsix` Visual Studio 2012 extension.
+Alternatively, you may choose to install the `i18n.POTGenerator.vsix` Visual Studio extension (2012/2013/2015).
 This installs an `i18n` button in the Solution Window for manual triggering of PO generation. Note that
 it is necessary to highlight the project in question within the Solution Window before pressing the button.
 
@@ -805,6 +805,11 @@ example, to include the **hiddenField** blocks, add the following to Application
 i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle,hiddenField";
 ```
 
+### OWIN support
+
+Suport for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241)
+for more details.
+
 ### A reminder about folders in a web application
 
 Your `locale` folder is exposed to HTTP requests as-is, just like a typical log directory, so remember to block all requests
@@ -848,22 +853,15 @@ The following stock implementations of ```i18n.ITranslateSvc``` are provided by 
 
 ### Build Notes
 
-The i18n project at present targets Visual Studio 2012 / .NET Framework 4 and requires the Visual Studio 2012 SDK libraries
+The i18n project at present targets Visual Studio 2013 / .NET Framework 4 and requires the Visual Studio 2013 SDK libraries
 installed to build.
-
-To build the project in Visual Studio 2013 / .NET Framework 4.5:
-
-1. Install the Visual Studio 2013 SDK if not already installed.
-2. Upgrade the i18n project to 2013.
-3. Remove the reference to Microsoft.VisualStudio.Shell.11 and replace it with a reference to Microsoft.VisualStudio.Shell.12.
-
-See [Issue #117](https://github.com/turquoiseowl/i18n/issues/117#issuecomment-57867637) for more information on building with VS 2013.
 
 ### Contributing
 
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
+* Full OWIN support (see [Issue #241](https://github.com/turquoiseowl/i18n/issues/241))
 * Input and ideas on a safe universal nugget syntax (see issue #69).
 * Plurals support.
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
