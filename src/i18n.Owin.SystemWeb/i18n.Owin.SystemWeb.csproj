@@ -67,6 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="i18n.Owin.SystemWeb.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

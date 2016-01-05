@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <owners>Martin Connell, Daniel Crenna</owners>
+    <licenseUrl>https://github.com/turquoiseowl/i18n/blob/v2.0/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/turquoiseowl/i18n</projectUrl>
+    <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>OWIN support for I18N.  I18N is a smart internationalization package for ASP.NET (official i18n nuget package).</summary>
+    <description>OWIN support for I18N.  See https://github.com/turquoiseowl/i18n#owin-support for details.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2011-2016</copyright>
+    <tags>i18n internationalization l10n localization globalization asp.net mvc PO</tags>
+    <dependencies>
+      <dependency id="I18N" version="2.1.6" />
+    </dependencies>
+  </metadata>
+</package>
