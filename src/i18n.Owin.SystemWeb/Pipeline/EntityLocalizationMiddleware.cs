@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace i18n.Owin.SystemWeb
 {
@@ -18,7 +17,7 @@ namespace i18n.Owin.SystemWeb
 
         public async override Task Invoke(IOwinContext owinContext)
         {
-            HttpContextBase context = owinContext.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
+            System.Web.HttpContextBase context = owinContext.Get<System.Web.HttpContextBase>(typeof(System.Web.HttpContextBase).FullName);
             Debug.WriteLine("OwinMiddleware::Invoke -- ContentType: {0},\n\tUrl: {1}\n\tRawUrl:{2}", context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             // If the content type of the entity is eligible for processing AND the URL is not to be excluded,

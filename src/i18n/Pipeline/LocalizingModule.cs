@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using i18n.Helpers;
 
 namespace i18n
@@ -32,7 +31,7 @@ namespace i18n
     ///             &lt;/httpModules&gt;
     ///           &lt;/system.web&gt;
     /// </remarks>
-    public class LocalizingModule : IHttpModule
+    public class LocalizingModule : System.Web.IHttpModule
     {
         private IRootServices m_rootServices;
 
@@ -47,7 +46,7 @@ namespace i18n
 
     #region [IHttpModule]
 
-        public void Init(HttpApplication application)
+        public void Init(System.Web.HttpApplication application)
         {
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
             
@@ -70,7 +69,7 @@ namespace i18n
         /// </summary>
         private void OnBeginRequest(object sender, EventArgs e)
         {
-            HttpContextBase context = HttpContext.Current.GetHttpContextBase();
+            System.Web.HttpContextBase context = System.Web.HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnBeginRequest -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             // Establish the language for the request. That is, we need to call
@@ -94,7 +93,7 @@ namespace i18n
         private void OnReleaseRequestState(object sender, EventArgs e)
         {
         //
-            HttpContextBase context = HttpContext.Current.GetHttpContextBase();
+            System.Web.HttpContextBase context = System.Web.HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
@@ -135,15 +134,15 @@ namespace i18n
         {
             //Deal with an issue that causes empty responses to requests for WebResource.axd, set the internal HttpWriter to allow further writes
             //this is not known to be necessary for any other cases, hence the hard-coded check for the WebResource.axd URL
-            var context = HttpContext.Current;
+            var context = System.Web.HttpContext.Current;
             DebugHelpers.WriteLine("LocalizingModule::OnPostRequestHandlerExecute -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
             if (context.Request.RawUrl.ToLower().StartsWith("/webresource.axd"))
             {
                 var response = context.Response;
-                var httpWriterField = typeof(HttpResponse).GetField("_httpWriter",
+                var httpWriterField = typeof(System.Web.HttpResponse).GetField("_httpWriter",
                                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                var ignoringFurtherWritesField = typeof(HttpWriter).GetField("_ignoringFurtherWrites",
+                var ignoringFurtherWritesField = typeof(System.Web.HttpWriter).GetField("_ignoringFurtherWrites",
                                                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 var httpWriter = httpWriterField.GetValue(response);
                 ignoringFurtherWritesField.SetValue(httpWriter, false);

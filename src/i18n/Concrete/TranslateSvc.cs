@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using i18n;
 
 namespace i18n
 {
     /// <summary>
-    /// ITranslateSvc implementation based on an given HttpContextBase instance.
+    /// ITranslateSvc implementation based on an given System.Web.HttpContextBase instance.
     /// </summary>
     public class TranslateSvc_HttpContextBase : ITranslateSvc
     {
@@ -22,9 +21,9 @@ namespace i18n
 
     #endregion
 
-        HttpContextBase m_context;
+        System.Web.HttpContextBase m_context;
 
-        public TranslateSvc_HttpContextBase(HttpContextBase context)
+        public TranslateSvc_HttpContextBase(System.Web.HttpContextBase context)
         {
             if (context == null) { throw new ArgumentNullException("context"); }
 
@@ -48,9 +47,9 @@ namespace i18n
 
     #endregion
 
-        HttpContext m_context;
+        System.Web.HttpContext m_context;
 
-        public TranslateSvc_HttpContext(HttpContext context)
+        public TranslateSvc_HttpContext(System.Web.HttpContext context)
         {
             if (context == null) { throw new ArgumentNullException("context"); }
 
@@ -69,7 +68,7 @@ namespace i18n
 
         public string ParseAndTranslate(string entity)
         {
-            return HttpContext.Current.ParseAndTranslate(entity);
+            return System.Web.HttpContext.Current.ParseAndTranslate(entity);
         }
 
     #endregion

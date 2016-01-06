@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 using System.Text.RegularExpressions;
 using i18n.Helpers;
 
@@ -21,7 +20,7 @@ namespace i18n
         /// <see href="https://docs.google.com/drawings/d/1cH3_PRAFHDz7N41l8Uz7hOIRGpmgaIlJe0fYSIOSZ_Y/edit?usp=sharing"/>
         /// </summary>
         public void ProcessIncoming(
-            HttpContextBase context)
+            System.Web.HttpContextBase context)
         {
             // Is URL explicitly excluded from localization?
             if (!m_urlLocalizer.FilterIncoming(context.Request.Url)) {
@@ -93,7 +92,7 @@ namespace i18n
         public string ProcessOutgoing(
             string entity, 
             string langtag, 
-            HttpContextBase context)
+            System.Web.HttpContextBase context)
         {
         // The goal here to localize same-host URLs in the entity body and so save a redirect 
         // on subsequent requests to those URLs by the user-agent (i.e. Early URL Localization
@@ -173,7 +172,7 @@ namespace i18n
         public static string[] m_httpHeadersContainingUrls = new[] { "Location", "Content-Location" };
 
         protected static void RedirectWithLanguage(
-            HttpContextBase context, 
+            System.Web.HttpContextBase context, 
             string urlNonlocalized,
             string langtag,
             IUrlLocalizer m_urlLocalizer)
@@ -212,7 +211,7 @@ namespace i18n
         /// either because it was already localized, or because it is from another host, or is explicitly
         /// excluded from localization by the filter.
         /// </returns>
-        protected string LocalizeUrl(HttpContextBase context, string url, string langtag, Uri requestUrl, bool incomingUrl)
+        protected string LocalizeUrl(System.Web.HttpContextBase context, string url, string langtag, Uri requestUrl, bool incomingUrl)
         {
             // If URL is already localized...leave matched token alone.
             string urlNonlocalized;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 
 namespace i18n
 {
@@ -12,7 +11,7 @@ namespace i18n
         /// Current http context.
         /// </param>
         void ProcessIncoming(
-            HttpContextBase context);
+            System.Web.HttpContextBase context);
 
         /// <summary>
         /// Method for performing Late Url Localization of the passed response entity
@@ -34,6 +33,6 @@ namespace i18n
         string ProcessOutgoing(
             string entity, 
             string langtag, 
-            HttpContextBase context);
+            System.Web.HttpContextBase context);
     }
 }

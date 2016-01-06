@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using i18n.Helpers;
 
 namespace i18n
@@ -136,7 +135,7 @@ namespace i18n
         /// <remarks>
         /// <see cref="UrlLocalizer.DetermineDefaultLanguageFromRequest"/>
         /// </remarks>
-        public delegate LanguageTag DetermineDefaultLanguageFromRequestProc(HttpContextBase context);
+        public delegate LanguageTag DetermineDefaultLanguageFromRequestProc(System.Web.HttpContextBase context);
 
         /// <summary>
         /// Registers the procedure used by instances of this class for determining the 
@@ -156,7 +155,7 @@ namespace i18n
         {
             // Register default per-class method for deriving the default langtag
             // for the current request.
-            DetermineDefaultLanguageFromRequest = delegate(HttpContextBase context)
+            DetermineDefaultLanguageFromRequest = delegate(System.Web.HttpContextBase context)
             {
                 return LocalizedApplication.Current.DefaultLanguageTag;
             };
@@ -205,7 +204,7 @@ namespace i18n
             return true;
         }
         
-        public string ExtractLangTagFromUrl(HttpContextBase context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
+        public string ExtractLangTagFromUrl(System.Web.HttpContextBase context, string url, UriKind uriKind, bool incomingUrl, out string urlPatched)
         {
             string siteRootPath = ExtractAnySiteRootPathFromUrl(ref url, uriKind);
 
@@ -240,7 +239,7 @@ namespace i18n
 
             return result;
         }
-        public string SetLangTagInUrlPath(HttpContextBase context, string url, UriKind uriKind, string langtag)
+        public string SetLangTagInUrlPath(System.Web.HttpContextBase context, string url, UriKind uriKind, string langtag)
         {
             switch (UrlLocalizationScheme)
             {

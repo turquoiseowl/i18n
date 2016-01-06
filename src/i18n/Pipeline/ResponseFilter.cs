@@ -2,8 +2,6 @@
 using System.Linq;
 using System.IO;
 using System.Text;
-using System.Web;
-using System.Web.UI;
 using i18n.Helpers;
 using i18n.Domain.Concrete;
 
@@ -40,10 +38,10 @@ namespace i18n
         /// <summary>
         /// HTTP context with which the filter is associated.
         /// </summary>
-        protected HttpContextBase m_httpContext;
+        protected System.Web.HttpContextBase m_httpContext;
 
         public ResponseFilter(
-            HttpContextBase httpContext, 
+            System.Web.HttpContextBase httpContext, 
             Stream outputStream,
             IEarlyUrlLocalizer earlyUrlLocalizer,
             INuggetLocalizer nuggetLocalizer)
@@ -116,11 +114,11 @@ namespace i18n
             // Translate any embedded messages aka 'nuggets'.
             if (m_nuggetLocalizer != null)
             {
-                var page = m_httpContext.Handler as Page;
+                var page = m_httpContext.Handler as System.Web.UI.Page;
                 bool isScriptManager = false;
                 if (page != null)
                 {
-                    var sm = ScriptManager.GetCurrent(page);
+                    var sm = System.Web.UI.ScriptManager.GetCurrent(page);
                     if (sm != null && sm.IsInAsyncPostBack) isScriptManager = true;
                 }
                 //if async postback

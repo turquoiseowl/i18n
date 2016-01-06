@@ -5,9 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web;
-using System.Web.Caching;
-using System.Web.Hosting;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 using i18n.Domain.Concrete;
@@ -37,12 +34,12 @@ namespace i18n
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
-            ConcurrentDictionary<string, LanguageTag> AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+            ConcurrentDictionary<string, LanguageTag> AppLanguages = (ConcurrentDictionary<string, LanguageTag>)System.Web.HttpRuntime.Cache["i18n.AppLanguages"];
             if (AppLanguages != null) {
                 return AppLanguages; }
             lock (Sync)
             {
-                AppLanguages = (ConcurrentDictionary<string, LanguageTag>)HttpRuntime.Cache["i18n.AppLanguages"];
+                AppLanguages = (ConcurrentDictionary<string, LanguageTag>)System.Web.HttpRuntime.Cache["i18n.AppLanguages"];
                 if (AppLanguages != null) {
                     return AppLanguages; }
                 AppLanguages = new ConcurrentDictionary<string, LanguageTag>();
@@ -51,7 +48,7 @@ namespace i18n
                // NB: we do this before actually populating the collection. This is so that any changes to the
                // folders before we finish populating the collection will cause the cache item to be invalidated
                // and hence reloaded on next request, and so will not be missed.
-                HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyForAllLanguages());
+                System.Web.HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyForAllLanguages());
 
                // Populate the collection.
 	            List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
@@ -126,14 +123,14 @@ namespace i18n
         /// <returns>true if one or more localized messages exist for the language; otherwise false.</returns>
         private bool IsLanguageValid(string langtag)
         {
-        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+        // Note that there is no need to serialize access to System.Web.HttpRuntime.Cache when just reading from it.
         //
             // Default language is always valid.
             if (LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage
                 && LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
                 return true; }
 
-			ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
+			ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
@@ -195,7 +192,7 @@ namespace i18n
 				// It is possible for multiple threads to race to this method. The first to
 				// enter the above lock will insert the messages into the cache.
 				// If we lost the race...no need to duplicate the work of the winning thread.
-				if (HttpRuntime.Cache[GetCacheKey(langtag)] != null)
+				if (System.Web.HttpRuntime.Cache[GetCacheKey(langtag)] != null)
 				{
 					return true;
 				}
@@ -209,7 +206,7 @@ namespace i18n
                 // See MessageKeyIsValueInDefaultLanguage.
                 var cd = _translationRepository.GetCacheDependencyForSingleLanguage(langtag);
 				if (cd != null) {
-                    HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd); }
+                    System.Web.HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd); }
 			}
             return true;
         }
@@ -217,16 +214,16 @@ namespace i18n
        /// <returns>null if not found.</returns>
         private string LookupText(string langtag, string msgkey)
         {
-        // Note that there is no need to serialize access to HttpRuntime.Cache when just reading from it.
+        // Note that there is no need to serialize access to System.Web.HttpRuntime.Cache when just reading from it.
         //
-            var messages = (ConcurrentDictionary<string, TranslationItem>) HttpRuntime.Cache[GetCacheKey(langtag)];
+            var messages = (ConcurrentDictionary<string, TranslationItem>) System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
             TranslationItem message = null;
 
 			//we need to populate the cache
 			if (messages == null)
 			{
 				LoadMessagesIntoCache(langtag);
-                messages = (ConcurrentDictionary<string, TranslationItem>)HttpRuntime.Cache[GetCacheKey(langtag)];
+                messages = (ConcurrentDictionary<string, TranslationItem>)System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
 			}
 
            // Normalize any CRLF in the msgid i.e. to just LF.

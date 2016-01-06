@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using i18n.Domain.Abstract;
-using System.Web.Configuration;
 using System.Configuration;
 
 namespace i18n.Domain.Concrete
@@ -25,7 +23,7 @@ namespace i18n.Domain.Concrete
 		        {
                     if (isVirtualPath)
 			        {
-                        _configuration = WebConfigurationManager.OpenWebConfiguration(configLocation);
+                        _configuration = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(configLocation);
                         _settings = _configuration.AppSettings;
 			        }
 			        else
@@ -42,7 +40,7 @@ namespace i18n.Domain.Concrete
 		        else
 		        {
 			        //No config file was sent in so we use default one
-			        _configuration = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current != null ? HttpContext.Current.Request.ApplicationPath : null);
+			        _configuration = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request.ApplicationPath : null);
 			        _settings = _configuration.AppSettings;
 		        }
 	        }

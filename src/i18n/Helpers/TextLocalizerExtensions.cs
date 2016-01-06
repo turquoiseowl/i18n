@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 
 namespace i18n.Helpers
 {
@@ -50,10 +49,10 @@ namespace i18n.Helpers
                 return message; }
            // 2.
             if (allowLookupWithHtmlDecodedMsgId) {
-                string msgIdHtmlDecoded = HttpUtility.HtmlDecode(msgid);
+                string msgIdHtmlDecoded = System.Web.HttpUtility.HtmlDecode(msgid);
     		    message = textLocalizer.GetText(
                     msgIdHtmlDecoded, 
-                    HttpUtility.HtmlDecode(msgcomment), 
+                    System.Web.HttpUtility.HtmlDecode(msgcomment), 
                     languages,
                     out o_langtag,
                     maxPasses);

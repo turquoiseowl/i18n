@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Web;
 using System.Text.RegularExpressions;
 using i18n.Domain.Helpers;
 using i18n.Domain.Abstract;
@@ -161,7 +160,7 @@ namespace i18n
         /// </summary>
         /// <param name="context">Current http context.</param>
         /// <param name="langtag">Language being set.</param>
-        public delegate void SetLanguageHandler(HttpContextBase context, ILanguageTag langtag);
+        public delegate void SetLanguageHandler(System.Web.HttpContextBase context, ILanguageTag langtag);
 
         /// <summary>
         /// Describes one or more procedures to be called when the principal application
@@ -232,7 +231,7 @@ namespace i18n
             // that it can also throw.
             try
             {
-                var mycontext = HttpContext.Current;
+                var mycontext = System.Web.HttpContext.Current;
                 if (mycontext != null && mycontext.Request.ApplicationPath != null)
                     ApplicationPath = mycontext.Request.ApplicationPath.TrimEnd('/');
             }
@@ -249,7 +248,7 @@ namespace i18n
             // Install default handler for Set-PAL event.
             // The default handler applies the setting to both the CurrentCulture and CurrentUICulture
             // settings of the thread.
-            SetPrincipalAppLanguageForRequestHandlers = delegate(HttpContextBase context, ILanguageTag langtag)
+            SetPrincipalAppLanguageForRequestHandlers = delegate(System.Web.HttpContextBase context, ILanguageTag langtag)
             {
                 if (langtag != null)
                 {
