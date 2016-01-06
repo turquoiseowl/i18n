@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("i18n.Owin.SystemWeb")]
+[assembly: AssemblyTitle("i18n.Adapter.OwinSystemWeb")]
 [assembly: AssemblyDescription("Smart internationalization for ASP.NET - Owin support")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Connell,Daniel Crenna,Bernie Zhao,contributors")] // picked up by nuspec $author$ identifier
-[assembly: AssemblyProduct("i18n.Owin.SystemWeb")]
+[assembly: AssemblyProduct("i18n.Adapter.OwinSystemWeb")]
 [assembly: AssemblyCopyright("Copyright (c) 2011-2015 Martin Connell, Daniel Crenna, Bernie Zhao and contributors.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

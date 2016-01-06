@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Domain.Tests", "i18n.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.POTGenerator", "i18n.POTGenerator\i18n.POTGenerator.csproj", "{CF0086A6-BE5F-462F-A735-B91686C20C6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Owin.SystemWeb", "i18n.Owin.SystemWeb\i18n.Owin.SystemWeb.csproj", "{785DE89F-4F74-4FAF-ADF6-E43749DF1D76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Adapter.OwinSystemWeb", "i18n.Adapter.OwinSystemWeb\i18n.Adapter.OwinSystemWeb.csproj", "{785DE89F-4F74-4FAF-ADF6-E43749DF1D76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

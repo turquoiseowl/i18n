@@ -7,8 +7,8 @@
     <ProjectGuid>{785DE89F-4F74-4FAF-ADF6-E43749DF1D76}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>i18n.Owin.SystemWeb</RootNamespace>
-    <AssemblyName>i18n.Owin.SystemWeb</AssemblyName>
+    <RootNamespace>i18n.Adapter.OwinSystemWeb</RootNamespace>
+    <AssemblyName>i18n.Adapter.OwinSystemWeb</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -67,7 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="i18n.Owin.SystemWeb.nuspec" />
+    <None Include="i18n.Adapter.OwinSystemWeb.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

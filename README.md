@@ -813,9 +813,9 @@ Currently we support OWIN hosted in IIS only, so it is still dependent on System
 
 Here is how to use i18n in OWIN Web API projects:
 
-- Add reference to I18N.Owin.SystemWeb (available on NuGet as well)
-- Add reference to Microsoft.Owin.Host.SystemWeb.  If you add I18n.Owin.SystemWeb from NuGet it should automatically add this for you.
-- No need for registering HttpModule in web.config file.
+- Add reference to i18n.Adapter.OwinSystemWeb (available on NuGet as well)
+- Add reference to Microsoft.Owin.Host.SystemWeb.  If you add i18n.Adapter.OwinSystemWeb from NuGet it should automatically add this for you.
+- No need to register HttpModule in web.config file.
 - Add the following middleware registration into your startup sequence.
 
 ```
@@ -824,20 +824,17 @@ public partial class Startup
     public void Configuration(IAppBuilder app)
     {
         ...
-        ...
 
         // i18n middlewares
-        app.Use(typeof(UrlLocalizationMiddleware));
-        app.Use(typeof(EntityLocalizationMiddleware));
-        // Configurations below
-        i18n.LocalizedApplication.Current.DefaultLanguage = "en";
-        // other i18n configurations
-        ...
+        app.Use(typeof(i18n.Adapter.OwinSystemWeb.UrlLocalizationMiddleware));
+        app.Use(typeof(i18n.Adapter.OwinSystemWeb.EntityLocalizationMiddleware));
 
+        // i18n config
+        i18n.LocalizedApplication.Current.DefaultLanguage = "en";
+        ...
     }
 }
 ```
-
 
 ### A reminder about folders in a web application
 

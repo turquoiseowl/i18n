@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace i18n.Owin.SystemWeb
+namespace i18n.Adapter.OwinSystemWeb
 {
     public class EntityLocalizationMiddleware : OwinMiddleware
     {
