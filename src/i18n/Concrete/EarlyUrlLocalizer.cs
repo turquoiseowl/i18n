@@ -215,14 +215,14 @@ namespace i18n
         /// </returns>
         protected string LocalizeUrl(System.Web.HttpContextBase context, string url, string langtag, Uri requestUrl, bool incomingUrl)
         {
+            // If URL has prefix indicating it should be excluded from localization...return unlocalized URL
+            if (url.StartsWith(IgnoreLocalizationUrlPrefix)) {
+                return url.Substring(IgnoreLocalizationUrlPrefix.Length); }
+
             // If URL is already localized...leave matched token alone.
             string urlNonlocalized;
             if (m_urlLocalizer.ExtractLangTagFromUrl(context, url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
                 return null; } // original
-
-            // If URL has prefix indicating it should be excluded from localization...return unlocalized URL
-            if (url.StartsWith(IgnoreLocalizationUrlPrefix)) {
-                return url.Substring(IgnoreLocalizationUrlPrefix.Length); }
 
             // If URL is not local (i.e. remote host)...leave matched token alone.
             if (requestUrl != null && !requestUrl.IsLocal(url)) {
