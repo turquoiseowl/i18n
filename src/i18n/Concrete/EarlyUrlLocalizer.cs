@@ -199,6 +199,8 @@ namespace i18n
             context.ApplicationInstance.CompleteRequest();
         }
 
+        public const string IgnoreLocalizationUrlPrefix = "^^^IGNORE_LOCALIZATION^^^";
+
         /// <summary>
         /// Helper for localizing an individual URL string for a particular langtag value
         /// and URL of the current request.
@@ -217,6 +219,10 @@ namespace i18n
             string urlNonlocalized;
             if (m_urlLocalizer.ExtractLangTagFromUrl(context, url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
                 return null; } // original
+
+            // If URL has prefix indicating it should be excluded from localization...return unlocalized URL
+            if (url.StartsWith(IgnoreLocalizationUrlPrefix)) {
+                return url.Substring(IgnoreLocalizationUrlPrefix.Length); }
 
             // If URL is not local (i.e. remote host)...leave matched token alone.
             if (requestUrl != null && !requestUrl.IsLocal(url)) {
