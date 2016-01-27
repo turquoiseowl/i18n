@@ -320,6 +320,29 @@ namespace i18n.Tests
                 "fr",
                 "\r\r\n\n\n\r\n\n\r\t\n\r\t<script\r\r\n\n\n\r\n\n\r\t\n\r\tsrc\r\r\n\n\n\r\n\n\r\t\n\r\t=\r\r\n\n\n\r\n\n\r\t\n\r\t\"123\"\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t</script\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t",
                 "\r\r\n\n\n\r\n\n\r\t\n\r\t<script\r\r\n\n\n\r\n\n\r\t\n\r\tsrc\r\r\n\n\n\r\n\n\r\t\n\r\t=\r\r\n\n\n\r\n\n\r\t\n\r\t\"/fr/123\"\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t</script\r\r\n\n\n\r\n\n\r\t\n\r\t>\r\r\n\n\n\r\n\n\r\t\n\r\t");
+
+            // IGNORE_LOCALIZATION URLs.
+            // These should not be changed by the filter.
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                string.Format("<script src=\"{0}123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
+                "<script src=\"123\"></script>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                string.Format("<script src=\"{0}/123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
+                "<script src=\"/123\"></script>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                string.Format("<script src=\"{0}http://example.com/123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
+                "<script src=\"http://example.com/123\"></script>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                string.Format("<script src=\"{0}https://example.com/123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
+                "<script src=\"https://example.com/123\"></script>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                string.Format("<script src=\"{0}https://example.com/fr/123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
+                "<script src=\"https://example.com/fr/123\"></script>");
         }
     }
 }
