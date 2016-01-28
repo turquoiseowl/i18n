@@ -459,6 +459,27 @@ true if the URL is to be localized, otherwise false. For example:
     }
 ```
 
+### Conditionally ignore localization for a specific URL
+
+There are very rare cases where you need to *conditionally* bypass the URL localization for a specific URL. 
+One example is when generating <a href='https://support.google.com/webmasters/answer/189077?hl=en'>hreflang tags</a> 
+when using i18n with Scheme2.
+
+You can do this by prefixing the URL like so:
+
+```
+	<link rel="alternate" hreflang="en" href="@(EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix)http://mysite.com" />
+	<link rel="alternate" hreflang="fr" href="http://mysite.com/fr" />
+	<link rel="alternate" hreflang="es" href="http://mysite.com/es" />
+```
+
+When i18n goes through the process for localizing outgoing URLs, this prefix will be stripped and the rendered URL 
+will be left non-localized.
+
+Note that this method of ignoring URL localization should not be widespread and is included to address *edge cases*. 
+Most use cases that require ignoring URL localization can be solved more eloquently by making use of the [UrlLocalizer 
+filters](#exclude-urls-from-being-localized).
+
 ### Principal Application Language
 
 During startup of your ASP.NET application, i18n determines the set of application 
