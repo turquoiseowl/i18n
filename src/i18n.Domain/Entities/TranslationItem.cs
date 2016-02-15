@@ -20,7 +20,7 @@ namespace i18n.Domain.Entities
 		public string MsgKey { get; set; }
 		public string MsgId { get; set; }
 		public string Message { get; set; }
-		public IEnumerable<string> References { get; set; }
+		public IEnumerable<ReferenceContext> References { get; set; }
 		public IEnumerable<string> ExtractedComments { get; set; }
 		public IEnumerable<string> TranslatorComments { get; set; }
 		public IEnumerable<string> Flags { get; set; }

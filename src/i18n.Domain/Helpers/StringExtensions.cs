@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using i18n.Domain.Helpers;
 
 namespace i18n.Helpers
 {
@@ -14,19 +15,6 @@ namespace i18n.Helpers
             this string str)
         {
             return !string.IsNullOrEmpty(str);
-        }
-
-        /// <summary>
-        /// Returns the line number (1-based) of the identified character in the string.
-        /// </summary>
-        public static int LineFromPos(this string S, int Pos)
-        {
-            int Res = 1;
-            for (int i = 0; i < Pos; i++) {
-                if (S[i] == '\n') {
-                    Res++; }
-            }
-            return Res;
         }
     }
 }

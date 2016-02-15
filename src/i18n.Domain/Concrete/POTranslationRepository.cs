@@ -224,7 +224,7 @@ namespace i18n.Domain.Concrete
 						foreach (var reference in item.References)
 						{
 							hasReferences = true;
-							stream.WriteLine("#: " + reference);
+							stream.WriteLine("#: " + reference.ToComment());
 						}
 					}
 
@@ -320,7 +320,7 @@ namespace i18n.Domain.Concrete
 
 					foreach (var reference in item.References)
 					{
-						stream.WriteLine("#: " + reference);
+						stream.WriteLine("#: " + reference.ToComment());
 					}
 
                     if (_settings.MessageContextEnabledFromComment
@@ -383,10 +383,10 @@ namespace i18n.Domain.Concrete
 				    bool itemStarted = false;
 				    while ((line = fs.ReadLine()) != null)
 				    {
-					    List<string> extractedComments = new List<string>();
-					    List<string> translatorComments = new List<string>();
-					    List<string> flags = new List<string>();
-					    List<string> references = new List<string>();
+					    var extractedComments = new List<string>();
+					    var translatorComments = new List<string>();
+					    var flags = new List<string>();
+					    var references = new List<ReferenceContext>();
 
 					    //read all comments, flags and other descriptive items for this string
 					    //if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
@@ -401,7 +401,7 @@ namespace i18n.Domain.Concrete
 									    extractedComments.Add(line.Substring(2).Trim());
 									    break;
 								    case ':': //references
-									    references.Add(line.Substring(2).Trim());
+									    references.Add(ReferenceContext.Parse(line.Substring(2).Trim()));
 									    break;
 								    case ',': //flags
 									    flags.Add(line.Substring(2).Trim());
@@ -435,9 +435,10 @@ namespace i18n.Domain.Concrete
                                     // Update routine.
                                     (k, v) => {
                                         v.References = v.References.Append(item.References);
-                                        v.ExtractedComments = v.ExtractedComments.Append(item.References);
-                                        v.TranslatorComments = v.TranslatorComments.Append(item.References);
-                                        v.Flags = v.Flags.Append(item.References);
+                                        var referencesAsComments = item.References.Select(r => r.ToComment()).ToList();
+                                        v.ExtractedComments = v.ExtractedComments.Append(referencesAsComments);
+                                        v.TranslatorComments = v.TranslatorComments.Append(referencesAsComments);
+                                        v.Flags = v.Flags.Append(referencesAsComments);
                                         return v;
                                     });
                             }

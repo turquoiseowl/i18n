@@ -15,7 +15,7 @@ namespace i18n.Domain.Entities
 	{
 		public string MsgKey;
         public string MsgId;
-		public IEnumerable<string> References { get; set; }
+		public IEnumerable<ReferenceContext> References { get; set; }
 		public IEnumerable<string> Comments { get; set; }
 
         public override string ToString()

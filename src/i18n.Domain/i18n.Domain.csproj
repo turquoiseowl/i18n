@@ -65,6 +65,7 @@
     <Compile Include="Concrete\WebConfigSettingService.cs" />
     <Compile Include="Entities\Language.cs" />
     <Compile Include="Concrete\POTranslationRepository.cs" />
+    <Compile Include="Entities\ReferenceContext.cs" />
     <Compile Include="Entities\TemplateItem.cs" />
     <Compile Include="Entities\TranslationItem.cs" />
     <Compile Include="Entities\Translation.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Helpers\HashHelper.cs" />
     <Compile Include="Helpers\LockFreeProperty.cs" />
     <Compile Include="Helpers\NuggetParser.cs" />
+    <Compile Include="Helpers\PathNormalizer.cs" />
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
