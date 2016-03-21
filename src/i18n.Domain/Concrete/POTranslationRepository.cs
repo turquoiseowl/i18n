@@ -178,7 +178,7 @@ namespace i18n.Domain.Concrete
 
 			using (StreamWriter stream = new StreamWriter(filePath))
 			{
-                Console.WriteLine("Writing file: {0}", filePath);
+                DebugHelpers.WriteLine("Writing file: {0}", filePath);
                // Establish ordering of items in PO file.
                 var orderedItems = translation.Items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
@@ -288,7 +288,7 @@ namespace i18n.Domain.Concrete
 
             using (StreamWriter stream = new StreamWriter(filePath))
 			{
-                Console.WriteLine("Writing file: {0}", filePath);
+                DebugHelpers.WriteLine("Writing file: {0}", filePath);
                // Establish ordering of items in PO file.
                 var orderedItems = items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
@@ -373,7 +373,7 @@ namespace i18n.Domain.Concrete
 			string path = GetPathForLanguage(langtag);
 
             if (File.Exists(path)) {
-                Console.WriteLine("Reading file: {0}", path);
+                DebugHelpers.WriteLine("Reading file: {0}", path);
 
 			    using (var fs = File.OpenText(path))
 			    {
@@ -508,7 +508,7 @@ namespace i18n.Domain.Concrete
 					line = RemoveCommentIfHistorical(line);
                     if (String.IsNullOrEmpty(line))
                     {
-                        Console.WriteLine("ERROR - line is empty. Original line: " + originalLine);
+                        DebugHelpers.WriteLine("ERROR - line is empty. Original line: " + originalLine);
                         continue;
                     }
 					if (!line.StartsWith("msgstr") && (msgid = Unquote(line)) != null)

@@ -50,7 +50,7 @@ namespace i18n.Domain.Concrete
 				{
                     if (filePath.Length >= 260)
                     {
-                        Console.WriteLine("Path too long to process. Path: " + filePath);
+                        DebugHelpers.WriteLine("Path too long to process. Path: " + filePath);
                         continue;
                     }
 

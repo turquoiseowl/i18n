@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using i18n.Helpers;
 
 namespace i18n.Domain.Helpers
 {
@@ -13,7 +14,7 @@ namespace i18n.Domain.Helpers
         {
             _blackList = blackList;
             foreach (string str in blackList)
-                Console.WriteLine(str);
+                DebugHelpers.WriteLine(str);
         }
 
         public IEnumerable<string> GetFiles(string path)
@@ -33,7 +34,7 @@ namespace i18n.Domain.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    DebugHelpers.WriteLine(ex.ToString());
                 }
                 IEnumerable<string> files = null;
                 try
@@ -42,7 +43,7 @@ namespace i18n.Domain.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine((object)ex);
+                    DebugHelpers.WriteLine(ex.ToString());
                 }
                 if (files != null)
                 {
