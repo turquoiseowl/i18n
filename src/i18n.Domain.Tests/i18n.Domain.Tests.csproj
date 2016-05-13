@@ -50,8 +50,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="NuggetTests.cs" />
+    <Compile Include="PathNormalizerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NuggetParserTests.cs" />
+    <Compile Include="ReferenceContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\i18n.Domain\i18n.Domain.csproj">

@@ -102,9 +102,7 @@ namespace i18n.Domain.Concrete
 
 		private void ParseFile(string projectDirectory, string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
         {
-            var referencePath = (projectDirectory != null) && filePath.StartsWith(projectDirectory, StringComparison.OrdinalIgnoreCase)
-                ? filePath.Substring(projectDirectory.Length + 1)
-                : filePath;
+            var referencePath = PathNormalizer.MakeRelativePath(projectDirectory, filePath);
 
             DebugHelpers.WriteLine("FileNuggetFinder.ParseFile -- {0}", filePath);
            // Lookup any/all nuggets in the file and for each add a new template item.
@@ -112,9 +110,10 @@ namespace i18n.Domain.Concrete
 			{
                 _nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
                 {
+                    var referenceContext = ReferenceContext.Create(referencePath, i_entity, pos);
+
 				    AddNewTemplateItem(
-                        referencePath, 
-                        i_entity.LineFromPos(pos), 
+                        referenceContext,
                         nugget, 
                         templateItems);
                    // Done.
@@ -123,13 +122,11 @@ namespace i18n.Domain.Concrete
             }
         }
 
-		private void AddNewTemplateItem(
-            string filePath, 
-            int lineNumber, 
+	    private void AddNewTemplateItem(
+            ReferenceContext referenceContext,
             Nugget nugget, 
             ConcurrentDictionary<string, TemplateItem> templateItems)
-		{
-			string reference = filePath + ":" + lineNumber.ToString();
+	    {
             string msgid = nugget.MsgId.Replace("\r\n", "\n").Replace("\r", "\\n");
                 // NB: In memory msgids are normalized so that LFs are converted to "\n" char sequence.
             string key = TemplateItem.KeyFromMsgidAndComment(msgid, nugget.Comment, _settings.MessageContextEnabledFromComment);
@@ -143,9 +140,7 @@ namespace i18n.Domain.Concrete
                     item.MsgKey = key;
 			        item.MsgId = msgid;
 
-			        tmpList = new List<string>();
-			        tmpList.Add(reference);
-			        item.References = tmpList;
+                    item.References = new List<ReferenceContext> {referenceContext};
 
 			        if (nugget.Comment.IsSet()) {
                         tmpList = new List<string>();
@@ -156,11 +151,11 @@ namespace i18n.Domain.Concrete
 			        return item;
                 },
                 // Update routine.
-                (k, v) => {
-
-					tmpList = v.References.ToList();
-					tmpList.Add(reference);
-					v.References = tmpList;
+                (k, v) =>
+                {
+                    var newReferences = new List<ReferenceContext>(v.References.ToList());
+                    newReferences.Add(referenceContext);
+					v.References = newReferences;
 
 			        if (nugget.Comment.IsSet()) {
 					    tmpList = v.Comments != null ? v.Comments.ToList() : new List<string>();
