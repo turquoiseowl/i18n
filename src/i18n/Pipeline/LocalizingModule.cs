@@ -137,7 +137,7 @@ namespace i18n
             var context = System.Web.HttpContext.Current;
             DebugHelpers.WriteLine("LocalizingModule::OnPostRequestHandlerExecute -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            if (context.Request.RawUrl.ToLower().StartsWith("/webresource.axd"))
+            if (context.Request.RawUrl.ToLower().Contains("/webresource.axd"))
             {
                 var response = context.Response;
                 var httpWriterField = typeof(System.Web.HttpResponse).GetField("_httpWriter",
