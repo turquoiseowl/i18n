@@ -672,7 +672,7 @@ On selection of a language in the above code, the AccountController.SetLanguage 
         }
         // Update PAL setting so that new language is reflected in any URL patched in the 
         // response (Late URL Localization).
-        HttpContext.SetPrincipalAppLanguageForRequest(lt);
+        HttpContext.Current.SetPrincipalAppLanguageForRequest(lt);
         // Patch in the new langtag into any return URL.
         if (returnUrl.IsSet()) {
             returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(HttpContext, returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
