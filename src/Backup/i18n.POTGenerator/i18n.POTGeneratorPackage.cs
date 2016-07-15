@@ -8,7 +8,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using i18n.Domain.Concrete;
-using EnvDTE;
 
 namespace VSPackage.i18n_POTGenerator
 {
@@ -45,6 +44,8 @@ namespace VSPackage.i18n_POTGenerator
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
+
+
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
         #region Package Members
@@ -70,30 +71,16 @@ namespace VSPackage.i18n_POTGenerator
             }
         }
 
-        /// <summary>
-        /// Get StartUp Project. 
-        /// </summary>
-        /// <returns></returns>
         private object _getCurrentProject()
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
 
-            Array projects = (Array)dte.ActiveSolutionProjects;
-            if (projects != null && projects.Length > 0)
-            {
-                return projects.GetValue(0) as Project;
-            }
-            projects = (Array)dte.Solution.SolutionBuild.StartupProjects;
-            if (projects != null && projects.Length >= 1)
-            {
-                return projects.GetValue(0) as Project;
-            }
-            projects = (Array)dte.Solution.Projects;
-            if (projects != null && projects.Length > 0)
-            {
-                return projects.GetValue(0) as Project;
-            }
-            return null;
+            var activeProjects = dte.ActiveSolutionProjects as object[];
+
+            if (activeProjects != null)
+                return activeProjects[0];
+            else
+                return null;
         }
 
         private void _menuItemQueryStatus(object sender, EventArgs e)
