@@ -194,20 +194,40 @@ namespace i18n
             if (UserLanguages == null)
             {
                 // Construct UserLanguages list and cache it for the rest of the request.
-	            context.Items["i18n.UserLanguages"]
-		            = UserLanguages = GetRequestUserLanguagesImplementation(context);
-	            // NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
-	            // here as the second parameter i.e. to specify the PAL. However, this was
-	            // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
-	            // as SetPrincipalAppLanguageForRequest was not being called, that normally
-	            // overwriting the PAL set erroneously here.
+	            context.Items["i18n.UserLanguages"] = UserLanguages = GetRequestUserLanguagesImplementation(context);
             }
             return UserLanguages;
         }
 
-	    public delegate LanguageItem[] GetRequestUserLanguagesProc(System.Web.HttpContextBase context);
+		/// <summary>
+		/// Describes a procedure for determining the user languages for the current request.
+		/// </summary>
+		/// <param name="context">
+		/// Describes the current request. May be null if called outside of any request.
+		/// </param>
+		/// <returns>The language items which are determined for the current current request.</returns>
+		/// <remarks>
+		/// <see cref="HttpContextExtensions.GetRequestUserLanguagesImplementation"/>
+		/// </remarks>
+		public delegate LanguageItem[] GetRequestUserLanguagesProc(System.Web.HttpContextBase context);
 
-	    public static GetRequestUserLanguagesProc GetRequestUserLanguagesImplementation { get; set; } = (context) => LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+		/// <summary>
+		/// Registers the procedure used by instances of this class for determining the 
+		/// available user languages for the current request.
+		/// </summary>
+		/// <remarks>
+		/// The default implementation will check the `Accept-Language` header attribute 
+		/// for the available languages in the current request.
+		/// </remarks>
+		public static GetRequestUserLanguagesProc GetRequestUserLanguagesImplementation { get; set; } = (context) =>
+		{
+			return LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+			// NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
+			// here as the second parameter i.e. to specify the PAL. However, this was
+			// found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
+			// as SetPrincipalAppLanguageForRequest was not being called, that normally
+			// overwriting the PAL set erroneously here.
+		};
 
 		/// <summary>
 		/// Add a Content-Language HTTP header to the response, based on any languages
