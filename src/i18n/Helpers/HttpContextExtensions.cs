@@ -10,6 +10,19 @@ namespace i18n
 {
     public static class HttpContextExtensions
     {
+        static HttpContextExtensions()
+        {
+            GetRequestUserLanguagesImplementation = (context) =>
+            {
+	            return LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+	            // NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
+	            // here as the second parameter i.e. to specify the PAL. However, this was
+	            // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
+	            // as SetPrincipalAppLanguageForRequest was not being called, that normally
+	            // overwriting the PAL set erroneously here.
+            };
+        }
+
         /// <summary>
         /// Returns an System.Web.HttpContextBase for the current System.Web.HttpContext.
         /// Facilitates efficient consolidation of methods that require support for both 
@@ -216,18 +229,10 @@ namespace i18n
 		/// available user languages for the current request.
 		/// </summary>
 		/// <remarks>
-		/// The default implementation will check the `Accept-Language` header attribute 
+		/// The default implementation is set in the static constructor and will check the `Accept-Language` header attribute 
 		/// for the available languages in the current request.
 		/// </remarks>
-		public static GetRequestUserLanguagesProc GetRequestUserLanguagesImplementation { get; set; } = (context) =>
-		{
-			return LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
-			// NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
-			// here as the second parameter i.e. to specify the PAL. However, this was
-			// found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
-			// as SetPrincipalAppLanguageForRequest was not being called, that normally
-			// overwriting the PAL set erroneously here.
-		};
+		public static GetRequestUserLanguagesProc GetRequestUserLanguagesImplementation { get; set; }
 
 		/// <summary>
 		/// Add a Content-Language HTTP header to the response, based on any languages
