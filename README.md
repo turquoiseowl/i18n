@@ -95,6 +95,9 @@ code shows the most common options:
 
 			// Change the types of async postback blocks that are localized
 			//i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle";
+
+            // Change which languages are parsed from the request, like skipping  the "Accept-Language"-header value. The default setting is:
+            //i18n.HttpContextExtensions.GetRequestUserLanguagesImplementation = (context) => LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
         }
     }
 ```

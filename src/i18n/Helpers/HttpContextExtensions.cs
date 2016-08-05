@@ -10,6 +10,19 @@ namespace i18n
 {
     public static class HttpContextExtensions
     {
+        static HttpContextExtensions()
+        {
+            GetRequestUserLanguagesImplementation = (context) =>
+            {
+	            return LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
+	            // NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
+	            // here as the second parameter i.e. to specify the PAL. However, this was
+	            // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
+	            // as SetPrincipalAppLanguageForRequest was not being called, that normally
+	            // overwriting the PAL set erroneously here.
+            };
+        }
+
         /// <summary>
         /// Returns an System.Web.HttpContextBase for the current System.Web.HttpContext.
         /// Facilitates efficient consolidation of methods that require support for both 
@@ -194,29 +207,43 @@ namespace i18n
             if (UserLanguages == null)
             {
                 // Construct UserLanguages list and cache it for the rest of the request.
-                context.Items["i18n.UserLanguages"] 
-                    = UserLanguages 
-                    = LanguageItem.ParseHttpLanguageHeader(
-                        context.Request.Headers["Accept-Language"]);
-                            // NB: originally we passed LocalizedApplication.Current.DefaultLanguageTag
-                            // here as the second parameter i.e. to specify the PAL. However, this was
-                            // found to be incorrect when operating i18n with EarlyUrlLocalization disabled,
-                            // as SetPrincipalAppLanguageForRequest was not being called, that normally
-                            // overwriting the PAL set erroneously here.
+	            context.Items["i18n.UserLanguages"] = UserLanguages = GetRequestUserLanguagesImplementation(context);
             }
             return UserLanguages;
         }
 
-        /// <summary>
-        /// Add a Content-Language HTTP header to the response, based on any languages
-        /// that have provided resources during the request.
-        /// </summary>
-        /// <param name="context">Context of the current request.</param>
-        /// <returns>
-        /// true if header added; false if no languages provided content during the request and
-        /// so no header was added.
-        /// </returns>
-        public static bool SetContentLanguageHeader(this System.Web.HttpContext context)
+		/// <summary>
+		/// Describes a procedure for determining the user languages for the current request.
+		/// </summary>
+		/// <param name="context">
+		/// Describes the current request. May be null if called outside of any request.
+		/// </param>
+		/// <returns>The language items which are determined for the current current request.</returns>
+		/// <remarks>
+		/// <see cref="HttpContextExtensions.GetRequestUserLanguagesImplementation"/>
+		/// </remarks>
+		public delegate LanguageItem[] GetRequestUserLanguagesProc(System.Web.HttpContextBase context);
+
+		/// <summary>
+		/// Registers the procedure used by instances of this class for determining the 
+		/// available user languages for the current request.
+		/// </summary>
+		/// <remarks>
+		/// The default implementation is set in the static constructor and will check the `Accept-Language` header attribute 
+		/// for the available languages in the current request.
+		/// </remarks>
+		public static GetRequestUserLanguagesProc GetRequestUserLanguagesImplementation { get; set; }
+
+		/// <summary>
+		/// Add a Content-Language HTTP header to the response, based on any languages
+		/// that have provided resources during the request.
+		/// </summary>
+		/// <param name="context">Context of the current request.</param>
+		/// <returns>
+		/// true if header added; false if no languages provided content during the request and
+		/// so no header was added.
+		/// </returns>
+		public static bool SetContentLanguageHeader(this System.Web.HttpContext context)
         {
             return context.GetHttpContextBase().SetContentLanguageHeader();
         }
