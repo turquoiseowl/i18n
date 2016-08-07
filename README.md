@@ -928,6 +928,13 @@ This behaviour is controlled via Git's ```core.autocrlf``` setting, which in thi
 
 See [Dealing with line endings](https://help.github.com/articles/dealing-with-line-endings/) for more information.
 
+### Release History
+
+2.1.8 (20160807)
+
+* Support for ignoring Accept-Language request header (#278, #285).
+* Support for optionally show source context next to reference paths & line numbers (#268)
+
 ### Acknowledgments
 
 Among the many contributors to the i18n library, a special acknowledgement is due to Daniel Crenna 
