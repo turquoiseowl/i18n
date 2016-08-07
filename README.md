@@ -933,7 +933,7 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 2.1.8 (20160807)
 
 * Support for ignoring Accept-Language request header ([#278](https://github.com/turquoiseowl/i18n/issues/278), [#285](https://github.com/turquoiseowl/i18n/issues/285)).
-* Support for optionally show source context next to reference paths & line numbers ([#268](https://github.com/turquoiseowl/i18n/issues/268))
+* Support for optionally showing source context next to reference paths & line numbers ([#268](https://github.com/turquoiseowl/i18n/issues/268))
 
 ### Acknowledgments
 
