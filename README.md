@@ -304,7 +304,7 @@ by default. To enable this feature:
 ```
 
 Note that note all PO editors support msgctxt and indeed may be thrown by the value
-when present in .PO files. See Issue #90 for more details.
+when present in .PO files. See [Issue #90](https://github.com/turquoiseowl/i18n/issues/90) for more details.
 
 #### Multi-line messages
 
@@ -912,7 +912,7 @@ There's lot of room for further enhancements and features to this library, and y
 contribute back anything new. Specifically, these would be great places to add more functionality:
 
 * Full OWIN support (see [Issue #241](https://github.com/turquoiseowl/i18n/issues/241))
-* Input and ideas on a safe universal nugget syntax (see issue #69).
+* Input and ideas on a safe universal nugget syntax (see issue [#69](https://github.com/turquoiseowl/i18n/issues/69)).
 * Plurals support.
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
 
@@ -932,8 +932,8 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 
 2.1.8 (20160807)
 
-* Support for ignoring Accept-Language request header (#278, #285).
-* Support for optionally show source context next to reference paths & line numbers (#268)
+* Support for ignoring Accept-Language request header ([#278](https://github.com/turquoiseowl/i18n/issues/278), [#285](https://github.com/turquoiseowl/i18n/issues/285)).
+* Support for optionally show source context next to reference paths & line numbers ([#268](https://github.com/turquoiseowl/i18n/issues/268))
 
 ### Acknowledgments
 
