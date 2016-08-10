@@ -232,6 +232,33 @@ namespace i18n
             if (!m_urlLocalizer.FilterOutgoing(url, requestUrl)) {
                 return null; } // original
 
+            // If url is un-rooted...make it rooted based on any current request URL.
+            // This is to resolve problems caused to i18n with resource URL paths relative to the 
+            // current page (see issue #286).
+            // By un-rooted we mean the url is not absolute (i.e. it starts from the path component),
+            // and that that path component itself is a relative path (i.e. it doesn't start with a /).
+            // In doing so we also eliminate any "../..", "./", etc.
+            // Examples:
+            //      url (before)                            requestUrl                  url (after)
+            //      -------------------------------------------------------------------------------------------------------------------
+            //      content/fred.jpg                        http://example.com/blog/    /blog/content/fred.jpg              (changed)
+            //      content/fred.jpg                        http://example.com/blog     /content/fred.jpg                   (changed)
+            //      /content/fred.jpg                       http://example.com/blog/    /content/fred.jpg                   (unchanged)
+            //      http://example.com/content/fred.jpg     http://example.com/blog/    http://example.com/content/fred.jpg (unchanged)
+            // See also test cases in ResponseFilterTests.ResponseFilter_can_patch_html_urls.
+            //
+            if (requestUrl != null) {
+                bool urlIsUnrooted = !url.StartsWith("/")
+                    && (!url.Contains(":") || !Uri.IsWellFormedUriString(url, UriKind.Absolute));
+                    // NB: the above is somewhat elaborate so as to avoid an object allocation
+                    // in all but edge cases. Note also that Uri.IsWellFormedUriString internally
+                    // simply does a Uri.TryCreate (at least as of .NET 4.6.1).
+                if (urlIsUnrooted) {
+                    Uri newUri = new Uri(requestUrl, url);
+                    url = newUri.PathAndQuery;
+                }
+            }
+
             // Localize the URL.
             return m_urlLocalizer.SetLangTagInUrlPath(context, url, UriKind.RelativeOrAbsolute, langtag);
         }

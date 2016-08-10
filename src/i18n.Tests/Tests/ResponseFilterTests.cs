@@ -3,24 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using i18n.Domain.Concrete;
+using i18n.Helpers;
+using NSubstitute;
 
 namespace i18n.Tests
 {
     [TestClass]
     public class ResponseFilterTests
     {
-        void Helper_ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, Uri requestUrl = null)
+        void Helper_ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, string requestUrl = null)
         {
+            HttpRequestBase fakeRequest   = Substitute.For<HttpRequestBase>();
+            HttpResponseBase fakeResponse = Substitute.For<HttpResponseBase>();
+            HttpContextBase fakeContext   = Substitute.For<HttpContextBase>();
+
+            fakeRequest.Url.Returns(requestUrl.IsSet() ? new Uri(requestUrl) : null);
+            fakeResponse.Headers.Returns(new System.Net.WebHeaderCollection
+            {
+                //{ "Authorization", "xyz" }
+            });
+
+            fakeContext.Request.Returns(fakeRequest);
+            fakeContext.Response.Returns(fakeResponse);
+
             i18n.EarlyUrlLocalizer obj = new i18n.EarlyUrlLocalizer(new UrlLocalizer());
-            string post = obj.ProcessOutgoing(pre, suffix, null);
+            string post = obj.ProcessOutgoing(pre, suffix, fakeContext);
             Assert.AreEqual(expectedPatched, post);
         }
 
         [TestMethod]
         public void ResponseFilter_can_patch_html_urls()
         {
+            // Non-rooted path as href/src url. This should become rooted based on the path of the current request url.
+            // See impl. details in EarlyUrlLocalizer.LocalizeUrl. Reference issue #286.
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"123\"></img>"                                , "<img src=\"/fr/123\"></img>"                                , "http://example.com/Default.aspx");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"123\"></img>"                                , "<img src=\"/fr/blogs/123\"></img>"                          , "http://example.com/blogs/Default.aspx");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"123\"></img>"                                , "<img src=\"/fr/blogs/123\"></img>"                          , "http://example.com/blogs/");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"123\"></img>"                                , "<img src=\"/fr/123\"></img>"                                , "http://example.com/blogs");
+            // NB: for the following we use .txt rather than .jpg because the defaule outgoing URL filter excludes .jpg urls.
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"content/fred.txt\"></img>"                   , "<img src=\"/fr/content/fred.txt\"></img>"                   , "http://example.com/blog");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"content/fred.txt\"></img>"                   , "<img src=\"/fr/blog/content/fred.txt\"></img>"              , "http://example.com/blog/");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"/content/fred.txt\"></img>"                  , "<img src=\"/fr/content/fred.txt\"></img>"                   , "http://example.com/blog/");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"http://example.com/content/fred.txt\"></img>", "<img src=\"http://example.com/fr/content/fred.txt\"></img>" , "http://example.com/blog/");
+            Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"http://other.com/content/fred.txt\"></img>"  , "<img src=\"http://other.com/content/fred.txt\"></img>"      , "http://example.com/blog/"); // NB: foreign site so no langtag added
+
             // One attribute.
             Helper_ResponseFilter_can_patch_html_urls(
                 "fr",
