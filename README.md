@@ -452,7 +452,7 @@ Firstly, you can set a RegEx pattern to match against the localpath part of the 
     {
         ...
         // Blacklist certain URLs from being 'localized'.
-        i18n.UrlLocalizer.QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(?:sitemap\.xml|\.css|\.less|\.jpg|\.jpeg|\.png|\.gif|\.ico|\.svg|\.woff|\.woff2|\.ttf|\.eot)$", RegexOptions.IgnoreCase);
+        i18n.UrlLocalizer.QuickUrlExclusionFilter = new System.Text.RegularExpressions.Regex(@"(^\/api\/)|((sitemap\.xml|\.css|\.less|\.jpg|\.jpeg|\.png|\.gif|\.ico|\.svg|\.woff|\.woff2|\.ttf|\.eot)$)", RegexOptions.IgnoreCase);
     }
 ```
 

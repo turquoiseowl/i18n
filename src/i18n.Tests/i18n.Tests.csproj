@@ -53,6 +53,7 @@
     <Compile Include="Tests\LanguageTagTests.cs" />
     <Compile Include="Tests\NuggetLocalizerTests.cs" />
     <Compile Include="Tests\ResponseFilterTests.cs" />
+    <Compile Include="Tests\UrlLocalizerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
