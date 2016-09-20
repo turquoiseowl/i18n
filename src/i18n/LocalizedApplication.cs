@@ -156,6 +156,11 @@ namespace i18n
         public string ApplicationPath { get; set; }
 
         /// <summary>
+        /// The name for the i18n cookie. Defaults to "i18n.langtag".
+        /// </summary>
+        public string CookieName { get; set; }
+
+        /// <summary>
         /// Declares a method type for handling the setting of the language.
         /// </summary>
         /// <param name="context">Current http context.</param>
@@ -222,6 +227,7 @@ namespace i18n
 
             // Default settings.
             DefaultLanguage = ("en");
+            CookieName = "i18n.langtag";
             MessageKeyIsValueInDefaultLanguage = true;
             PermanentRedirects = false;
 

@@ -299,7 +299,7 @@ namespace i18n
             // 1. Inferred user languages (cookie and Accept-Language header)
             // 2. App Languages.
             LanguageTag lt = null;
-            System.Web.HttpCookie cookie_langtag = context.Request.Cookies.Get("i18n.langtag");
+            System.Web.HttpCookie cookie_langtag = context.Request.Cookies.Get(LocalizedApplication.Current.CookieName);
             if (cookie_langtag != null) {
                 lt = LanguageHelpers.GetMatchingAppLanguage(cookie_langtag.Value); }
             if (lt == null) {

@@ -71,6 +71,9 @@ code shows the most common options:
             // Change from the default of 'en'.
             i18n.LocalizedApplication.Current.DefaultLanguage = "fr";
 
+            // Change from the default of 'i18n.langtag'.
+            i18n.LocalizedApplication.Current.CookieName = "i18n_langtag";
+
             // Change from the of temporary redirects during URL localization
             i18n.LocalizedApplication.Current.PermanentRedirects = true;
 
