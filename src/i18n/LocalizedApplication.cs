@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Text.RegularExpressions;
 using i18n.Domain.Helpers;
+using i18n.Helpers;
 using i18n.Domain.Abstract;
 using i18n.Domain.Concrete;
 
@@ -178,6 +179,39 @@ namespace i18n
         /// or replacing with a new delegate.
         /// </remarks>
         public SetLanguageHandler SetPrincipalAppLanguageForRequestHandlers { get; set; }
+
+        /// <summary>
+        /// Declares a method type for a custom method called after a nugget has been translated
+        /// that allows the resulting message to be modified.
+        /// </summary>
+        /// <remarks>
+        /// In general it is good practice to postpone the escaping of characters until they 
+        /// are about to be displayed and then according to the content type of the output.
+        /// Thus, a single quote character need not be escaped if in JSON, but should be escaped
+        /// if in HTML or Javascript.
+        /// This method allows for such conditional modification of the message.
+        /// </remarks>
+        /// <param name="context">Current http context.</param>
+        /// <param name="nugget">The subject nugget being translated.</param>
+        /// <param name="langtag">Language being set.</param>
+        /// <param name="message">The message string which may be modified.</param>
+        /// <returns>
+        /// Modified message string (or message if no modification).
+        /// </returns>
+        public delegate string TweakMessageTranslationProc(System.Web.HttpContextBase context, Nugget nugget, LanguageTag langtag, string message);
+
+        /// <summary>
+        /// Registers a custom method called after a nugget has been translated
+        /// that allows the resulting message to be modified.
+        /// </summary>
+        /// <remarks>
+        /// In general it is good practice to postpone the escaping of characters until they 
+        /// are about to be displayed and then according to the content type of the output.
+        /// This, a single quote character need not be escaped if in JSON, but should be escaped
+        /// if in HTML or Javascript.
+        /// This method allows for such conditional modification of the message.
+        /// </remarks>
+        public TweakMessageTranslationProc TweakMessageTranslation { get; set; }
 
         /// <summary>
         /// Specifies the type of HTTP redirect to be issued by automatic language routing:

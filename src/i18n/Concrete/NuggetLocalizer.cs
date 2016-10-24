@@ -93,6 +93,13 @@ namespace i18n
                         message += "[FORMAT EXCEPTION]";
                     }
                 }
+               // Optional late custom message translation modification.
+                if (LocalizedApplication.Current.TweakMessageTranslation != null) {
+                    message = LocalizedApplication.Current.TweakMessageTranslation(
+                        System.Web.HttpContext.Current.GetHttpContextBase(),
+                        nugget,
+                        lt,
+                        message); }
                // Output modified message (to be subsituted for original in the source entity).
                 DebugHelpers.WriteLine("I18N.NuggetLocalizer.ProcessNuggets -- msgid: {0,35}, message: {1}", nugget.MsgId, message);
                //

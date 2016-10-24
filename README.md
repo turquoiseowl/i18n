@@ -91,6 +91,19 @@ code shows the most common options:
             // the message in the default language. Defaults to true.
             //i18n.LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage = false;
 
+            // Specifies a custom method called after a nugget has been translated
+            // that allows the resulting message to be modified, for instance according to content type.
+            // See [Issue #300](https://github.com/turquoiseowl/i18n/issues/300) for example usage case.
+            i18n.LocalizedApplication.Current.TweakMessageTranslation = delegate(System.Web.HttpContextBase context, i18n.Helpers.Nugget nugget, i18n.LanguageTag langtag, string message)
+            {
+                switch (context.Response.ContentType)
+                {
+                    case "text/html":
+                        return message.Replace("\'", "&apos;");
+                }
+                return message;
+            };
+
             // Blacklist certain URLs from being 'localized' via a callback.
             i18n.UrlLocalizer.IncomingUrlFilters += delegate(Uri url) {
                 if (url.LocalPath.EndsWith("sitemap.xml", StringComparison.OrdinalIgnoreCase)) {
@@ -407,6 +420,29 @@ locale/messages.pot
 locale/fr/messages.po
 locale/es/messages.po
 locale/es-MX/messages.po
+```
+
+#### Custom Modifications To Translations
+
+Nuggets translations can be modified at runtime as follows:
+
+```
+    protected void Application_Start()
+    {
+        ...
+        // Specifies a custom method called after a nugget has been translated
+        // that allows the resulting message to be modified, for instance according to content type.
+        // See [Issue #300](https://github.com/turquoiseowl/i18n/issues/300) for example usage case.
+        i18n.LocalizedApplication.Current.TweakMessageTranslation = delegate(System.Web.HttpContextBase context, i18n.Helpers.Nugget nugget, i18n.LanguageTag langtag, string message)
+        {
+            switch (context.Response.ContentType)
+            {
+                case "text/html":
+                    return message.Replace("\'", "&apos;");
+            }
+            return message;
+        };
+    }
 ```
 
 ### URL Localization
