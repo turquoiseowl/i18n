@@ -95,6 +95,27 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+		private const string _localeOtherFilesDefault = "";
+		public virtual IEnumerable<string> LocaleOtherFiles
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("LocaleOtherFiles");
+				string setting = _settingService.GetSetting(prefixedString);
+				if (!setting.IsSet())
+				{
+					setting = _localeOtherFilesDefault;
+				}
+
+				return setting.Split(';');
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("LocaleOtherFiles");
+				_settingService.SetSetting(prefixedString, string.Join(";", value));
+			}
+		}
+
 		#endregion
 
 		#region White list
