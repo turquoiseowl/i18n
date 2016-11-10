@@ -142,7 +142,7 @@ namespace i18n.Domain.Concrete
 		/// <param name="translation">The translation you wish to save. Must have Language shortag filled out.</param>
 		public void SaveTranslation(Translation translation)
 		{
-            var templateFilePath = GetAbsoluteLocaleDir() + "/messages.pot";
+            var templateFilePath = GetAbsoluteLocaleDir() + "/" + _settings.LocaleFilename + ".pot";
             var POTDate = DateTime.Now;
             if (File.Exists(templateFilePath)) {
                 POTDate = File.GetLastWriteTime(templateFilePath); }
@@ -258,7 +258,7 @@ namespace i18n.Domain.Concrete
 		/// <param name="items">A list of template items to save. The list should be all template items for the entire project.</param>
 		public void SaveTemplate(IDictionary<string, TemplateItem> items)
 		{
-			string filePath = GetAbsoluteLocaleDir() + "/messages.pot";
+		    string filePath = GetAbsoluteLocaleDir() + "/" + _settings.LocaleFilename + ".pot";
 			string backupPath = filePath + ".backup";
 
 			if (File.Exists(filePath)) //we backup one version. more advanced backup solutions could be added here.
@@ -352,7 +352,7 @@ namespace i18n.Domain.Concrete
 
 		private string GetPathForLanguage(string langtag)
 		{
-			return Path.Combine(GetAbsoluteLocaleDir(), langtag, "messages.po");
+			return Path.Combine(GetAbsoluteLocaleDir(), langtag, _settings.LocaleFilename + ".po");
 		}
 
 		/// <summary>
