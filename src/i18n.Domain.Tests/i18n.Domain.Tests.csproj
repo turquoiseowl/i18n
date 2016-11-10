@@ -49,11 +49,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="FileNuggetFinderTests.cs" />
     <Compile Include="NuggetTests.cs" />
     <Compile Include="PathNormalizerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NuggetParserTests.cs" />
     <Compile Include="ReferenceContextTests.cs" />
+    <Compile Include="SettingService_Mock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\i18n.Domain\i18n.Domain.csproj">
@@ -64,6 +66,14 @@
       <Project>{E7A9BBA3-8A95-492C-8806-4DE63C1DBA06}</Project>
       <Name>i18n</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestDir\Dir1\ReferencesTest.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestDir\Dir02\TextFile2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

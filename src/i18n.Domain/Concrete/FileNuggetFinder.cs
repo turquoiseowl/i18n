@@ -110,7 +110,9 @@ namespace i18n.Domain.Concrete
 			{
                 _nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
                 {
-                    var referenceContext = ReferenceContext.Create(referencePath, i_entity, pos);
+                    var referenceContext = _settings.DisableReferences
+                        ? ReferenceContext.Create("Disabled references", i_entity, 0)
+                        : ReferenceContext.Create(referencePath, i_entity, pos);
 
 				    AddNewTemplateItem(
                         referenceContext,
@@ -153,13 +155,17 @@ namespace i18n.Domain.Concrete
                 // Update routine.
                 (k, v) =>
                 {
-                    var newReferences = new List<ReferenceContext>(v.References.ToList());
-                    newReferences.Add(referenceContext);
-					v.References = newReferences;
+                    if (!_settings.DisableReferences)
+                    {
+                        var newReferences = new List<ReferenceContext>(v.References.ToList());
+                        newReferences.Add(referenceContext);
+                        v.References = newReferences;
+                    }
 
-			        if (nugget.Comment.IsSet()) {
+                    if (nugget.Comment.IsSet()) {
 					    tmpList = v.Comments != null ? v.Comments.ToList() : new List<string>();
-					    tmpList.Add(nugget.Comment);
+                        if (!_settings.DisableReferences || !tmpList.Contains(nugget.Comment))
+                            tmpList.Add(nugget.Comment);
 					    v.Comments = tmpList;
                     }
 
