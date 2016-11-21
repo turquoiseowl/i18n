@@ -60,6 +60,15 @@ of your application's source files:
   </appSettings>
 ```
 
+The following one is optional. It allows you to generate lighter pot/po files by deleting 
+references to your translation tokens (nuggets) :
+
+```xml
+  <appSettings>
+    <add key="i18n.DisableReferences" value="true" />
+  </appSettings>
+```
+
 Certain behaviours of i18n may be altered at runtime on application startup. The following
 code shows the most common options:
 
