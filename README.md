@@ -445,6 +445,23 @@ Nuggets translations can be modified at runtime as follows:
     }
 ```
 
+#### PO customization
+
+i18n allows you to change the PO file name to use and use PO files from other sources (when working with multiple projects for example).
+To enable this feature, you can set :
+
+
+```xml
+  <appSettings>
+    ...
+    <add key="i18n.LocaleFilename" value="messages" />
+    <add key="i18n.LocaleOtherFiles" value="external1;external2" /><!-- relative path from the directory of {LocaleFilename}.po-->
+    ...
+  </appSettings>
+```
+
+Note : i18n.LocaleOtherFiles paths are relative to the directory of the file {i18n.LocaleFilename}.po (messages.po by default).
+
 ### URL Localization
 
 In keeping with emerging standards for internationalized web applications, i18n provides support for
