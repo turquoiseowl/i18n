@@ -205,7 +205,7 @@ namespace i18n.Domain.Concrete
 
 					if (item.TranslatorComments != null)
 					{
-						foreach (var translatorComment in item.TranslatorComments)
+						foreach (var translatorComment in item.TranslatorComments.Distinct())
 						{
 							stream.WriteLine("# " + translatorComment);
 						}
@@ -213,7 +213,7 @@ namespace i18n.Domain.Concrete
 
 					if (item.ExtractedComments != null)
 					{
-						foreach (var extractedComment in item.ExtractedComments)
+						foreach (var extractedComment in item.ExtractedComments.Distinct())
 						{
 							stream.WriteLine("#. " + extractedComment);
 						}
@@ -221,7 +221,7 @@ namespace i18n.Domain.Concrete
 
 					if (item.References != null)
 					{
-						foreach (var reference in item.References)
+						foreach (var reference in item.References.Distinct())
 						{
 							hasReferences = true;
 							stream.WriteLine("#: " + reference.ToComment());
@@ -230,7 +230,7 @@ namespace i18n.Domain.Concrete
 
 					if (item.Flags != null)
 					{
-						foreach (var flag in item.Flags)
+						foreach (var flag in item.Flags.Distinct())
 						{
 							stream.WriteLine("#, " + flag);
 						}
@@ -395,10 +395,10 @@ namespace i18n.Domain.Concrete
                         bool itemStarted = false;
                         while ((line = fs.ReadLine()) != null)
                         {
-                            var extractedComments = new List<string>();
-                            var translatorComments = new List<string>();
-                            var flags = new List<string>();
-                            var references = new List<ReferenceContext>();
+                            var extractedComments  = new HashSet<string>();
+                            var translatorComments = new HashSet<string>();
+                            var flags              = new HashSet<string>();
+                            var references         = new List<ReferenceContext>();
 
                             //read all comments, flags and other descriptive items for this string
                             //if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
@@ -496,7 +496,7 @@ namespace i18n.Domain.Concrete
 		/// <param name="fs">A textreader that must be on the second line of a message body</param>
 		/// <param name="line">The first line of the message body.</param>
 		/// <returns>Returns a TranslationItem with only key, id and message set</returns>
-		private TranslationItem ParseBody(TextReader fs, string line, List<string> extractedComments)
+		private TranslationItem ParseBody(TextReader fs, string line, IEnumerable<string> extractedComments)
 		{
             string originalLine = line;
 
