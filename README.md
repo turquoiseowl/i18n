@@ -1006,6 +1006,15 @@ This behaviour is controlled via Git's ```core.autocrlf``` setting, which in thi
 
 See [Dealing with line endings](https://help.github.com/articles/dealing-with-line-endings/) for more information.
 
+#### Contributing and Coding Style Guidlines
+
+Contributions to the project are always welcome and even more so when adopting the following guidlines:
+
+* Pull Requests that add functionality to be accompanied with documentation added to this README.
+* Pull Request to be as granular as possible (e.g. limited to single features/enhancements).
+* All methods to be commented including helper routine.
+* 4-spaces used for tab indent.
+
 ### Release History
 
 #### 2.1.9 (20161125)
