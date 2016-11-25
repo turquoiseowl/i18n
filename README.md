@@ -56,7 +56,16 @@ of your application's source files:
   <appSettings>
     <add key="i18n.DirectoriesToScan" value=".." /> <!-- Rel to web.config file -->
     <add key="i18n.WhiteList" value="*.cs;*.cshtml;*.sitemap" />
-    <add key="i18n.BlackList" value=".\js\kendo;.\js\angular" />
+    <add key="i18n.BlackList" value=".\js\kendo;.\js\angular;.\*\dist" />
+  </appSettings>
+```
+
+The following one is optional. It allows you to generate lighter pot/po files by deleting 
+references to your translation tokens (nuggets) :
+
+```xml
+  <appSettings>
+    <add key="i18n.DisableReferences" value="true" />
   </appSettings>
 ```
 

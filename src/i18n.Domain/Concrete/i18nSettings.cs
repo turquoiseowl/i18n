@@ -13,6 +13,8 @@ namespace i18n.Domain.Concrete
 	{
 		private AbstractSettingService _settingService;
 		private const string _prefix = "i18n.";
+        private const string _allToken = "*";
+        private const string _oneToken = "?";
 
 		public i18nSettings(AbstractSettingService settings)
 		{
@@ -41,6 +43,50 @@ namespace i18n.Domain.Concrete
 			}
 		}
 
+        private static bool HasSearchCharacter(string s)
+        {
+            return s.Contains(_allToken) || s.Contains(_oneToken);
+        }
+
+        private IEnumerable<string> TransformToken(string path)
+        {
+            List<string> paths = new List<string>();
+            if (HasSearchCharacter(path))
+            {
+                string[] parts = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                paths = GetPaths(parts).ToList();
+            }
+            else
+            {
+                paths.Add(path);
+            }
+            return paths;
+        }
+
+        private IEnumerable<string> GetPaths(string[] parts, string root = "")
+        {
+            if (parts == null || parts.Length == 0)
+            {
+                return new[] { root };
+            }
+
+            List<string> paths = new List<string>();
+            if (HasSearchCharacter(parts[0]))
+            {
+                var rooted = MakePathAbsoluteAndFromConfigFile(root);
+                string[] list = Directory.GetDirectories(rooted, parts[0]);
+                foreach (string path in list)
+                {
+                    paths.AddRange(GetPaths(parts.Skip(1).ToArray(), path));
+                }
+            }
+            else
+            {
+                return GetPaths(parts.Skip(1).ToArray(), Path.Combine(root, parts[0]));
+            }
+
+            return paths;
+        }
 
 		#region Locale directory
 
@@ -162,6 +208,7 @@ namespace i18n.Domain.Concrete
 		#region Black list
 
 		private const string _blackListDefault = "";
+        private IList<string> _cached_blackList;
 
         /// <summary>
         /// Describes zero or more source directory/folder paths to be ignored during nugget parsing
@@ -179,8 +226,18 @@ namespace i18n.Domain.Concrete
 		{
 			get
 			{
-				string prefixedString = GetPrefixedString("BlackList");
+			    if (_cached_blackList != null)
+			    {
+			        return _cached_blackList;
+			    }
+                _cached_blackList = new List<string>();
+                string prefixedString = GetPrefixedString("BlackList");
 				string setting = _settingService.GetSetting(prefixedString);
+                if (setting != null && HasSearchCharacter(setting))
+                {
+                    IEnumerable<string> preblacklist = setting.Split(';');
+                    setting = string.Join(";", preblacklist.SelectMany(TransformToken));
+                }
 				List<string> list;
 				if (setting != null)
 				{
@@ -192,16 +249,15 @@ namespace i18n.Domain.Concrete
                 }
                 else
                 {
-                    return new List<string>();
+                    return _cached_blackList;
 				}
 
-				List<string> returnList = new List<string>();
 				foreach (var path in list.Where(x => !string.IsNullOrWhiteSpace(x)))
 				{
-					returnList.Add(MakePathAbsoluteAndFromConfigFile(path));
+                    _cached_blackList.Add(MakePathAbsoluteAndFromConfigFile(path));
 				}
 
-				return returnList;
+                return _cached_blackList;
 			}
 			set
 			{
@@ -544,6 +600,34 @@ namespace i18n.Domain.Concrete
             {
                 string prefixedString = GetPrefixedString("VisualizeLanguageSeparator");
                 _settingService.SetSetting(prefixedString, value);
+            }
+        }
+
+        #endregion
+
+        #region DisableReferences
+
+        private bool? _cached_disableReferences;
+        public virtual bool DisableReferences
+        {
+            get
+            {
+                if (_cached_disableReferences != null)
+                {
+                    return _cached_disableReferences.Value;
+                }
+
+                string prefixedString = GetPrefixedString("DisableReferences");
+                string setting = _settingService.GetSetting(prefixedString);
+                bool result = !string.IsNullOrEmpty(setting) && setting == "true";
+                _cached_disableReferences = result;
+                return _cached_disableReferences.Value;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("DisableReferences");
+                _settingService.SetSetting(prefixedString, value ? "true" : "false");
+                _cached_disableReferences = value;
             }
         }
 
