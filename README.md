@@ -128,14 +128,14 @@ code shows the most common options:
             // Whitelist content types to translate. The default setting is:
             //i18n.LocalizedApplication.Current.ContentTypesToLocalize = new Regex(@"^(?:(?:(?:text|application)/(?:plain|html|xml|javascript|x-javascript|json|x-json))(?:\s*;.*)?)$");
 
-			// Change the types of async postback blocks that are localized
-			//i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle";
+            // Change the types of async postback blocks that are localized
+            //i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle";
 
             // Change which languages are parsed from the request, like skipping  the "Accept-Language"-header value. The default setting is:
             //i18n.HttpContextExtensions.GetRequestUserLanguagesImplementation = (context) => LanguageItem.ParseHttpLanguageHeader(context.Request.Headers["Accept-Language"]);
 
-			// Override the i18n service injection. See source code for more details!
-			//i18n.LocalizedApplication.Current.RootServices = new Myi18nRootServices();
+            // Override the i18n service injection. See source code for more details!
+            //i18n.LocalizedApplication.Current.RootServices = new Myi18nRootServices();
         }
     }
 ```
@@ -549,9 +549,9 @@ when using i18n with Scheme2.
 You can do this by prefixing the URL like so:
 
 ```
-	<link rel="alternate" hreflang="en" href="@(EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix)http://mysite.com" />
-	<link rel="alternate" hreflang="fr" href="http://mysite.com/fr" />
-	<link rel="alternate" hreflang="es" href="http://mysite.com/es" />
+    <link rel="alternate" hreflang="en" href="@(EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix)http://mysite.com" />
+    <link rel="alternate" hreflang="fr" href="http://mysite.com/fr" />
+    <link rel="alternate" hreflang="es" href="http://mysite.com/es" />
 ```
 
 When i18n goes through the process for localizing outgoing URLs, this prefix will be stripped and the rendered URL 

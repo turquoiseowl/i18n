@@ -118,8 +118,8 @@ namespace i18n.Tests
             Assert.AreEqual("!!ZipCode! is required!", post);
         }
 
-		
-		[TestMethod]
+        
+        [TestMethod]
         public void NuggetLocalizer_can_visualize_nugget()
         {
             ITextLocalizer textLocalizer = new TextLocalizer_Mock_PrefixSuffix("xxx", "yyy");

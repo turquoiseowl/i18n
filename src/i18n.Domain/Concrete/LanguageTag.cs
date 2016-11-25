@@ -306,10 +306,10 @@ namespace i18n
             LanguageTag rhs = obj as LanguageTag;
             return rhs != null && Equals(rhs);
         }
-		public override int GetHashCode()
+        public override int GetHashCode()
         {
             return m_langtagLC.GetHashCode();
-		}
+        }
     // [IEquatable<ILanguageTag>]
         public bool Equals(ILanguageTag other)
         {

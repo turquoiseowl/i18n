@@ -90,16 +90,16 @@ namespace i18n.PostBuild
 
             ReferenceContext.ShowSourceContext = ShowSourceContext;
 
-			//todo: this assumes PO files, if not using po files then other solution needed.
-			var settings = new i18nSettings(new WebConfigSettingService(ConfigPath));
-			var repository = new POTranslationRepository(settings);
+            //todo: this assumes PO files, if not using po files then other solution needed.
+            var settings = new i18nSettings(new WebConfigSettingService(ConfigPath));
+            var repository = new POTranslationRepository(settings);
 
-			var nuggetFinder = new FileNuggetFinder(settings);
-	        var items = nuggetFinder.ParseAll();
-	        repository.SaveTemplate(items);
+            var nuggetFinder = new FileNuggetFinder(settings);
+            var items = nuggetFinder.ParseAll();
+            repository.SaveTemplate(items);
 
-			var merger = new TranslationMerger(repository);
-			merger.MergeAllTranslation(items);
+            var merger = new TranslationMerger(repository);
+            merger.MergeAllTranslation(items);
 
             Console.WriteLine("i18n.PostBuild completed successfully.");
         }

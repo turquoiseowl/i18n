@@ -37,7 +37,7 @@ namespace i18n.Tests.Tests
     #endregion
 
         [TestMethod]
-		[TestCategory("Unit")]
+        [TestCategory("Unit")]
         public void LanguageMatching_Basic()
         {
            //                       Result            UserLanguages                 Notes

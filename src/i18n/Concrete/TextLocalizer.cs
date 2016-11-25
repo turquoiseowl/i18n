@@ -19,18 +19,18 @@ namespace i18n
     {
         private i18nSettings _settings;
 
-	    private ITranslationRepository _translationRepository;
+        private ITranslationRepository _translationRepository;
 
-	    public TextLocalizer(
+        public TextLocalizer(
             i18nSettings settings,
             ITranslationRepository translationRepository)
-	    {
+        {
             _settings = settings;
-		    _translationRepository = translationRepository;
-	    }
+            _translationRepository = translationRepository;
+        }
 
 
-	#region [ITextLocalizer]
+    #region [ITextLocalizer]
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {
@@ -51,7 +51,7 @@ namespace i18n
                 System.Web.HttpRuntime.Cache.Insert("i18n.AppLanguages", AppLanguages, _translationRepository.GetCacheDependencyForAllLanguages());
 
                // Populate the collection.
-	            List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
+                List<string> languages = _translationRepository.GetAvailableLanguages().Select(x => x.LanguageShortTag).ToList();
 
                 // Ensure default language is included in AppLanguages where appropriate.
                 if (LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage
@@ -60,10 +60,10 @@ namespace i18n
 
                 foreach (var langtag in languages)
                 {
-					if (IsLanguageValid(langtag))
-					{
+                    if (IsLanguageValid(langtag))
+                    {
                         AppLanguages[langtag] = LanguageTag.GetCachedInstance(langtag); 
-					}
+                    }
                 }
 
                // Done.
@@ -130,15 +130,15 @@ namespace i18n
                 && LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
                 return true; }
 
-			ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
+            ConcurrentDictionary<string, TranslationItem> messages = (ConcurrentDictionary<string, TranslationItem>)System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
 
             // If messages not yet loaded in for the language
             if (messages == null)
             {
-	            return _translationRepository.TranslationExists(langtag);
+                return _translationRepository.TranslationExists(langtag);
             }
 
-	        return true;
+            return true;
         }
 
         /// <summary>
@@ -187,27 +187,27 @@ namespace i18n
 
         private bool LoadMessagesIntoCache(string langtag)
         {
-			lock (Sync)
-			{
-				// It is possible for multiple threads to race to this method. The first to
-				// enter the above lock will insert the messages into the cache.
-				// If we lost the race...no need to duplicate the work of the winning thread.
-				if (System.Web.HttpRuntime.Cache[GetCacheKey(langtag)] != null)
-				{
-					return true;
-				}
+            lock (Sync)
+            {
+                // It is possible for multiple threads to race to this method. The first to
+                // enter the above lock will insert the messages into the cache.
+                // If we lost the race...no need to duplicate the work of the winning thread.
+                if (System.Web.HttpRuntime.Cache[GetCacheKey(langtag)] != null)
+                {
+                    return true;
+                }
 
-				Translation t = _translationRepository.GetTranslation(langtag);
+                Translation t = _translationRepository.GetTranslation(langtag);
 
-				// Cache messages.
-				// NB: if the file changes we want to be able to rebuild the index without recompiling.
+                // Cache messages.
+                // NB: if the file changes we want to be able to rebuild the index without recompiling.
                 // NB: it is possible for GetCacheDependencyForSingleLanguage to return null in the
                 // case of the default language where it is added to AppLanguages yet doesn't actually exist.
                 // See MessageKeyIsValueInDefaultLanguage.
                 var cd = _translationRepository.GetCacheDependencyForSingleLanguage(langtag);
-				if (cd != null) {
+                if (cd != null) {
                     System.Web.HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd); }
-			}
+            }
             return true;
         }
 
@@ -219,12 +219,12 @@ namespace i18n
             var messages = (ConcurrentDictionary<string, TranslationItem>) System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
             TranslationItem message = null;
 
-			//we need to populate the cache
-			if (messages == null)
-			{
-				LoadMessagesIntoCache(langtag);
+            //we need to populate the cache
+            if (messages == null)
+            {
+                LoadMessagesIntoCache(langtag);
                 messages = (ConcurrentDictionary<string, TranslationItem>)System.Web.HttpRuntime.Cache[GetCacheKey(langtag)];
-			}
+            }
 
            // Normalize any CRLF in the msgid i.e. to just LF.
            // PO only support LF so we expect strings to be stored in the repo in that form.

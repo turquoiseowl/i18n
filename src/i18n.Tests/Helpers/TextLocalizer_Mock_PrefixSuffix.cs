@@ -34,7 +34,7 @@ namespace i18n.Tests
             AddAppLanguage("en");
         }
 
-	#region [ITextLocalizer]
+    #region [ITextLocalizer]
 
         public virtual ConcurrentDictionary<string, LanguageTag> GetAppLanguages()
         {

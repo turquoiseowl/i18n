@@ -21,16 +21,16 @@ namespace i18n.Helpers
     /// </remarks>
     public class NuggetTokens
     {
-		public string BeginToken     { get; private set; }
-		public string EndToken       { get; private set; }
-		public string DelimiterToken { get; private set; }
+        public string BeginToken     { get; private set; }
+        public string EndToken       { get; private set; }
+        public string DelimiterToken { get; private set; }
         public string CommentToken   { get; private set; }
 
         public NuggetTokens(
-		    string beginToken,
-		    string endToken,
-		    string delimiterToken,
-		    string commentToken)
+            string beginToken,
+            string endToken,
+            string delimiterToken,
+            string commentToken)
         {
             if (!beginToken.IsSet())     { throw new ArgumentNullException("beginToken"); }
             if (!endToken.IsSet())       { throw new ArgumentNullException("endToken"); }
@@ -139,7 +139,7 @@ namespace i18n.Helpers
     // Con
 
         public NuggetParser(
-		    NuggetTokens nuggetTokens,
+            NuggetTokens nuggetTokens,
             Context context)
         {
             m_nuggetTokens = nuggetTokens;
@@ -186,7 +186,7 @@ namespace i18n.Helpers
         //
            // Lookup any/all nuggets in the entity and call the client delegate (ProcessNugget) for each.
             return m_regexNuggetBreakdown.Replace(entity, delegate(Match match)
-	        {
+            {
                 Nugget nugget = NuggetFromRegexMatch(match);
                //
                 string modifiedNuggetString = ProcessNugget(
@@ -196,7 +196,7 @@ namespace i18n.Helpers
                     entity);               // source entity string
                // Returns either modified nugget string, or original nugget string (i.e. for no replacement).
                 return modifiedNuggetString ?? match.Groups[0].Value;
-	        });
+            });
         }
 
         /// <summary>

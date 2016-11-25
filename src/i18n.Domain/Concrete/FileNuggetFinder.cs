@@ -11,50 +11,50 @@ using i18n.Helpers;
 
 namespace i18n.Domain.Concrete
 {
-	public class FileNuggetFinder : INuggetFinder
-	{
-		private i18nSettings _settings;
+    public class FileNuggetFinder : INuggetFinder
+    {
+        private i18nSettings _settings;
 
         private NuggetParser _nuggetParser;
 
-		public FileNuggetFinder(i18nSettings settings)
-		{
+        public FileNuggetFinder(i18nSettings settings)
+        {
             _settings = settings;
             _nuggetParser = new NuggetParser(new NuggetTokens(
-			    _settings.NuggetBeginToken,
-			    _settings.NuggetEndToken,
-			    _settings.NuggetDelimiterToken,
-			    _settings.NuggetCommentToken),
+                _settings.NuggetBeginToken,
+                _settings.NuggetEndToken,
+                _settings.NuggetDelimiterToken,
+                _settings.NuggetCommentToken),
                 NuggetParser.Context.SourceProcessing);
-		}
+        }
 
-		/// <summary>
-		/// Goes through the Directories to scan recursively and starts a scan of each while that matches the whitelist. (both from settings)
-		/// </summary>
-		/// <returns>All found nuggets.</returns>
-		public IDictionary<string, TemplateItem> ParseAll()
-		{
-			IEnumerable<string> fileWhiteList = _settings.WhiteList;
-			IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
+        /// <summary>
+        /// Goes through the Directories to scan recursively and starts a scan of each while that matches the whitelist. (both from settings)
+        /// </summary>
+        /// <returns>All found nuggets.</returns>
+        public IDictionary<string, TemplateItem> ParseAll()
+        {
+            IEnumerable<string> fileWhiteList = _settings.WhiteList;
+            IEnumerable<string> directoriesToSearchRecursively = _settings.DirectoriesToScan;
             FileEnumerator fileEnumerator = new FileEnumerator(_settings.BlackList);
 
-			string currentFullPath;
-			bool blacklistFound = false;
+            string currentFullPath;
+            bool blacklistFound = false;
 
-			var templateItems = new ConcurrentDictionary<string, TemplateItem>();
+            var templateItems = new ConcurrentDictionary<string, TemplateItem>();
                 // Collection of template items keyed by their id.
 
-			foreach (var directoryPath in directoriesToSearchRecursively)
-			{
+            foreach (var directoryPath in directoriesToSearchRecursively)
+            {
                 foreach (string filePath in fileEnumerator.GetFiles(directoryPath))
-				{
+                {
                     if (filePath.Length >= 260)
                     {
                         DebugHelpers.WriteLine("Path too long to process. Path: " + filePath);
                         continue;
                     }
 
-					blacklistFound = false;
+                    blacklistFound = false;
                     currentFullPath = Path.GetDirectoryName(Path.GetFullPath(filePath));
                     foreach (var blackItem in _settings.BlackList)
                     {
@@ -94,25 +94,25 @@ namespace i18n.Domain.Concrete
                         }
 
                     }
-				}
-			}
+                }
+            }
 
-			return templateItems;
-		}
+            return templateItems;
+        }
 
-		private void ParseFile(string projectDirectory, string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
+        private void ParseFile(string projectDirectory, string filePath, ConcurrentDictionary<string, TemplateItem> templateItems)
         {
             var referencePath = PathNormalizer.MakeRelativePath(projectDirectory, filePath);
 
             DebugHelpers.WriteLine("FileNuggetFinder.ParseFile -- {0}", filePath);
            // Lookup any/all nuggets in the file and for each add a new template item.
-			using (var fs = File.OpenText(filePath))
-			{
+            using (var fs = File.OpenText(filePath))
+            {
                 _nuggetParser.ParseString(fs.ReadToEnd(), delegate(string nuggetString, int pos, Nugget nugget, string i_entity)
                 {
                     var referenceContext = ReferenceContext.Create(referencePath, i_entity, pos);
 
-				    AddNewTemplateItem(
+                    AddNewTemplateItem(
                         referenceContext,
                         nugget, 
                         templateItems);
@@ -122,49 +122,49 @@ namespace i18n.Domain.Concrete
             }
         }
 
-	    private void AddNewTemplateItem(
+        private void AddNewTemplateItem(
             ReferenceContext referenceContext,
             Nugget nugget, 
             ConcurrentDictionary<string, TemplateItem> templateItems)
-	    {
+        {
             string msgid = nugget.MsgId.Replace("\r\n", "\n").Replace("\r", "\\n");
                 // NB: In memory msgids are normalized so that LFs are converted to "\n" char sequence.
             string key = TemplateItem.KeyFromMsgidAndComment(msgid, nugget.Comment, _settings.MessageContextEnabledFromComment);
-			List<string> tmpList;
+            List<string> tmpList;
            //
             templateItems.AddOrUpdate(
                 key,
                 // Add routine.
                 k => {
-			        TemplateItem item = new TemplateItem();
+                    TemplateItem item = new TemplateItem();
                     item.MsgKey = key;
-			        item.MsgId = msgid;
+                    item.MsgId = msgid;
 
                     item.References = new List<ReferenceContext> {referenceContext};
 
-			        if (nugget.Comment.IsSet()) {
+                    if (nugget.Comment.IsSet()) {
                         tmpList = new List<string>();
                         tmpList.Add(nugget.Comment);
                         item.Comments = tmpList;
                     }
 
-			        return item;
+                    return item;
                 },
                 // Update routine.
                 (k, v) =>
                 {
                     var newReferences = new List<ReferenceContext>(v.References.ToList());
                     newReferences.Add(referenceContext);
-					v.References = newReferences;
+                    v.References = newReferences;
 
-			        if (nugget.Comment.IsSet()) {
-					    tmpList = v.Comments != null ? v.Comments.ToList() : new List<string>();
-					    tmpList.Add(nugget.Comment);
-					    v.Comments = tmpList;
+                    if (nugget.Comment.IsSet()) {
+                        tmpList = v.Comments != null ? v.Comments.ToList() : new List<string>();
+                        tmpList.Add(nugget.Comment);
+                        v.Comments = tmpList;
                     }
 
                     return v;
                 });
-		}
-	}
+        }
+    }
 }

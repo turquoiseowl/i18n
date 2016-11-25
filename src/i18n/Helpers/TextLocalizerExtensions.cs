@@ -38,7 +38,7 @@ namespace i18n.Helpers
         //
             string message;
            // 1.
-			message = textLocalizer.GetText(
+            message = textLocalizer.GetText(
                 msgid,
                 msgcomment,
                 languages,
@@ -50,7 +50,7 @@ namespace i18n.Helpers
            // 2.
             if (allowLookupWithHtmlDecodedMsgId) {
                 string msgIdHtmlDecoded = System.Web.HttpUtility.HtmlDecode(msgid);
-    		    message = textLocalizer.GetText(
+                message = textLocalizer.GetText(
                     msgIdHtmlDecoded, 
                     System.Web.HttpUtility.HtmlDecode(msgcomment), 
                     languages,

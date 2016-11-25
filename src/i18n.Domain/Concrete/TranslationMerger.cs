@@ -9,16 +9,16 @@ using i18n.Domain.Abstract;
 
 namespace i18n.Domain.Concrete
 {
-	public class TranslationMerger
-	{
-		private ITranslationRepository _repository;
+    public class TranslationMerger
+    {
+        private ITranslationRepository _repository;
 
-		public TranslationMerger(ITranslationRepository repository)
-		{
-			_repository = repository;
-		}
+        public TranslationMerger(ITranslationRepository repository)
+        {
+            _repository = repository;
+        }
 
-		public void MergeTranslation(IDictionary<string, TemplateItem> src, Translation dst)
+        public void MergeTranslation(IDictionary<string, TemplateItem> src, Translation dst)
         {
         // Our purpose here is to merge newly parsed message items (src) with those already stored in a translation repo (dst).
         // 1. Where an orphan msgid is found (present in the dst but not the src) we update it in the dst to remove all references.
@@ -37,16 +37,16 @@ namespace i18n.Domain.Concrete
                 dstItem.ExtractedComments = srcItem.Comments;
              }
            // Persist changes.
-			_repository.SaveTranslation(dst);
+            _repository.SaveTranslation(dst);
         }
 
-		public void MergeAllTranslation(IDictionary<string, TemplateItem> items)
-		{
-			foreach (var language in _repository.GetAvailableLanguages())
-			{
-				MergeTranslation(items, _repository.GetTranslation(language.LanguageShortTag));
-			}
-		}
+        public void MergeAllTranslation(IDictionary<string, TemplateItem> items)
+        {
+            foreach (var language in _repository.GetAvailableLanguages())
+            {
+                MergeTranslation(items, _repository.GetTranslation(language.LanguageShortTag));
+            }
+        }
 
-	}
+    }
 }

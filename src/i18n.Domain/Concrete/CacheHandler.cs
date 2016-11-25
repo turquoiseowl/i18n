@@ -6,13 +6,13 @@ using System.Web.Caching;
 
 namespace i18n.Domain.Concrete
 {
-	public class CacheHandler
-	{
-		private CacheDependency _cacheDependency;
+    public class CacheHandler
+    {
+        private CacheDependency _cacheDependency;
 
-		public CacheHandler(CacheDependency cacheDependency)
-		{
-			_cacheDependency = cacheDependency;
-		}
-	}
+        public CacheHandler(CacheDependency cacheDependency)
+        {
+            _cacheDependency = cacheDependency;
+        }
+    }
 }

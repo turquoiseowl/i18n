@@ -10,7 +10,7 @@
     <iconUrl>http://apitize.com.s3.amazonaws.com/logo_i18n.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>I18N OWIN middleware for Katana + IIS (Microsoft.Owin.Host.SystemWeb).</summary>
-	  <description>Smart internationalization for ASP.NET-based web applications. The i18n library is designed to replace the use of .NET resources in favor of an easier, globally-recognized standard for localizing ASP.NET-based web applications. Supports ASP.NET MVC, ASP.NET Web API, ASP.NET WebMatrix / Web Pages and ASP.NET Web Forms.</description>
+      <description>Smart internationalization for ASP.NET-based web applications. The i18n library is designed to replace the use of .NET resources in favor of an easier, globally-recognized standard for localizing ASP.NET-based web applications. Supports ASP.NET MVC, ASP.NET Web API, ASP.NET WebMatrix / Web Pages and ASP.NET Web Forms.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2011-2016</copyright>
     <tags>i18n internationalization l10n localization globalization asp.net mvc PO OWIN Katana</tags>

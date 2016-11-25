@@ -7,16 +7,16 @@ using i18n;
 
 namespace i18n.Domain.Entities
 {
-	/// <summary>
-	/// Template items are only used to keep track of the strings needing translation in any given project and for then updating the translations and translationItems with this data.
-	/// You should never need to work with TemplateItem unless you work with finding nuggets and updating the template file.
-	/// </summary>
-	public class TemplateItem
-	{
-		public string MsgKey;
+    /// <summary>
+    /// Template items are only used to keep track of the strings needing translation in any given project and for then updating the translations and translationItems with this data.
+    /// You should never need to work with TemplateItem unless you work with finding nuggets and updating the template file.
+    /// </summary>
+    public class TemplateItem
+    {
+        public string MsgKey;
         public string MsgId;
-		public IEnumerable<ReferenceContext> References { get; set; }
-		public IEnumerable<string> Comments { get; set; }
+        public IEnumerable<ReferenceContext> References { get; set; }
+        public IEnumerable<string> Comments { get; set; }
 
         public override string ToString()
         {
@@ -33,5 +33,5 @@ namespace i18n.Domain.Entities
             return msgid;
         }
 
-	}
+    }
 }
