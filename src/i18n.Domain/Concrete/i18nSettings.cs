@@ -72,6 +72,51 @@ namespace i18n.Domain.Concrete
 
 		#endregion
 
+		#region Locale filename
+
+		private const string _localeFilenameDefault = "messages";
+		public virtual string LocaleFilename
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("LocaleFilename");
+				string setting = _settingService.GetSetting(prefixedString);
+				if (setting.IsSet())
+				{
+					return setting;
+				}
+
+				return _localeFilenameDefault;
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("LocaleFilename");
+				_settingService.SetSetting(prefixedString, value);
+			}
+		}
+
+		private const string _localeOtherFilesDefault = "";
+		public virtual IEnumerable<string> LocaleOtherFiles
+		{
+			get
+			{
+				string prefixedString = GetPrefixedString("LocaleOtherFiles");
+				string setting = _settingService.GetSetting(prefixedString);
+				if (!setting.IsSet())
+				{
+					setting = _localeOtherFilesDefault;
+				}
+
+				return setting.Split(';');
+			}
+			set
+			{
+				string prefixedString = GetPrefixedString("LocaleOtherFiles");
+				_settingService.SetSetting(prefixedString, string.Join(";", value));
+			}
+		}
+
+		#endregion
 
 		#region White list
 
