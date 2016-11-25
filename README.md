@@ -1008,7 +1008,7 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 
 ### Release History
 
-2.1.9 (20161125)
+#### 2.1.9 (20161125)
 
 * Support for customization of PO filenames and sources ([#305](https://github.com/turquoiseowl/i18n/issues/305)).
 * Support for modifying nugget translation at runtime ([#300](https://github.com/turquoiseowl/i18n/issues/300)).
@@ -1016,7 +1016,7 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 * Added ```/api/``` to default UrlLocalizer.QuickUrlExclusionFilter ([#289](https://github.com/turquoiseowl/i18n/issues/289)). 
 * Support for converting outgoing URLs where un-rooted paths into rooted paths (common in ASP.NET WebForms) ([#286](https://github.com/turquoiseowl/i18n/issues/286)).
 
-2.1.8 (20160807)
+#### 2.1.8 (20160807)
 
 * Support for ignoring Accept-Language request header ([#278](https://github.com/turquoiseowl/i18n/issues/278), [#285](https://github.com/turquoiseowl/i18n/issues/285)).
 * Support for optionally showing source context next to reference paths & line numbers ([#268](https://github.com/turquoiseowl/i18n/issues/268))
