@@ -549,5 +549,31 @@ namespace i18n.Domain.Concrete
 
         #endregion
 
-    }
+        #region DisableReferences
+        private bool? _cached_disableReferences;
+
+        public virtual bool DisableReferences
+        {
+            get
+            {
+                if (_cached_disableReferences != null)
+                {
+                    return _cached_disableReferences.Value;
+                }
+
+                string prefixedString = GetPrefixedString("DisableReferences");
+                string setting = _settingService.GetSetting(prefixedString);
+                bool result = !string.IsNullOrEmpty(setting) && setting == "true";
+                _cached_disableReferences = result;
+                return _cached_disableReferences.Value;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("DisableReferences");
+                _settingService.SetSetting(prefixedString, value ? "true" : "false");
+                _cached_disableReferences = value;
+            }
+        }
+        #endregion
+}
 }
