@@ -22,8 +22,9 @@ namespace i18n.Domain.Abstract
         /// </summary>
         /// <param name="langtag">The language tag to get the translation for. For instance "sv-SE"</param>
         /// <param name="fileNames">A list of file names generated.</param>
+        /// <param name="loadingCache">Flag determining whether the call came from the generator or the localizing module.</param>
         /// <returns>A Translation object with the Language->LanguageShortTag set and all the translation items returned in a Dictionary</returns>
-        Translation GetTranslation(string langtag, List<string> fileNames = null);
+        Translation GetTranslation(string langtag, List<string> fileNames = null, bool loadingCache = true);
 
         /// <summary>
         /// Gets all available languages. There is a setting for available languages that can be used by the implementation. But the implementation can if prefered use other method.

@@ -45,7 +45,7 @@ namespace i18n.Domain.Concrete
             foreach (var language in _repository.GetAvailableLanguages())
             {
                 var filesNames = items.GroupBy(x => x.Value.FileName).Select(x => x.Key).ToList();
-                MergeTranslation(items, _repository.GetTranslation(language.LanguageShortTag, filesNames));
+                MergeTranslation(items, _repository.GetTranslation(language.LanguageShortTag, filesNames, false));
             }
         }
 
