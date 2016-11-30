@@ -25,9 +25,9 @@ namespace i18n.Domain.Concrete
 
         #region load and getters
 
-        public Translation GetTranslation(string langtag, List<string> fileNames = null)
+        public Translation GetTranslation(string langtag, List<string> fileNames = null, bool loadingCache = true)
         {
-            return ParseTranslationFile(langtag, fileNames);
+            return ParseTranslationFile(langtag, fileNames, loadingCache);
         }
 
 
@@ -378,7 +378,7 @@ namespace i18n.Domain.Concrete
         /// </summary>
         /// <param name="langtag">The language (tag) you wish to load into Translation object</param>
         /// <returns>A complete translation object with all all translations and language values set.</returns>
-        private Translation ParseTranslationFile(string langtag, List<string> fileNames)
+        private Translation ParseTranslationFile(string langtag, List<string> fileNames, bool loadingCache)
         {
             //todo: consider that lines we don't understand like headers from poedit and #| should be preserved and outputted again.
 
@@ -390,7 +390,7 @@ namespace i18n.Domain.Concrete
 
             List<string> paths = new List<string>();
 
-            if (!_settings.GenerateTemplatePerFile)
+            if (!_settings.GenerateTemplatePerFile || loadingCache)
                 paths.Add(GetPathForLanguage(langtag));
 
             foreach (var file in _settings.LocaleOtherFiles)
@@ -398,7 +398,7 @@ namespace i18n.Domain.Concrete
                 paths.Add(GetPathForLanguage(langtag, file));
             }
 
-            if (_settings.GenerateTemplatePerFile)
+            if (_settings.GenerateTemplatePerFile && !loadingCache)
             {
                 if (fileNames != null && fileNames.Count > 0)
                 {
