@@ -68,8 +68,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestDir\Dir02\TextFile2.txt" />
-    <Content Include="TestDir\Dir1\ReferencesTest.txt" />
+    <Content Include="TestDir\Dir02\TextFile2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestDir\Dir1\ReferencesTest.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
