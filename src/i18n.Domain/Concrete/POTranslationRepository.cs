@@ -25,9 +25,9 @@ namespace i18n.Domain.Concrete
 
         #region load and getters
 
-        public Translation GetTranslation(string langtag)
+        public Translation GetTranslation(string langtag, List<string> fileNames = null)
         {
-            return ParseTranslationFile(langtag);
+            return ParseTranslationFile(langtag, fileNames);
         }
 
 
@@ -258,7 +258,22 @@ namespace i18n.Domain.Concrete
         /// <param name="items">A list of template items to save. The list should be all template items for the entire project.</param>
         public void SaveTemplate(IDictionary<string, TemplateItem> items)
         {
-            string filePath = GetAbsoluteLocaleDir() + "/" + _settings.LocaleFilename + ".pot";
+            if (_settings.GenerateTemplatePerFile)
+            {
+                foreach (var item in items.GroupBy(x => x.Value.FileName))
+                {
+                    SaveTemplate(item.ToDictionary(x => x.Key, x => x.Value), item.Key);
+                }
+            }
+            else
+            {
+                SaveTemplate(items, string.Empty);
+            }
+        }
+
+        private void SaveTemplate(IDictionary<string, TemplateItem> items, string fileName)
+        {
+            string filePath = GetAbsoluteLocaleDir() + "/" + (!string.IsNullOrWhiteSpace(fileName) ? fileName : _settings.LocaleFilename) + ".pot";
             string backupPath = filePath + ".backup";
 
             if (File.Exists(filePath)) //we backup one version. more advanced backup solutions could be added here.
@@ -275,11 +290,11 @@ namespace i18n.Domain.Concrete
                 File.Delete(filePath);
             }
 
-            if (! File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 var fileInfo = new FileInfo(filePath);
                 var dirInfo = new DirectoryInfo(Path.GetDirectoryName(filePath));
-                if (! dirInfo.Exists)
+                if (!dirInfo.Exists)
                 {
                     dirInfo.Create();
                 }
@@ -289,13 +304,13 @@ namespace i18n.Domain.Concrete
             using (StreamWriter stream = new StreamWriter(filePath))
             {
                 DebugHelpers.WriteLine("Writing file: {0}", filePath);
-               // Establish ordering of items in PO file.
+                // Establish ordering of items in PO file.
                 var orderedItems = items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
-                        // Non-orphan items before orphan items.
+                    // Non-orphan items before orphan items.
                     .ThenBy(x => x.MsgKey);
-                        // Then order alphanumerically.
-               //
+                // Then order alphanumerically.
+                //
 
                 //This is required for poedit to read the files correctly if they contains for instance swedish characters
                 stream.WriteLine("msgid \"\"");
@@ -325,7 +340,8 @@ namespace i18n.Domain.Concrete
 
                     if (_settings.MessageContextEnabledFromComment
                         && item.Comments != null
-                        && item.Comments.Count() != 0) {
+                        && item.Comments.Count() != 0)
+                    {
                         WriteString(stream, true, "msgctxt", item.Comments.First());
                     }
 
@@ -362,7 +378,7 @@ namespace i18n.Domain.Concrete
         /// </summary>
         /// <param name="langtag">The language (tag) you wish to load into Translation object</param>
         /// <returns>A complete translation object with all all translations and language values set.</returns>
-        private Translation ParseTranslationFile(string langtag)
+        private Translation ParseTranslationFile(string langtag, List<string> fileNames)
         {
             //todo: consider that lines we don't understand like headers from poedit and #| should be preserved and outputted again.
 
@@ -374,11 +390,23 @@ namespace i18n.Domain.Concrete
 
             List<string> paths = new List<string>();
 
-            paths.Add(GetPathForLanguage(langtag));
+            if (!_settings.GenerateTemplatePerFile)
+                paths.Add(GetPathForLanguage(langtag));
 
             foreach (var file in _settings.LocaleOtherFiles)
             {
                 paths.Add(GetPathForLanguage(langtag, file));
+            }
+
+            if (_settings.GenerateTemplatePerFile)
+            {
+                if (fileNames != null && fileNames.Count > 0)
+                {
+                    foreach (var fileName in fileNames)
+                    {
+                        paths.Add(GetPathForLanguage(langtag, fileName));
+                    }
+                }
             }
 
             foreach (var path in paths)

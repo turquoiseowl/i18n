@@ -17,6 +17,7 @@ namespace i18n.Domain.Entities
         public string MsgId;
         public IEnumerable<ReferenceContext> References { get; set; }
         public IEnumerable<string> Comments { get; set; }
+        public string FileName { get; set; }
 
         public override string ToString()
         {

@@ -60,12 +60,14 @@ of your application's source files:
   </appSettings>
 ```
 
-The following one is optional. It allows you to generate lighter pot/po files by deleting 
-references to your translation tokens (nuggets) :
+The following configuration options are optional. ```i18n.DisableReferences``` allows you to generate lighter pot/po files by deleting 
+references to your translation tokens (nuggets) and ```i18n.GenerateTemplatePerFile``` generates a pot file per file scanned and merges
+all po files into messages.po:
 
 ```xml
   <appSettings>
     <add key="i18n.DisableReferences" value="true" />
+    <add key="i18n.GenerateTemplatePerFile" value="true" />
   </appSettings>
 ```
 

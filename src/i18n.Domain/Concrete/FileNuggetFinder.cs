@@ -113,8 +113,13 @@ namespace i18n.Domain.Concrete
                     var referenceContext = _settings.DisableReferences
                         ? ReferenceContext.Create("Disabled references", i_entity, 0)
                         : ReferenceContext.Create(referencePath, i_entity, pos);
+                    var fileName = Path.GetFileNameWithoutExtension(filePath);
+                    // If we have a file like "myfile.aspx.vb" then the fileName will be "myfile.aspx" resulting in split
+                    // .pot files. So remove all extensions, so that we just have the actual name to deal with.
+                    fileName = fileName.IndexOf('.') > -1 ? fileName.Split('.')[0] : fileName;
 
                     AddNewTemplateItem(
+                        fileName,
                         referenceContext,
                         nugget, 
                         templateItems);
@@ -125,6 +130,7 @@ namespace i18n.Domain.Concrete
         }
 
         private void AddNewTemplateItem(
+            string fileName,
             ReferenceContext referenceContext,
             Nugget nugget, 
             ConcurrentDictionary<string, TemplateItem> templateItems)
@@ -141,6 +147,7 @@ namespace i18n.Domain.Concrete
                     TemplateItem item = new TemplateItem();
                     item.MsgKey = key;
                     item.MsgId = msgid;
+                    item.FileName = fileName;
 
                     item.References = new List<ReferenceContext> {referenceContext};
 

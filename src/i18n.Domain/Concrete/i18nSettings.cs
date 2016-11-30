@@ -575,5 +575,35 @@ namespace i18n.Domain.Concrete
             }
         }
         #endregion
-}
+
+        #region GenerateTemplatePerFile
+
+        private bool? _cached_generateTemplatePerFile;
+        public virtual bool GenerateTemplatePerFile
+        {
+            get
+            {
+                // NB: this is not particularly thread-safe, but not seen as dangerous
+                // if done concurrently as modification is one-way.
+                if (_cached_generateTemplatePerFile != null)
+                {
+                    return _cached_generateTemplatePerFile.Value;
+                }
+
+                string prefixedString = GetPrefixedString("GenerateTemplatePerFile");
+                string setting = _settingService.GetSetting(prefixedString);
+                bool result = !string.IsNullOrEmpty(setting) && setting == "true";
+                _cached_generateTemplatePerFile = result;
+                return _cached_generateTemplatePerFile.Value;
+            }
+            set
+            {
+                string prefixedString = GetPrefixedString("GenerateTemplatePerFile");
+                _settingService.SetSetting(prefixedString, value ? "true" : "false");
+                _cached_generateTemplatePerFile = value;
+            }
+        }
+
+        #endregion
+    }
 }
