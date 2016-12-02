@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("2.1.10")]
 [assembly: AssemblyFileVersion("2.1.10")]
-[assembly: AssemblyInformationalVersion("2.1.10-pre010")] // picked up by nuspec $version$ identifier
+[assembly: AssemblyInformationalVersion("2.1.10-pre011")] // picked up by nuspec $version$ identifier
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information

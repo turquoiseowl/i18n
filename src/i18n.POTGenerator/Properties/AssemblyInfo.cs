@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("2.1.10")]
 [assembly: AssemblyFileVersion("2.1.10")]
-[assembly: AssemblyInformationalVersion("2.1.10-pre010")]
+[assembly: AssemblyInformationalVersion("2.1.10-pre011")]
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
