@@ -393,9 +393,12 @@ namespace i18n.Domain.Concrete
             if (!_settings.GenerateTemplatePerFile || loadingCache)
                 paths.Add(GetPathForLanguage(langtag));
 
-            foreach (var file in _settings.LocaleOtherFiles)
+            if (loadingCache)
             {
-                paths.Add(GetPathForLanguage(langtag, file));
+                foreach (var file in _settings.LocaleOtherFiles)
+                {
+                    paths.Add(GetPathForLanguage(langtag, file));
+                }
             }
 
             if (_settings.GenerateTemplatePerFile && !loadingCache)

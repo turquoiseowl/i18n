@@ -93,7 +93,6 @@ namespace i18n.PostBuild
 
             //todo: this assumes PO files, if not using po files then other solution needed.
             var settings = new i18nSettings(new WebConfigSettingService(ConfigPath));
-            settings.LocaleOtherFiles = Enumerable.Empty<string>();
             var repository = new POTranslationRepository(settings);
 
             var nuggetFinder = new FileNuggetFinder(settings);
