@@ -185,7 +185,6 @@ namespace i18n.Domain.Concrete
                         // Non-orphan items before orphan items.
                     .ThenBy(x => x.MsgKey);
                         // Then order alphanumerically.
-               //
 
                 //This is required for poedit to read the files correctly if they contains for instance swedish characters
                 stream.WriteLine("msgid \"\"");
@@ -307,12 +306,12 @@ namespace i18n.Domain.Concrete
                 // Establish ordering of items in PO file.
                 var orderedItems = items.Values
                     .OrderBy(x => x.References == null || x.References.Count() == 0)
-                    // Non-orphan items before orphan items.
+                        // Non-orphan items before orphan items.
                     .ThenBy(x => x.MsgKey);
-                // Then order alphanumerically.
-                //
+                        // Then order alphanumerically.
 
-                //This is required for poedit to read the files correctly if they contains for instance swedish characters
+                // This is required for poedit to read the files correctly if they contains 
+                // for instance swedish characters.
                 stream.WriteLine("msgid \"\"");
                 stream.WriteLine("msgstr \"\"");
                 stream.WriteLine("\"Project-Id-Version: \\n\"");
@@ -390,12 +389,13 @@ namespace i18n.Domain.Concrete
 
             List<string> paths = new List<string>();
 
-            if (!_settings.GenerateTemplatePerFile || loadingCache)
-                paths.Add(GetPathForLanguage(langtag));
+            if (!_settings.GenerateTemplatePerFile || loadingCache) {
+                paths.Add(GetPathForLanguage(langtag)); }
 
             foreach (var file in _settings.LocaleOtherFiles)
             {
-                paths.Add(GetPathForLanguage(langtag, file));
+                if (file.IsSet()) {
+                    paths.Add(GetPathForLanguage(langtag, file)); }
             }
 
             if (_settings.GenerateTemplatePerFile && !loadingCache)
