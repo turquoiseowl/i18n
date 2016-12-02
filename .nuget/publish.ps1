@@ -62,7 +62,7 @@ function update_version_string_in_code($path)
 {
     Get-ChildItem $path -Recurse | ForEach-Object -Process {
         (Get-Content $_) `
-            -replace 'version="(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('version="' + $ver + '"')`
+            -replace 'version="(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('version="' + $verPre + '"')`
             -replace 'AssemblyVersion."(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('AssemblyVersion("' + $ver + '"')`
             -replace 'AssemblyFileVersion."(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('AssemblyFileVersion("' + $ver + '"')`
             -replace 'AssemblyInformationalVersion."(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('AssemblyInformationalVersion("' + $verPre + '"')`
