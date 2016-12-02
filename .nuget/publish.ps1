@@ -92,5 +92,6 @@ $package = 'i18n.Adapter.OwinSystemWeb.' + $verPre +'.nupkg'
 #&nuget push $package
 
 writeinfo "6. Tag the git repo for version"
-$tag = 'v' + $verPre
-git tag -a $tag
+$tagName = 'v' + $verPre
+$tagMsg = '"Version ' + $verPre +'"'
+git tag -a $tagName -m $tagMsg
