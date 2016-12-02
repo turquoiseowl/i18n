@@ -7,6 +7,8 @@
 #
 # We follow the NuGet versioning guidelines: https://docs.nuget.org/ndocs/create-packages/prerelease-packages
 #
+# Run this script from the "i18n\.nuget" directory.
+#
 # Syntax:
 #
 #    powershell -file publish.ps1 -ver <ver> [-pre <pre>]
@@ -36,8 +38,10 @@ if (!$ver) {
 if ($pre) {
     $pre = '-' + $pre; }
 
-
 function update_version_string_in_code($path)
+    # $path {String}
+    #    Path to the directory from which to scan for files to update, relative to the
+    #    directory from which the script has been run. E.g. "..\
 {
     Get-ChildItem $path -Recurse | ForEach-Object -Process {
         (Get-Content $_) -replace '"(\d+)(\.\d+)(\.\d+)(?:(?:\.\d+)?|(\-\w+)?)?"', ('"' + $ver + $pre + '"') | Set-Content $_
@@ -46,4 +50,3 @@ function update_version_string_in_code($path)
 
 update_version_string_in_code "..\AssemblyInfo.cs"
 update_version_string_in_code "..\*.nuspec"
-
