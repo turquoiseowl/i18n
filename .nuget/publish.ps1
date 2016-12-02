@@ -93,4 +93,4 @@ $package = 'i18n.Adapter.OwinSystemWeb.' + $verPre +'.nupkg'
 
 writeinfo "6. Tag the git repo for version"
 $tag = 'v' + $verPre
-git tag -l $tag
+git tag -a $tag
