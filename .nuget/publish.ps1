@@ -74,8 +74,6 @@ writeinfo "1. Update vesion number in code files..."
 update_version_string_in_code "..\AssemblyInfo.cs"
 update_version_string_in_code "..\*.nuspec"
 
-#exit 0
-
 writeinfo "2. Commit changes to current branch..."
 $commitMsg = '"Version number bumped to ' + $verPre +'"'
 git commit -a -m $commitMsg
