@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>$id$</id>
@@ -15,7 +15,7 @@
     <copyright>Copyright 2011-2016</copyright>
     <tags>i18n internationalization l10n localization globalization asp.net mvc PO OWIN Katana</tags>
     <dependencies>
-      <dependency id="I18N" version="2.1.9" />
+      <dependency id="I18N" version="2.1.10" />
       <dependency id="Microsoft.Owin.Host.SystemWeb" />
     </dependencies>
   </metadata>
