@@ -29,7 +29,10 @@ namespace i18n
                 _settings.NuggetBeginToken,
                 _settings.NuggetEndToken,
                 _settings.NuggetDelimiterToken,
-                _settings.NuggetCommentToken),
+                _settings.NuggetCommentToken,
+                _settings.NuggetParameterBeginToken,
+                _settings.NuggetParameterEndToken
+                ),
                 NuggetParser.Context.ResponseProcessing);
         }
 
@@ -82,7 +85,11 @@ namespace i18n
                             if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
 
                             // replace parameter tokens with nugget tokens 
-                            var fItem = formatItems[i].Replace(_settings.NuggetParameterBeginToken, _settings.NuggetBeginToken).Replace(_settings.NuggetParameterEndToken, _settings.NuggetEndToken);
+                            var fItem = formatItems[i];
+                            if (fItem.StartsWith(_settings.NuggetParameterBeginToken) && fItem.EndsWith(_settings.NuggetParameterEndToken))
+                                fItem = _settings.NuggetBeginToken
+                                + fItem.Substring(_settings.NuggetParameterBeginToken.Length, fItem.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length)
+                                + _settings.NuggetEndToken;
                             // and process nugget 
                             formatItems[i] = ProcessNuggets(fItem, languages);
                         }
