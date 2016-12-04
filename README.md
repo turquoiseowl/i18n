@@ -370,6 +370,20 @@ message spread over
 three lines]]]
 ```
 
+#### Parameters inside Parameters
+
+This helps you to reuse some parametrized translations inside other parametrized translations.
+For example:
+
+```
+[[[Product]]] -> "Produto"
+[[[%0 Status]]] -> "Status do %0"
+[[[Please select a %0]]] -> "Por favor escolha o %0"
+
+[[[Please select a %0|||(((%0 Status|||(((Product))))))]]] -> "Por favor escolha o Status do Produto"
+```
+
+
 ### Static File Compression and i18n
 The i18n module localizes nuggets in the HTTP response by modifying the response stream using a response filter 
 (see the .NET Framework documentation for more info about the HttpResponse.Filter property).

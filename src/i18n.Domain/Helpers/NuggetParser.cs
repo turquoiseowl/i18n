@@ -168,17 +168,17 @@ namespace i18n.Helpers
                                             {6} (?<-LEVEL>)       # On parameter closing pop level
                                             |
                                             (?! {5} | {6}  ) .    # Match any char unless the opening and closing strings   
-                                            )*?                   # as few as possible, allowing other parameters to start a new capture occurrence
+                                            ){4}?                 # as few as possible, allowing other parameters to start a new capture occurrence
                                             (?(LEVEL)(?!))        # If level exists (parameter was not correctly closed) then fail - (balancing groups)
                                         )
                                     )*
-                                    (?<msgctxt>{2}(.+?))?
+                                    ({2}(?<msgctxt>(.+?)))?
                                 {3}",
                     EscapeString(m_nuggetTokens.BeginToken),
                     EscapeString(m_nuggetTokens.DelimiterToken),
                     EscapeString(m_nuggetTokens.CommentToken),
                     EscapeString(m_nuggetTokens.EndToken),
-                    m_context == Context.SourceProcessing ? "+" : "*", // not sure why this was used before, or how to add in this new recursive parameters regex
+                    m_context == Context.SourceProcessing ? "+" : "*", // Issue #110: Parsing a nugget with empty parameter in Source should leave delimiters intact. - see test NuggetParser_SourceMode_CanParseEntity_EmptyParam
                     EscapeString(m_nuggetTokens.ParameterBeginToken),
                     EscapeString(m_nuggetTokens.ParameterEndToken)
                     ),
