@@ -43,12 +43,26 @@ namespace i18n.Domain.Concrete
             }
         }
 
-        private static bool HasSearchCharacter(string s)
+
+        /// <summary>
+        /// Determines whether the specified path has a windows wildcard character (* or ?)
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified path has a wildcard otherwise, <c>false</c>.
+        /// </returns>
+        private static bool HasSearchCharacter(string path)
         {
-            return s.Contains(_allToken) || s.Contains(_oneToken);
+            return path.Contains(_allToken) || path.Contains(_oneToken);
         }
 
-        private IEnumerable<string> TransformToken(string path)
+        /// <summary>
+        /// Find all the existing physical paths that corresponds to the specified path.
+        /// Returns a single value if there are no wildcards in the specified path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>An enumeration of corresponding paths</returns>
+        private IEnumerable<string> FindPaths(string path)
         {
             List<string> paths = new List<string>();
             if (HasSearchCharacter(path))
@@ -63,6 +77,12 @@ namespace i18n.Domain.Concrete
             return paths;
         }
 
+        /// <summary>
+        /// Recursively gets the path by moving through a directory tree (parts).
+        /// </summary>
+        /// <param name="parts">The path parts to process.</param>
+        /// <param name="root">The root path from where to start.</param>
+        /// <returns>A list of existing paths</returns>
         private IEnumerable<string> GetPaths(string[] parts, string root = "")
         {
             if (parts == null || parts.Length == 0)
@@ -206,7 +226,6 @@ namespace i18n.Domain.Concrete
 
         #endregion
 
-
         #region Black list
 
         private const string _blackListDefault = "";
@@ -235,10 +254,11 @@ namespace i18n.Domain.Concrete
                 _cached_blackList = new List<string>();
                 string prefixedString = GetPrefixedString("BlackList");
                 string setting = _settingService.GetSetting(prefixedString);
+                //If we find any wildcard in the setting, we replace it by the exitsing physical paths
                 if (setting != null && HasSearchCharacter(setting))
                 {
                     IEnumerable<string> preblacklist = setting.Split(';');
-                    setting = string.Join(";", preblacklist.SelectMany(TransformToken));
+                    setting = string.Join(";", preblacklist.SelectMany(FindPaths));
                 }
                 List<string> list;
                 if (setting != null)
@@ -269,7 +289,6 @@ namespace i18n.Domain.Concrete
         }
 
         #endregion
-
 
         #region Nugget tokens
 
