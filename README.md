@@ -370,6 +370,23 @@ message spread over
 three lines]]]
 ```
 
+#### Conditionals
+
+With **conditionals** you can use a single nugget tag and have different translations according to the value of parameters.
+
+```
+[[[%0_PRODUCTS_ADDED_TO_ORDER]]] -> 
+"%0{0:No products were added|1:1 product was added|%0 products were added} to your order" 
+
+[[[DEAR_SIR_OR_MADAM|||@ViewBag.Gender]]] -> 
+"Dear %0{M:Sir|F:Madam|user}"
+```
+
+Please note that conditionals work like C# switch - you can specify the translation for each expected value ("No products" for "0", "1 product" for "1") and specify a translation for all other cases ("%0 products").
+
+This can be useful both for inflection of genders and numbers (singular/plural).
+
+
 #### Parameters inside Parameters
 
 This helps you to reuse some parametrized translations inside other parametrized translations.

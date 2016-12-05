@@ -73,34 +73,53 @@ namespace i18n
                     out lt);
                //
                 if (nugget.IsFormatted) {
-                   // Convert any identifies in a formatted nugget: %0 -> {0}
-                    message = ConvertIdentifiersInMsgId(message);
-                   // Format the message.
-                    var formatItems = new List<string>(nugget.FormatItems);
-                    try {
-                        // translate nuggets in parameters 
-                        for (int i = 0; i < formatItems.Count; i++)
+                    var formatItems = new List<string>(nugget.FormatItems); // list of all parameters (both literals and nuggets)
+                    // translate nuggets in parameters 
+                    for (int i = 0; i < formatItems.Count; i++)
+                    {
+                        // if formatItem (parameter) is null or does not contain NuggetParameterBegintoken then continue
+                        if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
+
+                        // replace parameter tokens with nugget tokens 
+                        var fItem = formatItems[i];
+                        if (fItem.StartsWith(_settings.NuggetParameterBeginToken) && fItem.EndsWith(_settings.NuggetParameterEndToken))
+                            fItem = _settings.NuggetBeginToken
+                            + fItem.Substring(_settings.NuggetParameterBeginToken.Length, fItem.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length)
+                            + _settings.NuggetEndToken;
+                        // and process nugget 
+                        formatItems[i] = ProcessNuggets(fItem, languages);
+                    }
+
+                    // Extracts and processes Conditionals. 
+                    // uses same format as https://github.com/siefca/i18n-inflector:
+                    // e.g. [[[Dear @0{f:Lady|m:Sir|n:You|All}!|||user.Gender]]]
+                    // TODO: add support for combining variables. e.g. @num+person{s+1:I|*+2:You|s+3:%{person}|p+3:They|p+1:We} - http://www.rubydoc.info/gems/i18n-inflector/file/docs/EXAMPLES
+                    message = m_regexConditionalIdentifiers.Replace(message, delegate (Match match)
+                    {
+                        int parameterId = int.Parse(match.Groups["ParameterId"].Value);
+                        var parameterValue = formatItems[parameterId];
+                        for (int i = 0; i < match.Groups["Value"].Captures.Count; i++)
                         {
-                            // if formatItem (parameter) is null or does not contain NuggetParameterBegintoken then continue
-                            if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
-
-                            // replace parameter tokens with nugget tokens 
-                            var fItem = formatItems[i];
-                            if (fItem.StartsWith(_settings.NuggetParameterBeginToken) && fItem.EndsWith(_settings.NuggetParameterEndToken))
-                                fItem = _settings.NuggetBeginToken
-                                + fItem.Substring(_settings.NuggetParameterBeginToken.Length, fItem.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length)
-                                + _settings.NuggetEndToken;
-                            // and process nugget 
-                            formatItems[i] = ProcessNuggets(fItem, languages);
+                            string value = match.Groups["Value"].Captures[i].Value;
+                            string Content = match.Groups["Content"].Captures[i].Value;
+                            if (parameterValue.ToLower() == value.ToLower())
+                                return Content;
                         }
+                        return match.Groups["Default"].Value ?? "";
+                    });
 
+
+                    // Convert any identifies in a formatted nugget: %0 -> {0}
+                    message = ConvertIdentifiersInMsgId(message);
+                    // Format the message.
+                    try {
                         message = string.Format(message, formatItems.ToArray()); }
                     catch (FormatException /*e*/) {
                         //message += string.Format(" [FORMAT EXCEPTION: {0}]", e.Message);
                         message += "[FORMAT EXCEPTION]";
                     }
                 }
-               // Optional late custom message translation modification.
+                // Optional late custom message translation modification.
                 if (LocalizedApplication.Current.TweakMessageTranslation != null) {
                     message = LocalizedApplication.Current.TweakMessageTranslation(
                         System.Web.HttpContext.Current.GetHttpContextBase(),
@@ -171,7 +190,7 @@ namespace i18n
             });
         }
 
-    // Implementation
+        // Implementation
 
         /// <summary>
         /// Regex for helping replace %0 style identifiers with {0} style ones.
@@ -179,6 +198,16 @@ namespace i18n
         protected static Regex m_regexPrintfIdentifiers = new Regex(
             @"(%\d+)", 
             RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Regex for replacing conditional identifiers
+        /// </summary>
+        protected static Regex m_regexConditionalIdentifiers = new Regex(
+            @"%(?<ParameterId>\d+){
+            (?<Value>[^:|}])+:(?<Content>[^:|}]*)
+            (\|(?<Value>[^:|}])+:(?<Content>[^:|}]*))*
+              (\| (?<Default>[^:|}]*))?
+            }", RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>
         /// Sequence of chars used to delimit internal components of a Formatted nugget.

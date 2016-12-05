@@ -155,6 +155,28 @@ namespace i18n.Tests
             Assert.AreEqual(obj.ProcessNuggets("[[[The %0 has not been saved. Would you like to save the changes?|||(((Current %0|||(((Order))))))]]]", pt), "O Pedido atual não foi salvo. Deseja salvar as mudanças?");
         }
 
+        [TestMethod]
+        [Description("Can translate recursive parameters.")]
+        public void NuggetLocalizer_can_translate_conditional()
+        {
+            var textLocalizer = new TextLocalizer_Mock_Generic();
+            textLocalizer.AddMessage("en", "%0_PRODUCTS_ADDED_TO_ORDER", "%0{0:No products were added|1:1 product was added|%0 products were added} to your order.");
+            textLocalizer.AddMessage("pt", "%0_PRODUCTS_ADDED_TO_ORDER", "%0{0:Nenhum produto foi adicionado|1:1 produto foi adicionado|%0 produtos foram adicionados} ao seu pedido.");
+
+            LanguageItem[] pt = LanguageItem.ParseHttpLanguageHeader("pt");
+            LanguageItem[] en = LanguageItem.ParseHttpLanguageHeader("en");
+
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||0]]]", pt), "Nenhum produto foi adicionado ao seu pedido.");
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||1]]]", pt), "1 produto foi adicionado ao seu pedido.");
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||3]]]", pt), "3 produtos foram adicionados ao seu pedido.");
+
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||0]]]", en), "No products were added to your order.");
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||1]]]", en), "1 product was added to your order.");
+            Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||3]]]", en), "3 products were added to your order.");
+        }
+
 
     }
 }
