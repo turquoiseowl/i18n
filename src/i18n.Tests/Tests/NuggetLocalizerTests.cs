@@ -177,6 +177,30 @@ namespace i18n.Tests
             Assert.AreEqual(obj.ProcessNuggets("[[[%0_PRODUCTS_ADDED_TO_ORDER|||3]]]", en), "3 products were added to your order.");
         }
 
+        [TestMethod]
+        [Description("Can translate conditional extension_attributes.")]
+        public void NuggetLocalizer_can_translate_conditional_extension_attributes()
+        {
+            var textLocalizer = new TextLocalizer_Mock_Generic();
+            textLocalizer.AddMessage("pt", "Product", "Produto");
+            textLocalizer.AddMessage("pt", "Invoice", "Nota Fiscal");
+
+            // In Portuguese all nouns have gender - they are either masculine (m) or feminine (f)
+            textLocalizer.AddMessage("pt", "Product_GENDER", "M"); // product is masculine
+            textLocalizer.AddMessage("pt", "Invoice_GENDER", "F"); // invoice is feminine
+
+            // In Portuguese all adjectives/articles/quantifiers/etc are inflected in gender according to the noun.
+            // Translations can use those extension attributes to make decisions
+
+            textLocalizer.AddMessage("pt", "Your %0 was saved.", "(((%0_GENDER))){M:O %0 foi salvo.|F:A %0 foi salva.}");
+
+            LanguageItem[] pt = LanguageItem.ParseHttpLanguageHeader("pt");
+
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+
+            Assert.AreEqual(obj.ProcessNuggets("[[[Your %0 was saved.|||(((Product)))]]]", pt), "O Produto foi salvo.");
+            Assert.AreEqual(obj.ProcessNuggets("[[[Your %0 was saved.|||(((Invoice)))]]]", pt), "A Nota Fiscal foi salva.");
+        }
 
     }
 }

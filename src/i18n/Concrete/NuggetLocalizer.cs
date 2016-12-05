@@ -74,6 +74,28 @@ namespace i18n
                //
                 if (nugget.IsFormatted) {
                     var formatItems = new List<string>(nugget.FormatItems); // list of all parameters (both literals and nuggets)
+
+                    // Extract attributes applied over existing variables - should be in this format: (((%ARGNO_AttributeName))) - e.g. (((%0_Gender))), (((%1_Number))), etc.
+                    Dictionary<string, string> attributes = new Dictionary<string, string>();
+                    message = m_regexAttributes.Replace(message, match =>
+                    {
+                        string attributeName = match.Groups["Attribute"].Value; // G (e.g. Gender, N for number, etc).
+                        int parameterId = int.Parse(match.Groups["ParameterId"].Value); // 1
+                        // if the attribute is (((%0_Gender) and parameter %0 is (((Customer))), paramterId is 0, and attributeKey will be the nugget translation for [[[Customer_Gender]]].
+                        string parameterKey = nugget.FormatItems[parameterId];
+                        if (parameterKey.StartsWith(_settings.NuggetParameterBeginToken) && parameterKey.EndsWith(_settings.NuggetParameterEndToken))
+                            parameterKey= parameterKey.Substring(_settings.NuggetParameterBeginToken.Length, parameterKey.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length);
+                        var attributeKey = _settings.NuggetBeginToken + parameterKey + "_" + attributeName + _settings.NuggetEndToken;
+                        if (!attributes.ContainsKey(attributeKey)) // if attribute wasn't yet extracted (calculated), then calculate its value, else get the cached value.
+                        {
+                            var attributeValue = ProcessNuggets(attributeKey, languages); 
+                            formatItems.Add(attributeValue); // append value to the end of parameters list
+                            attributes.Add(attributeKey, "%" + (formatItems.Count - 1)); // if we added element 3, refere to it as "%2"
+                        }
+                        return attributes[attributeKey];
+                    });
+
+
                     // translate nuggets in parameters 
                     for (int i = 0; i < formatItems.Count; i++)
                     {
@@ -208,6 +230,14 @@ namespace i18n
             (\|(?<Value>[^:|}])+:(?<Content>[^:|}]*))*
               (\| (?<Default>[^:|}]*))?
             }", RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// Regex for replacing extension attributes over existing parameters
+        /// </summary>
+        protected static Regex m_regexAttributes = new Regex(
+            @"\(\(\(%(?<ParameterId>\d+)_(?<Attribute>[^\(\)]*?)\)\)\)",
+            RegexOptions.CultureInvariant);
+
 
         /// <summary>
         /// Sequence of chars used to delimit internal components of a Formatted nugget.

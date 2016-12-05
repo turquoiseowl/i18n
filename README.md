@@ -386,6 +386,29 @@ Please note that conditionals work like C# switch - you can specify the translat
 
 This can be useful both for inflection of genders and numbers (singular/plural).
 
+#### Extension Attributes
+
+Conditionals allow you to create conditional translations depending on the argument itself, but sometimes the decision must not be made on something that you know in advance but rather on some language-specific attribute.
+For example, "map" in portuguese is masculine gender but in french it's feminine gender.
+
+Portuguese:
+```
+[[[The %0 is being exported.]]] -> "%0_GENDER{M:O %0 está sendo exportado.|A %0 está sendo exportada.}" 
+[[[map]]] -> "mapa"
+[[[map_GENDER]]] -> "M"
+[[[The %0 is being exported.|||(((map)))]]]  -> "O mapa está sendo exportado" (masculine)
+```
+
+French:
+```
+[[[The %0 is being exported.]]] -> "%0_GENDER{M:Le %0 a été exporté.|F:La %0 a été exporté.}"
+[[[map]]] -> "carte"
+[[[map_GENDER]]] -> "F"
+[[[The %0 is being exported.|||(((map)))]]]  -> "Le carte a été exporté" (feminine)
+```
+
+You can create attributes for gender, number (singular/plural), etc. Attributes may be only part of the the translation language.
+
 
 #### Parameters inside Parameters
 
