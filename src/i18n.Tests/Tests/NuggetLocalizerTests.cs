@@ -156,7 +156,7 @@ namespace i18n.Tests
         }
 
         [TestMethod]
-        [Description("Can translate recursive parameters.")]
+        [Description("Can translate conditional parameters.")]
         public void NuggetLocalizer_can_translate_conditional()
         {
             var textLocalizer = new TextLocalizer_Mock_Generic();
