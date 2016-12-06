@@ -1028,6 +1028,14 @@ Contributions to the project are always welcome and even more so when adopting t
 
 ### Release History
 
+#### 2.1.10 (20161206)
+
+* New setting ```i18n.DisableReferences``` allows for the generation of lighter POT/PO files by excluding nugget references ([#304](https://github.com/turquoiseowl/i18n/issues/304)).
+* New setting ```i18n.GenerateTemplatePerFile``` enables the breakdown of the POT template file into one POT file per scanned file ([#314](https://github.com/turquoiseowl/i18n/issues/314)).
+* FIX: PostBuild bug introduced by release 2.1.9 ([#316](https://github.com/turquoiseowl/i18n/issues/316)).
+* FIX: Duplicate message properties in POT/PO files.
+* Introduced support for publishing regular pre-release packages to NuGet.
+
 #### 2.1.9 (20161125)
 
 * Support for customization of PO filenames and sources ([#305](https://github.com/turquoiseowl/i18n/issues/305)).
