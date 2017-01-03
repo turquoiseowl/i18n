@@ -98,10 +98,11 @@ namespace i18n.PostBuild
 
             var nuggetFinder = new FileNuggetFinder(settings);
             var items = nuggetFinder.ParseAll();
-            repository.SaveTemplate(items);
-
-            var merger = new TranslationMerger(repository);
-            merger.MergeAllTranslation(items);
+            if (repository.SaveTemplate(items))
+            {
+                var merger = new TranslationMerger(repository);
+                merger.MergeAllTranslation(items);
+            }
 
             Console.WriteLine("i18n.PostBuild completed successfully.");
         }

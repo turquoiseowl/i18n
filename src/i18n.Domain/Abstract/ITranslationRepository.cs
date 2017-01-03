@@ -49,7 +49,8 @@ namespace i18n.Domain.Abstract
         /// Save a template. A template differs from a translation in that a translation holds all messages but no translation data. It is used for updating translations to make sure all translations have all strings.
         /// </summary>
         /// <param name="items">All template items to save, in a dictionary indexed by their id</param>
-        void SaveTemplate(IDictionary<string, TemplateItem> items);
+        /// <returns>True if the template have been saved</returns>
+        bool SaveTemplate(IDictionary<string, TemplateItem> items);
 
         /// <summary>
         /// Returns a CacheDependency for a language. This can be a subclass such as <see cref="SqlCacheDependency"/>

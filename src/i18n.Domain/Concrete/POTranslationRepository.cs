@@ -255,22 +255,24 @@ namespace i18n.Domain.Concrete
         /// Saves a template file which is a all strings (needing translation) used in the entire project. Not language dependent
         /// </summary>
         /// <param name="items">A list of template items to save. The list should be all template items for the entire project.</param>
-        public void SaveTemplate(IDictionary<string, TemplateItem> items)
+        public bool SaveTemplate(IDictionary<string, TemplateItem> items)
         {
             if (_settings.GenerateTemplatePerFile)
             {
+                bool result = false;
                 foreach (var item in items.GroupBy(x => x.Value.FileName))
                 {
-                    SaveTemplate(item.ToDictionary(x => x.Key, x => x.Value), item.Key);
+                    result |= SaveTemplate(item.ToDictionary(x => x.Key, x => x.Value), item.Key);
                 }
+                return result;
             }
             else
             {
-                SaveTemplate(items, string.Empty);
+                return SaveTemplate(items, string.Empty);
             }
         }
 
-        private void SaveTemplate(IDictionary<string, TemplateItem> items, string fileName)
+        private bool SaveTemplate(IDictionary<string, TemplateItem> items, string fileName)
         {
             string filePath = GetAbsoluteLocaleDir() + "/" + (!string.IsNullOrWhiteSpace(fileName) ? fileName : _settings.LocaleFilename) + ".pot";
             string backupPath = filePath + ".backup";
@@ -350,6 +352,20 @@ namespace i18n.Domain.Concrete
                     stream.WriteLine("");
                 }
             }
+
+            //we just compare output file with the backed up file to check for changes
+            if (File.Exists(filePath) && File.Exists(backupPath))
+            {
+                //We skip the four first lines since the fourth will always be different (the generation date)
+                var newContent = File.ReadAllLines(filePath).Skip(4).ToList();
+                var oldContent = File.ReadAllLines(backupPath).Skip(4).ToList();
+                if (newContent.Zip(oldContent, (n, o) => o != null && o.Equals(n)).All(b => b))
+                {
+                    File.Copy(backupPath, filePath, true);
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
