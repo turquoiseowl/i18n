@@ -14,17 +14,17 @@ namespace i18n
     /// </summary>
     /// <remarks>
     ///     LocalizingModule can be installed like this:
-    /// 
+    ///
     ///         IIS7+ Integrated mode:
-    /// 
+    ///
     ///           &lt;system.webServer&gt;
     ///             &lt;modules&gt;
     ///               &lt;add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" /&gt;
     ///             &lt;/modules&gt;
     ///           &lt;/system.webServer&gt;
-    /// 
+    ///
     ///         IIS7 Classic mode and IIS6:
-    /// 
+    ///
     ///           &lt;system.web&gt;
     ///             &lt;httpModules&gt;
     ///               &lt;add name="i18n.LocalizingModule" type="i18n.LocalizingModule, i18n" /&gt; &lt;!-- #37 --&gt;
@@ -49,7 +49,7 @@ namespace i18n
         public void Init(System.Web.HttpApplication application)
         {
             DebugHelpers.WriteLine("LocalizingModule::Init -- application: {0}", application);
-            
+
             // Wire up our event handlers into the ASP.NET pipeline.
             application.BeginRequest        += OnBeginRequest;
             application.ReleaseRequestState += OnReleaseRequestState;
@@ -92,42 +92,10 @@ namespace i18n
         /// </summary>
         private void OnReleaseRequestState(object sender, EventArgs e)
         {
-        //
             System.Web.HttpContextBase context = System.Web.HttpContext.Current.GetHttpContextBase();
             DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- sender: {0}, e:{1}, ContentType: {2},\n\tUrl: {3}\n\tRawUrl:{4}", sender, e, context.Response.ContentType, context.Request.Url, context.Request.RawUrl);
 
-            // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
-            // wire up our filter to do the processing. The entity data will be run through the filter a
-            // bit later on in the pipeline.
-            if ((LocalizedApplication.Current.ContentTypesToLocalize != null
-                    && LocalizedApplication.Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
-                    )
-            {
-                if ((LocalizedApplication.Current.UrlsToExcludeFromProcessing != null
-                    && LocalizedApplication.Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) // Exclude certain URLs from being processed
-                    )
-                {
-                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, URL excluded: ({0}).", context.Request.RawUrl);
-                }
-                else if ((context.Response.Headers["Content-Encoding"] != null
-                    || context.Response.Headers["Content-Encoding"] == "gzip") // Exclude responses that have already been compressed earlier in the pipeline
-                )
-                {
-                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, response compressed.");
-                }
-                else
-                {
-                    DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Installing filter");
-                    context.Response.Filter = new ResponseFilter(
-                        context,
-                        context.Response.Filter,
-                        UrlLocalizer.UrlLocalizationScheme == UrlLocalizationScheme.Void ? null : m_rootServices.EarlyUrlLocalizerForApp,
-                        m_rootServices.NuggetLocalizerForApp);
-                }
-            }
-            else {
-                DebugHelpers.WriteLine("LocalizingModule::OnReleaseRequestState -- Bypassing filter, No content-type match: ({0}).", context.Response.ContentType);
-            }
+            LocalizedApplication.InstallResponseFilter(context, m_rootServices);
         }
 
         private void OnPostRequestHandlerExecute(object sender, EventArgs e)

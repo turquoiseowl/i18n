@@ -764,7 +764,7 @@ On selection of a language in the above code, the AccountController.SetLanguage 
         }
         // Update PAL setting so that new language is reflected in any URL patched in the 
         // response (Late URL Localization).
-        HttpContext.Current.SetPrincipalAppLanguageForRequest(lt);
+        HttpContext.SetPrincipalAppLanguageForRequest(lt);
         // Patch in the new langtag into any return URL.
         if (returnUrl.IsSet()) {
             returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(HttpContext, returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
@@ -920,7 +920,8 @@ i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,s
 
 ### OWIN support
 
-Support for OWIN is available to a limited extent. See [Issue #241](https://github.com/turquoiseowl/i18n/issues/241) for more details.
+Support for OWIN is available to a limited extent. See issues [#241](https://github.com/turquoiseowl/i18n/issues/241) and
+[#333](https://github.com/turquoiseowl/i18n/issues/333) for more details.
 i18n is created based on `HttpContextBase` in System.Web assembly, which means the foundation was built on IIS pipeline.
 Currently we support OWIN hosted in IIS only, so it is still dependent on System.Web.  Self-hosted OWIN is not supported.
 
@@ -929,7 +930,7 @@ Here is how to use i18n in OWIN Web API projects:
 - Add reference to i18n.Adapter.OwinSystemWeb (available on NuGet as well)
 - Add reference to Microsoft.Owin.Host.SystemWeb.  If you add i18n.Adapter.OwinSystemWeb from NuGet it should automatically add this for you.
 - No need to register HttpModule in web.config file.
-- Add the following middleware registration into your startup sequence.
+- Add the following middleware registration into your startup sequence:
 
 ```
 public partial class Startup
@@ -938,16 +939,45 @@ public partial class Startup
     {
         ...
 
-        // i18n middlewares
-        app.Use(typeof(i18n.Adapter.OwinSystemWeb.UrlLocalizationMiddleware));
-        app.Use(typeof(i18n.Adapter.OwinSystemWeb.EntityLocalizationMiddleware));
-
         // i18n config
         i18n.LocalizedApplication.Current.DefaultLanguage = "en";
+
+        // i18n middleware
+        app.Use(typeof(i18n.Adapter.OwinSystemWeb.UrlLocalizationMiddleware));
+
+        // i18n response filter installer for static files
+        var staticFileOptions = new StaticFileOptions
+        {
+            OnPrepareResponse = (staticFileResponseContext) =>
+            {
+                if (staticFileResponseContext.File.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
+                {
+                    HttpContextBase context = staticFileResponseContext.OwinContext.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
+                    LocalizedApplication.InstallResponseFilter(context);
+                }
+            }
+        };
+        app.UseStaticFiles(staticFileOptions);
+
         ...
     }
 }
 ```
+
+- Add the following handler to Global.asax:
+```
+    /// <summary>
+    /// Handles the ReleaseRequestState event of the Application control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    protected void Application_ReleaseRequestState(object sender, EventArgs e)
+    {
+        HttpContextBase context = this.Request.GetOwinContext().Get<HttpContextBase>(typeof(HttpContextBase).FullName);
+        i18n.LocalizedApplication.InstallResponseFilter(context);
+    }
+```
+
 
 ### A reminder about folders in a web application
 
