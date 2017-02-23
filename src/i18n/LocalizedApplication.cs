@@ -20,7 +20,7 @@ namespace i18n
         public DefaultRootServices()
         {
             // Use Lazy to delay the creation of objects to when a request is being processed.
-            // When initializing the app thehi may throw "Request is not available in this context" from WebConfigService 
+            // When initializing the app thehi may throw "Request is not available in this context" from WebConfigService
             translationRepository = new Lazy<POTranslationRepository>(() => new POTranslationRepository(new i18nSettings(new WebConfigSettingService())));
             urlLocalizer = new UrlLocalizer();
             textLocalizer = new Lazy<TextLocalizer>(() => new TextLocalizer(new i18nSettings(new WebConfigSettingService()), TranslationRepositoryForApp));
@@ -173,7 +173,7 @@ namespace i18n
         /// language (PAL) is set for an HTTP request.
         /// </summary>
         /// <remarks>
-        /// A default handlers is installed which applies the PAL setting to both the 
+        /// A default handlers is installed which applies the PAL setting to both the
         /// CurrentCulture and CurrentUICulture settings of the current thread.
         /// This behaviour can be altered by removing (nulling) the value of this property
         /// or replacing with a new delegate.
@@ -185,7 +185,7 @@ namespace i18n
         /// that allows the resulting message to be modified.
         /// </summary>
         /// <remarks>
-        /// In general it is good practice to postpone the escaping of characters until they 
+        /// In general it is good practice to postpone the escaping of characters until they
         /// are about to be displayed and then according to the content type of the output.
         /// Thus, a single quote character need not be escaped if in JSON, but should be escaped
         /// if in HTML or Javascript.
@@ -205,7 +205,7 @@ namespace i18n
         /// that allows the resulting message to be modified.
         /// </summary>
         /// <remarks>
-        /// In general it is good practice to postpone the escaping of characters until they 
+        /// In general it is good practice to postpone the escaping of characters until they
         /// are about to be displayed and then according to the content type of the output.
         /// This, a single quote character need not be escaped if in JSON, but should be escaped
         /// if in HTML or Javascript.
@@ -306,6 +306,59 @@ namespace i18n
         {
             get { return current ?? (current = new LocalizedApplication()); }
             set { current = value; }
+        }
+
+        /// <summary>
+        /// Conditionally installs the i18n response filter.
+        /// </summary>
+        /// <param name="context">The HttpContext context.</param>
+        public static void InstallResponseFilter(System.Web.HttpContextBase context)
+        {
+            InstallResponseFilter(context, null);
+        }
+
+        /// <summary>
+        /// Conditionally installs the i18n response filter.
+        /// </summary>
+        /// <param name="context">The HTTP context.</param>
+        /// <param name="rootServices">The root services.</param>
+        public static void InstallResponseFilter(System.Web.HttpContextBase context, IRootServices rootServices)
+        {
+            if (rootServices == null)
+            {
+                rootServices = Current.RootServices;
+            }
+
+            // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
+            // wire up our filter to do the processing. The entity data will be run through the filter a
+            // bit later on in the pipeline.
+            if (Current.ContentTypesToLocalize != null
+                    && Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
+            {
+                if (Current.UrlsToExcludeFromProcessing != null
+                    && Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) // Exclude certain URLs from being processed
+                {
+                    DebugHelpers.WriteLine("InstallResponseFilter -- Bypassing filter, URL excluded: ({0}).", context.Request.RawUrl);
+                }
+                else if (context.Response.Headers["Content-Encoding"] != null
+                    || context.Response.Headers["Content-Encoding"] == "gzip") // Exclude responses that have already been compressed earlier in the pipeline
+                {
+                    DebugHelpers.WriteLine("InstallResponseFilter -- Bypassing filter, response compressed.");
+                }
+                else
+                {
+                    DebugHelpers.WriteLine("InstallResponseFilter -- Installing filter");
+                    context.Response.Filter = new ResponseFilter(
+                        context,
+                        context.Response.Filter,
+                        UrlLocalizer.UrlLocalizationScheme == UrlLocalizationScheme.Void ? null : rootServices.EarlyUrlLocalizerForApp,
+                        rootServices.NuggetLocalizerForApp);
+                }
+            }
+            else
+            {
+                DebugHelpers.WriteLine("InstallResponseFilter -- Bypassing filter, No content-type match: ({0}).", context.Response.ContentType);
+            }
         }
 
         /// <summary>
