@@ -36,6 +36,15 @@ namespace i18n.PostBuild
             catch (Exception exception)
             {
                 Console.WriteLine("ERROR: {0}", exception.Message);
+                if (exception.InnerException == null)
+                {
+                    return;
+                }
+                while (exception.InnerException != null)
+                {
+                    exception = exception.InnerException;
+                }
+                Console.WriteLine("Error (InnerException): {0}", exception.Message);
             }
         }
 
