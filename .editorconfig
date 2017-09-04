@@ -1,7 +1,11 @@
 # top-most EditorConfig file
 root = true
 
-# 4 space indentation
+# 2 space indentation by default
 [*.*]
 indent_style = space
+indent_size = 2
+
+# 4 space indentation in c# files
+[*.cs]
 indent_size = 4
