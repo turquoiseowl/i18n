@@ -29,7 +29,10 @@ namespace i18n
                 _settings.NuggetBeginToken,
                 _settings.NuggetEndToken,
                 _settings.NuggetDelimiterToken,
-                _settings.NuggetCommentToken),
+                _settings.NuggetCommentToken,
+                _settings.NuggetParameterBeginToken,
+                _settings.NuggetParameterEndToken
+                ),
                 NuggetParser.Context.ResponseProcessing);
         }
 
@@ -70,30 +73,75 @@ namespace i18n
                     out lt);
                //
                 if (nugget.IsFormatted) {
-                   // Convert any identifies in a formatted nugget: %0 -> {0}
-                    message = ConvertIdentifiersInMsgId(message);
-                   // Format the message.
-                    var formatItems = new List<string>(nugget.FormatItems);
-                    try {
-                        // translate nuggets in parameters 
-                        for (int i = 0; i < formatItems.Count; i++)
+                    var formatItems = new List<string>(nugget.FormatItems); // list of all parameters (both literals and nuggets)
+
+                    // Extract attributes applied over existing variables - should be in this format: (((%ARGNO_AttributeName))) - e.g. (((%0_Gender))), (((%1_Number))), etc.
+                    Dictionary<string, string> attributes = new Dictionary<string, string>();
+                    message = m_regexAttributes.Replace(message, match =>
+                    {
+                        string attributeName = match.Groups["Attribute"].Value; // G (e.g. Gender, N for number, etc).
+                        int parameterId = int.Parse(match.Groups["ParameterId"].Value); // 1
+                        // if the attribute is (((%0_Gender) and parameter %0 is (((Customer))), paramterId is 0, and attributeKey will be the nugget translation for [[[Customer_Gender]]].
+                        string parameterKey = nugget.FormatItems[parameterId];
+                        if (parameterKey.StartsWith(_settings.NuggetParameterBeginToken) && parameterKey.EndsWith(_settings.NuggetParameterEndToken))
+                            parameterKey= parameterKey.Substring(_settings.NuggetParameterBeginToken.Length, parameterKey.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length);
+                        var attributeKey = _settings.NuggetBeginToken + parameterKey + "_" + attributeName + _settings.NuggetEndToken;
+                        if (!attributes.ContainsKey(attributeKey)) // if attribute wasn't yet extracted (calculated), then calculate its value, else get the cached value.
                         {
-                            // if formatItem (parameter) is null or does not contain NuggetParameterBegintoken then continue
-                            if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
-
-                            // replace parameter tokens with nugget tokens 
-                            var fItem = formatItems[i].Replace(_settings.NuggetParameterBeginToken, _settings.NuggetBeginToken).Replace(_settings.NuggetParameterEndToken, _settings.NuggetEndToken);
-                            // and process nugget 
-                            formatItems[i] = ProcessNuggets(fItem, languages);
+                            var attributeValue = ProcessNuggets(attributeKey, languages); 
+                            formatItems.Add(attributeValue); // append value to the end of parameters list
+                            attributes.Add(attributeKey, "%" + (formatItems.Count - 1)); // if we added element 3, refere to it as "%2"
                         }
+                        return attributes[attributeKey];
+                    });
 
+
+                    // translate nuggets in parameters 
+                    for (int i = 0; i < formatItems.Count; i++)
+                    {
+                        // if formatItem (parameter) is null or does not contain NuggetParameterBegintoken then continue
+                        if (formatItems[i] == null || !formatItems[i].Contains(_settings.NuggetParameterBeginToken)) continue;
+
+                        // replace parameter tokens with nugget tokens 
+                        var fItem = formatItems[i];
+                        if (fItem.StartsWith(_settings.NuggetParameterBeginToken) && fItem.EndsWith(_settings.NuggetParameterEndToken))
+                            fItem = _settings.NuggetBeginToken
+                            + fItem.Substring(_settings.NuggetParameterBeginToken.Length, fItem.Length - _settings.NuggetParameterBeginToken.Length - _settings.NuggetParameterEndToken.Length)
+                            + _settings.NuggetEndToken;
+                        // and process nugget 
+                        formatItems[i] = ProcessNuggets(fItem, languages);
+                    }
+
+                    // Extracts and processes Conditionals. 
+                    // uses same format as https://github.com/siefca/i18n-inflector:
+                    // e.g. [[[Dear @0{f:Lady|m:Sir|n:You|All}!|||user.Gender]]]
+                    // TODO: add support for combining variables. e.g. @num+person{s+1:I|*+2:You|s+3:%{person}|p+3:They|p+1:We} - http://www.rubydoc.info/gems/i18n-inflector/file/docs/EXAMPLES
+                    message = m_regexConditionalIdentifiers.Replace(message, delegate (Match match)
+                    {
+                        int parameterId = int.Parse(match.Groups["ParameterId"].Value);
+                        var parameterValue = formatItems[parameterId];
+                        for (int i = 0; i < match.Groups["Value"].Captures.Count; i++)
+                        {
+                            string value = match.Groups["Value"].Captures[i].Value;
+                            string Content = match.Groups["Content"].Captures[i].Value;
+                            if (parameterValue.ToLower() == value.ToLower())
+                                return Content;
+                        }
+                        return match.Groups["Default"].Value ?? "";
+                    });
+
+
+                    // Convert any identifies in a formatted nugget: %0 -> {0}
+                    message = ConvertIdentifiersInMsgId(message);
+                    // Format the message.
+                    try {
                         message = string.Format(message, formatItems.ToArray()); }
                     catch (FormatException /*e*/) {
                         //message += string.Format(" [FORMAT EXCEPTION: {0}]", e.Message);
                         message += "[FORMAT EXCEPTION]";
                     }
                 }
-               // Optional late custom message translation modification.
+                // Optional late custom message translation modification.
                 if (LocalizedApplication.Current.TweakMessageTranslation != null) {
                     message = LocalizedApplication.Current.TweakMessageTranslation(
                         System.Web.HttpContext.Current.GetHttpContextBase(),
@@ -164,7 +212,7 @@ namespace i18n
             });
         }
 
-    // Implementation
+        // Implementation
 
         /// <summary>
         /// Regex for helping replace %0 style identifiers with {0} style ones.
@@ -172,6 +220,24 @@ namespace i18n
         protected static Regex m_regexPrintfIdentifiers = new Regex(
             @"(%\d+)", 
             RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Regex for replacing conditional identifiers
+        /// </summary>
+        protected static Regex m_regexConditionalIdentifiers = new Regex(
+            @"%(?<ParameterId>\d+){
+            (?<Value>[^:|}])+:(?<Content>[^:|}]*)
+            (\|(?<Value>[^:|}])+:(?<Content>[^:|}]*))*
+              (\| (?<Default>[^:|}]*))?
+            }", RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// Regex for replacing extension attributes over existing parameters
+        /// </summary>
+        protected static Regex m_regexAttributes = new Regex(
+            @"\(\(\(%(?<ParameterId>\d+)_(?<Attribute>[^\(\)]*?)\)\)\)",
+            RegexOptions.CultureInvariant);
+
 
         /// <summary>
         /// Sequence of chars used to delimit internal components of a Formatted nugget.

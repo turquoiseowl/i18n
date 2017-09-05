@@ -370,6 +370,60 @@ message spread over
 three lines]]]
 ```
 
+#### Conditionals
+
+With **conditionals** you can use a single nugget tag and have different translations according to the value of parameters.
+
+```
+[[[%0_PRODUCTS_ADDED_TO_ORDER]]] -> 
+"%0{0:No products were added|1:1 product was added|%0 products were added} to your order" 
+
+[[[DEAR_SIR_OR_MADAM|||@ViewBag.Gender]]] -> 
+"Dear %0{M:Sir|F:Madam|user}"
+```
+
+Please note that conditionals work like C# switch - you can specify the translation for each expected value ("No products" for "0", "1 product" for "1") and specify a translation for all other cases ("%0 products").
+
+This can be useful both for inflection of genders and numbers (singular/plural).
+
+#### Extension Attributes
+
+Conditionals allow you to create conditional translations depending on the argument itself, but sometimes the decision must not be made on something that you know in advance but rather on some language-specific attribute.
+For example, "map" in portuguese is masculine gender but in french it's feminine gender.
+
+Portuguese:
+```
+[[[The %0 is being exported.]]] -> "%0_GENDER{M:O %0 está sendo exportado.|A %0 está sendo exportada.}" 
+[[[map]]] -> "mapa"
+[[[map_GENDER]]] -> "M"
+[[[The %0 is being exported.|||(((map)))]]]  -> "O mapa está sendo exportado" (masculine)
+```
+
+French:
+```
+[[[The %0 is being exported.]]] -> "%0_GENDER{M:Le %0 a été exporté.|F:La %0 a été exporté.}"
+[[[map]]] -> "carte"
+[[[map_GENDER]]] -> "F"
+[[[The %0 is being exported.|||(((map)))]]]  -> "Le carte a été exporté" (feminine)
+```
+
+You can create attributes for gender, number (singular/plural), etc. Attributes may be only part of the the translation language.
+
+
+#### Parameters inside Parameters
+
+This helps you to reuse some parametrized translations inside other parametrized translations.
+For example:
+
+```
+[[[Product]]] -> "Produto"
+[[[%0 Status]]] -> "Status do %0"
+[[[Please select a %0]]] -> "Por favor escolha o %0"
+
+[[[Please select a %0|||(((%0 Status|||(((Product))))))]]] -> "Por favor escolha o Status do Produto"
+```
+
+
 ### Static File Compression and i18n
 The i18n module localizes nuggets in the HTTP response by modifying the response stream using a response filter 
 (see the .NET Framework documentation for more info about the HttpResponse.Filter property).

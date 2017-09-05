@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\TextLocalizer_Mock_Generic.cs" />
     <Compile Include="Helpers\TextLocalizer_Mock_SingleMessage.cs" />
     <Compile Include="Helpers\TextLocalizer_Mock_PrefixSuffix.cs" />
     <Compile Include="Tests\LanguageMatchingTests.cs" />
