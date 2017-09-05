@@ -24,7 +24,9 @@ namespace i18n.Domain.Concrete
                 _settings.NuggetBeginToken,
                 _settings.NuggetEndToken,
                 _settings.NuggetDelimiterToken,
-                _settings.NuggetCommentToken),
+                _settings.NuggetCommentToken,
+                _settings.NuggetParameterBeginToken,
+                _settings.NuggetParameterEndToken),
                 NuggetParser.Context.SourceProcessing);
         }
 

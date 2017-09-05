@@ -99,7 +99,7 @@ namespace i18n.Tests
             i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService()), textLocalizer);
 
             string pre = "[[[Will occur %0 every %1 years|||April|||///First variable is a month]]]";
-                // Value for second variable is missing.
+            // Value for second variable is missing.
             string post = obj.ProcessNuggets(pre, languages);
             Assert.AreEqual("Will occur April every  years", post);
         }
@@ -113,7 +113,6 @@ namespace i18n.Tests
             i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
 
             string pre = "[[[%0 is required|||(((ZipCode)))]]]";
-            // Value for second variable is missing.
             string post = obj.ProcessNuggets(pre, languages);
             Assert.AreEqual("!!ZipCode! is required!", post);
         }
@@ -134,6 +133,28 @@ namespace i18n.Tests
             string post = obj.ProcessNuggets(pre, languages);
             Assert.AreEqual("!xxx123yyy! !xxx456yyy!", post);
         }
+
+        [TestMethod]
+        [Description("Can translate recursive parameters.")]
+        public void NuggetLocalizer_can_translate_recursive_parameter()
+        {
+            var textLocalizer = new TextLocalizer_Mock_Generic();
+            textLocalizer.AddMessage("pt", "Product", "Produto");
+            textLocalizer.AddMessage("pt", "Order", "Pedido");
+            textLocalizer.AddMessage("pt", "%0 Status", "Status do %0");
+            textLocalizer.AddMessage("pt", "Current %0", "%0 atual");
+            textLocalizer.AddMessage("pt", "Please select a %0", "Por favor escolha o %0");
+            textLocalizer.AddMessage("pt", "The %0 has not been saved. Would you like to save the changes?", "O %0 não foi salvo. Deseja salvar as mudanças?");
+
+            LanguageItem[] pt = LanguageItem.ParseHttpLanguageHeader("pt");
+
+            i18n.NuggetLocalizer obj = new i18n.NuggetLocalizer(new i18nSettings(new WebConfigSettingService(null)), textLocalizer);
+
+            Assert.AreEqual(obj.ProcessNuggets("[[[Please select a %0|||(((%0 Status|||(((Order))))))]]]", pt), "Por favor escolha o Status do Pedido");
+            Assert.AreEqual(obj.ProcessNuggets("[[[Please select a %0|||(((%0 Status|||(((Product))))))]]]", pt), "Por favor escolha o Status do Produto");
+            Assert.AreEqual(obj.ProcessNuggets("[[[The %0 has not been saved. Would you like to save the changes?|||(((Current %0|||(((Order))))))]]]", pt), "O Pedido atual não foi salvo. Deseja salvar as mudanças?");
+        }
+
 
     }
 }
