@@ -13,7 +13,7 @@ namespace i18n.Domain.Tests
         private void ParseAndComp(string nuggetString, Nugget rhs, bool equal = true)
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
            // Act.
             Nugget nugget = nuggetParser.BreakdownNugget(nuggetString);
@@ -74,7 +74,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity01()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello]]]</p><p>[[[there]]]</p>";
            // Act.
@@ -94,7 +94,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity02()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello|||{0}]]]</p><p>[[[there]]]</p>";
            // Act.
@@ -114,7 +114,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity03()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello|||{0}]]]</p><p>[[[there|||{0}|||{1}///comment comment comment]]]</p>";
            // Act.
@@ -134,7 +134,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity_CustomNuggetTokens01()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[[", "]]]]]", "||", "//");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[[", "]]]]]", "||", "//", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[[hello||{0}]]]]]</p><p>[[[[there||{0}||{1}//comment comment comment]]]]]</p>";
            // Act.
@@ -145,7 +145,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity_CustomNuggetTokens02()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[:", ":]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[:", ":]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[:hello|||{0}:]]]</p><p>[[[:there|||{0}|||{1}///comment comment comment:]]]</p>";
            // Act.
@@ -156,7 +156,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity_CustomNuggetTokens03()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("```", "'''", "###", "@@@");
+            NuggetTokens nuggetTokens = new NuggetTokens("```", "'''", "###", "@@@", "[[[", "]]]");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>```hello###{0}'''</p><p>```there###{0}###{1}@@@comment comment comment'''</p>";
            // Act.
@@ -167,7 +167,7 @@ namespace i18n.Domain.Tests
         public void NuggetParser_CanParseEntity_MultiLineNugget01()
         {
            // Arrange.
-            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            NuggetTokens nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             string entity = "<p>[[[hello\r\n%0|||{0}]]]</p><p>[[[there]]]</p>";
            // Act.
@@ -194,7 +194,7 @@ namespace i18n.Domain.Tests
         [TestMethod]
         [Description("Issue #110: Parsing a nugget with empty parameter in Response should not leave delimiters intact.")]
         public void NuggetParser_ResponseMode_CanParseEntity_EmptyParam() {
-            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
             var input = "[[[Title: %0|||]]]";
             var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
@@ -210,7 +210,7 @@ namespace i18n.Domain.Tests
         [TestMethod]
         [Description("Issue #110: Parsing a nugget with empty parameter in Source should leave delimiters intact.")]
         public void NuggetParser_SourceMode_CanParseEntity_EmptyParam() {
-            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.SourceProcessing);
             var input = "[[[Title: %0|||]]]";
             var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
@@ -224,7 +224,7 @@ namespace i18n.Domain.Tests
         [TestMethod]
         [Description("Issue #165: Parsing a nugget with empty parameter in Response should not give format exception.")]
         public void NuggetParser_ResponseMode_CanParseEntity_TwoParams_FirstEmpty_SecondNonEmpty() {
-            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
             var input = "[[[Title: %0, %1||||||X]]]";
             var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {
@@ -238,7 +238,7 @@ namespace i18n.Domain.Tests
         [TestMethod]
         [Description("Issue #165: Parsing a nugget with empty parameter in Response should not give format exception.")]
         public void NuggetParser_ResponseMode_CanParseEntity_TwoParams_FirstNonEmpty_SecondEmpty() {
-            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///");
+            var nuggetTokens = new NuggetTokens("[[[", "]]]", "|||", "///", "(((", ")))");
             NuggetParser nuggetParser = new NuggetParser(nuggetTokens, NuggetParser.Context.ResponseProcessing);
             var input = "[[[Title: %0, %1|||X|||]]]";
             var result = nuggetParser.ParseString(input, (nuggetString, pos, nugget, i_entity) => {

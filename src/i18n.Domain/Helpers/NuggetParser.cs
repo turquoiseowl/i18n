@@ -25,22 +25,30 @@ namespace i18n.Helpers
         public string EndToken       { get; private set; }
         public string DelimiterToken { get; private set; }
         public string CommentToken   { get; private set; }
+        public string ParameterBeginToken { get; private set; }
+        public string ParameterEndToken { get; private set; }
 
         public NuggetTokens(
             string beginToken,
             string endToken,
             string delimiterToken,
-            string commentToken)
+            string commentToken,
+            string parameterBeginToken,
+            string parameterEndToken)
         {
             if (!beginToken.IsSet())     { throw new ArgumentNullException("beginToken"); }
             if (!endToken.IsSet())       { throw new ArgumentNullException("endToken"); }
             if (!delimiterToken.IsSet()) { throw new ArgumentNullException("delimiterToken"); }
             if (!commentToken.IsSet())   { throw new ArgumentNullException("commentToken"); }
+            if (!parameterBeginToken.IsSet()) { throw new ArgumentNullException("parameterBeginToken"); }
+            if (!parameterEndToken.IsSet()) { throw new ArgumentNullException("parameterEndToken"); }
 
             BeginToken = beginToken;
             EndToken = endToken;
             DelimiterToken = delimiterToken;
             CommentToken = commentToken;
+            ParameterBeginToken = parameterBeginToken;
+            ParameterEndToken = parameterEndToken;
         }
     }
 
@@ -144,16 +152,38 @@ namespace i18n.Helpers
         {
             m_nuggetTokens = nuggetTokens;
             m_context = context;
-           // Prep the regexes. We escape each token char to ensure it is not misinterpreted.
-           // · Breakdown e.g. "\[\[\[(.+?)(?:\|\|\|(.+?))*(?:\/\/\/(.+?))?\]\]\]"
+            // Prep the regexes. We escape each token char to ensure it is not misinterpreted.
+            // · Breakdown e.g. "\[\[\[(.+?)(?:\|\|\|(.+?))*(?:\/\/\/(.+?))?\]\]\]"
+            // This regex allows parameters inside parameters (recursive parameters)
+            //e.g. [[[This %0 allows %1 to have %2|||regex|||nuggets|||(((recursive %0|||(((parameters///comment3)))///comment2)))///comment1]]]
+            // will become "This regex allows nuggets to have recursive parameters"
             m_regexNuggetBreakdown = new Regex(
-                string.Format(@"{0}(.+?)(?:{1}(.{4}?))*(?:{2}(.+?))?{3}",
-                    EscapeString(m_nuggetTokens.BeginToken), 
-                    EscapeString(m_nuggetTokens.DelimiterToken), 
-                    EscapeString(m_nuggetTokens.CommentToken), 
+                string.Format(@"{0}
+                                    (?<msgid>.+?)                 # as few as possible will make the capture first extract the parameters and comments
+                                    ({1}
+                                        (?<parameters>
+                                            (?>
+                                            {5}  (?<LEVEL>)       # On parameter opening push level
+                                            |
+                                            {6} (?<-LEVEL>)       # On parameter closing pop level
+                                            |
+                                            (?! {5} | {6}  ) .    # Match any char unless the opening and closing strings   
+                                            ){4}?                 # as few as possible, allowing other parameters to start a new capture occurrence
+                                            (?(LEVEL)(?!))        # If level exists (parameter was not correctly closed) then fail - (balancing groups)
+                                        )
+                                    )*
+                                    ({2}(?<msgctxt>(.+?)))?
+                                {3}",
+                    EscapeString(m_nuggetTokens.BeginToken),
+                    EscapeString(m_nuggetTokens.DelimiterToken),
+                    EscapeString(m_nuggetTokens.CommentToken),
                     EscapeString(m_nuggetTokens.EndToken),
-                    m_context == Context.SourceProcessing ? "+" : "*"), 
-                RegexOptions.CultureInvariant 
+                    m_context == Context.SourceProcessing ? "+" : "*", // Issue #110: Parsing a nugget with empty parameter in Source should leave delimiters intact. - see test NuggetParser_SourceMode_CanParseEntity_EmptyParam
+                    EscapeString(m_nuggetTokens.ParameterBeginToken),
+                    EscapeString(m_nuggetTokens.ParameterEndToken)
+                    ),
+                    RegexOptions.CultureInvariant
+                    | RegexOptions.IgnorePatternWhitespace
                     | RegexOptions.Singleline);
                         // RegexOptions.Singleline in fact enable multi-line nuggets.
         }
@@ -231,14 +261,13 @@ namespace i18n.Helpers
         /// </summary>
         private Nugget NuggetFromRegexMatch(Match match)
         {
-            if (!match.Success
-                || match.Groups.Count != 4) {
-                return null; }
+            if (!match.Success)
+                return null;
             Nugget n = new Nugget();
            // Extract msgid from 2nd capture group.
-            n.MsgId = match.Groups[1].Value;
+            n.MsgId = match.Groups["msgid"].Value;
            // Extract format items from 3rd capture group.
-            var formatItems = match.Groups[2].Captures;
+            var formatItems = match.Groups["parameters"].Captures;
             if (formatItems.Count != 0) {
                 n.FormatItems = new string[formatItems.Count];
                 int i = 0;
@@ -250,8 +279,8 @@ namespace i18n.Helpers
                 }
             }
            // Extract comment from 4th capture group.
-            if (match.Groups[3].Value.IsSet()) {
-                n.Comment = match.Groups[3].Value; }
+            if (match.Groups["msgctxt"].Value.IsSet()) {
+                n.Comment = match.Groups["msgctxt"].Value; }
            // Success.
             return n;
         }
