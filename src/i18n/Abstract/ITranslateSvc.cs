@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace i18n
+﻿namespace i18n
 {
     /// <summary>
     /// Abstracts a translation service.

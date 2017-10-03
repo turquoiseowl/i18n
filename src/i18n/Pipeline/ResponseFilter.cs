@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.IO;
 using System.Text;
 using i18n.Helpers;
-using i18n.Domain.Concrete;
 
 namespace i18n
 {
