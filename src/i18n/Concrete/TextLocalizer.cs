@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 using i18n.Domain.Concrete;
@@ -172,6 +173,8 @@ namespace i18n
 
             // Lookup specific message text in the language PO and if found...return that.
             string text = LookupText(langtag, msgkey);
+            if (text == null) {
+                text = LookupText(langtag, UnescapeUnicodeCharacters(msgkey)); }
             if (text != null) {
                 return text; }
 
@@ -183,6 +186,17 @@ namespace i18n
 
             // Lookup failed.
             return null;
+        }
+
+
+        /// <summary>
+        /// Replaces escaped unicode characters with their corresponding unescaped character.
+        /// </summary>
+        /// <param name="msgkey">Key of the message to lookup, containing the escaped the characters.</param>
+        /// <returns>The unescpaed msgkey.</returns>
+        private static string UnescapeUnicodeCharacters(string msgkey)
+        {
+            return Regex.Replace(msgkey, @"\\u(?<Value>[a-zA-Z0-9]{4})", m => ((char) int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString());
         }
 
         private bool LoadMessagesIntoCache(string langtag)
