@@ -35,3 +35,4 @@ publish.xml
 TestResults
 *.nupkg
 /src/packages
+src/.vs/

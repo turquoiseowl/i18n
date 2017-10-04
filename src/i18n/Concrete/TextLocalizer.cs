@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using i18n.Domain.Abstract;
 using i18n.Domain.Entities;
 using i18n.Domain.Concrete;
@@ -20,6 +19,8 @@ namespace i18n
         private i18nSettings _settings;
 
         private ITranslationRepository _translationRepository;
+
+        private static Regex unicodeMatchRegex = new Regex(@"\\U(?<Value>[0-9A-F]{4})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public TextLocalizer(
             i18nSettings settings,
@@ -172,6 +173,18 @@ namespace i18n
 
             // Lookup specific message text in the language PO and if found...return that.
             string text = LookupText(langtag, msgkey);
+            if (text == null && unicodeMatchRegex.IsMatch(msgkey))
+            {
+                // If message was not found but contains escaped unicode characters, try converting those
+                // to characters and look up the message again
+                var msgkeyClean = unicodeMatchRegex.Replace(msgkey, m =>
+                {
+                    var code = int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber);
+                    return char.ConvertFromUtf32(code);
+                });
+                text = LookupText(langtag, msgkeyClean);
+            }
+
             if (text != null) {
                 return text; }
 

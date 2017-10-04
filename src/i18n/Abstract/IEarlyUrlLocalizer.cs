@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace i18n
+﻿namespace i18n
 {
     public interface IEarlyUrlLocalizer
     {
