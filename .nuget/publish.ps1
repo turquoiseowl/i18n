@@ -87,9 +87,9 @@ writeinfo "4. Create nuget packages..."
 
 writeinfo "5. Publish nuget packages..."
 $package = 'i18n.' + $verPre +'.nupkg'
-&.\nuget.exe push $package
+&.\nuget.exe push $package -Source https://www.nuget.org/api/v2/package
 $package = 'i18n.Adapter.OwinSystemWeb.' + $verPre +'.nupkg'
-&.\nuget.exe push $package
+&.\nuget.exe push $package -Source https://www.nuget.org/api/v2/package
 
 writeinfo "6. Tag the git repo for version"
 $tagName = 'v' + $verPre
