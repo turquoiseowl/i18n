@@ -1058,6 +1058,12 @@ Contributions to the project are always welcome and even more so when adopting t
 
 ### Release History
 
+#### 2.1.11 (20180528)
+
+* Improved support for wildcards in BlackList and WhileList settings ([#319](https://github.com/turquoiseowl/i18n/issues/319)).
+* FIX: redundant updates to PO files ([#329](https://github.com/turquoiseowl/i18n/issues/329)).
+* Modifications to OWIN support ([#334](https://github.com/turquoiseowl/i18n/issues/334)) [BREAKING CHANGE].
+
 #### 2.1.10 (20161206)
 
 * New setting ```i18n.DisableReferences``` allows for the generation of lighter POT/PO files by excluding nugget references ([#304](https://github.com/turquoiseowl/i18n/issues/304)).
