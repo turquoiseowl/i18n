@@ -16,7 +16,7 @@
     <tags>i18n internationalization l10n localization globalization asp.net mvc PO OWIN Katana</tags>
     <dependencies>
       <dependency id="I18N" version="2.1.11" />
-      <dependency id="Microsoft.Owin.Host.SystemWeb" />
+      <dependency id="Microsoft.Owin.Host.SystemWeb" version="3.0.1" />
     </dependencies>
   </metadata>
 </package>
