@@ -213,13 +213,22 @@ namespace i18n
                 Translation t = _translationRepository.GetTranslation(langtag);
 
                 // Cache messages.
-                // NB: if the file changes we want to be able to rebuild the index without recompiling.
-                // NB: it is possible for GetCacheDependencyForSingleLanguage to return null in the
-                // case of the default language where it is added to AppLanguages yet doesn't actually exist.
-                // See MessageKeyIsValueInDefaultLanguage.
-                var cd = _translationRepository.GetCacheDependencyForSingleLanguage(langtag);
-                if (cd != null) {
-                    System.Web.HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd); }
+                // · In order to facilitate dynamic refreshing of translations during runtime
+                //   (without restarting the server instance) we first establish something upon 
+                //   which the cache entry will be dependent: that is a 'cache dependency' object
+                //   which essentially triggers an event if/when the entry is to be considered
+                //   as 'dirty' and whihc is listened to by the cache.
+                //   In our case, we want this 'dirty' event to be triggered if/when the
+                //   translation's source PO file is updated.
+                //   NB: it is possible for GetCacheDependencyForSingleLanguage to return null in the
+                //   case of the default language where it is added to AppLanguages yet there 
+                //   doesn't actually exist an underlying PO file. This is perfectly valid when
+                //   LocalizedApplication.MessageKeyIsValueInDefaultLanguage == true (default setting).
+                //   In this case the cache entry is associated with the null CacheDependency instance
+                //   which means the cache entry is effectively permanent for this server instance.
+                System.Web.Caching.CacheDependency cd = _translationRepository.GetCacheDependencyForSingleLanguage(langtag);
+                // · Insert translation into cache associating it with any CacheDependency.
+                System.Web.HttpRuntime.Cache.Insert(GetCacheKey(langtag), t.Items, cd);
             }
             return true;
         }
