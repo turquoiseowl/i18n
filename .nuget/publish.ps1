@@ -82,14 +82,14 @@ writeinfo "3. Rebuild All in Release mode..."
 &"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.com" ..\src\i18n.sln /rebuild `"Release`|Any CPU`"
 
 writeinfo "4. Create nuget packages..."
-&nuget pack C:\DevRoot\DevGit\i18n\src\i18n\i18n.csproj                                             -BasePath C:\DevRoot\DevGit\i18n\src\i18n                       -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed -Properties OutDir=C:\DevRoot\DevGit\i18n\src\i18n\bin\Release
-&nuget pack C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb\i18n.Adapter.OwinSystemWeb.csproj -BasePath C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed -Properties OutDir=C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb\bin\Release
+&.\nuget.exe pack C:\DevRoot\DevGit\i18n\src\i18n\i18n.csproj                                             -BasePath C:\DevRoot\DevGit\i18n\src\i18n                       -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed -Properties OutDir=C:\DevRoot\DevGit\i18n\src\i18n\bin\Release
+&.\nuget.exe pack C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb\i18n.Adapter.OwinSystemWeb.csproj -BasePath C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed -Properties OutDir=C:\DevRoot\DevGit\i18n\src\i18n.Adapter.OwinSystemWeb\bin\Release
 
 writeinfo "5. Publish nuget packages..."
 $package = 'i18n.' + $verPre +'.nupkg'
-&nuget push $package
+&.\nuget.exe push $package
 $package = 'i18n.Adapter.OwinSystemWeb.' + $verPre +'.nupkg'
-&nuget push $package
+&.\nuget.exe push $package
 
 writeinfo "6. Tag the git repo for version"
 $tagName = 'v' + $verPre
