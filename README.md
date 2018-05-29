@@ -1020,11 +1020,6 @@ The following stock implementations of ```i18n.ITranslateSvc``` are provided by 
 - TranslateSvc_HttpContext - ITranslateSvc implementation based on an given HttpContext instance.
 - TranslateSvc_HttpContextCurrent - ITranslateSvc implementation based on the static HttpContext.Current instance (obtained at the time of calling the interface).
 
-### Build Notes
-
-The i18n project at present targets Visual Studio 2013 / .NET Framework 4 and requires the Visual Studio 2013 SDK libraries
-installed to build.
-
 ### Contributing
 
 There's lot of room for further enhancements and features to this library, and you are encouraged to fork it and
@@ -1034,6 +1029,13 @@ contribute back anything new. Specifically, these would be great places to add m
 * Input and ideas on a safe universal nugget syntax (see issue [#69](https://github.com/turquoiseowl/i18n/issues/69)).
 * Plurals support.
 * Help me fix the bugs! Chances are I don't ship in your language. Fix what hurts. Please?
+
+#### Coding Style Guidlines
+
+* Pull Requests that add functionality to be accompanied with documentation added to this README.
+* Pull Request to be as granular as possible (e.g. limited to single features/enhancements).
+* All methods to be commented including helper routine.
+* 4-spaces used for tab indent.
 
 #### Line Endings
 
@@ -1047,14 +1049,10 @@ This behaviour is controlled via Git's ```core.autocrlf``` setting, which in thi
 
 See [Dealing with line endings](https://help.github.com/articles/dealing-with-line-endings/) for more information.
 
-#### Contributing and Coding Style Guidlines
+#### Build Notes
 
-Contributions to the project are always welcome and even more so when adopting the following guidlines:
-
-* Pull Requests that add functionality to be accompanied with documentation added to this README.
-* Pull Request to be as granular as possible (e.g. limited to single features/enhancements).
-* All methods to be commented including helper routine.
-* 4-spaces used for tab indent.
+The i18n project at present targets Visual Studio 2013 / .NET Framework 4 and requires the Visual Studio 2013 SDK libraries
+installed to build.
 
 ### Release History
 
