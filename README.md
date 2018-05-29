@@ -1054,6 +1054,10 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 The i18n project at present targets Visual Studio 2013 / .NET Framework 4 and requires the Visual Studio 2013 SDK libraries
 installed to build.
 
+### Known Issues
+
+* MVC controller names must be more than 3 chars ([#370](https://github.com/turquoiseowl/i18n/issues/370)).
+
 ### Release History
 
 #### 2.1.11 (20180528)
