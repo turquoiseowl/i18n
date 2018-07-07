@@ -1060,6 +1060,11 @@ installed to build.
 
 ### Release History
 
+#### 2.1.13 (20180707)
+
+* FIX: performance issues related to translations in the default application language ([#368](https://github.com/turquoiseowl/i18n/issues/368)).
+* FIX: URI fragments breaking localization of outgoing URIs ([#372](https://github.com/turquoiseowl/i18n/issues/372)).
+
 #### 2.1.11 (20180528)
 
 * Improved support for wildcards in BlackList and WhileList settings ([#319](https://github.com/turquoiseowl/i18n/issues/319)).
