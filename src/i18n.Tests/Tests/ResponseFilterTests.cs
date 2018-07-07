@@ -55,6 +55,10 @@ namespace i18n.Tests
                 "fr",
                 "<a href=\"/\"></a>",
                 "<a href=\"/fr\"></a>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<a href=\"/shop\"></a>",
+                "<a href=\"/fr/shop\"></a>");
 
             // Two attributes.
             Helper_ResponseFilter_can_patch_html_urls(
@@ -179,6 +183,12 @@ namespace i18n.Tests
                 "fr",
                 "<script src=\"123?a=b&c=d\"></script>",
                 "<script src=\"/fr/123?a=b&c=d\"></script>");
+
+            // Fragments.
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<a href=\"123#foo\"></a>",
+                "<a href=\"/fr/123#foo\"></a>");
 
             // Single full script tag.
             Helper_ResponseFilter_can_patch_html_urls(
