@@ -124,7 +124,7 @@ namespace i18n
                 }
             }
             
-            // Localize urls in the entity.
+            // Localize urls in the response body (entity).
             return m_regexHtmlUrls.Replace(
                 entity,
                 delegate(Match match)
@@ -255,7 +255,8 @@ namespace i18n
                     // simply does a Uri.TryCreate (at least as of .NET 4.6.1).
                 if (urlIsUnrooted) {
                     Uri newUri = new Uri(requestUrl, url);
-                    url = newUri.PathAndQuery;
+                    url = newUri.PathAndQuery + newUri.Fragment;
+                        // NB: if there is no fragment then newUri.Fragment == ""
                 }
             }
 

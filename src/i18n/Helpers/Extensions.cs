@@ -151,10 +151,16 @@ namespace i18n
            // If rhs is valid relative Uri then treat as local.
            // NB: this code was based on HttpRequestBase.IsUrlLocalToHost in MVC3 which seems to be broken 
            // now with MVC4.
-            bool isLocal = !rhs.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
-                && !rhs.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
-                && Uri.IsWellFormedUriString(rhs, UriKind.Relative);
-            return isLocal;
+            if (rhs.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
+                || rhs.StartsWith("https:", StringComparison.OrdinalIgnoreCase)) {
+                return false; }
+            //if (!Uri.IsWellFormedUriString(rhs, UriKind.Relative)) {
+            //    return false; }
+                // Uri.IsWellFormedUriString is a bit unreliable e.g. if a relative URI contains a fragment
+                // then it returns false even if the a similar URI in absolute form returns true.
+                // Given that the purpose of this method is NOT to vaslidate URLs but rather sift out
+                // non local ones, let's just assume URI is local if it gets passed the http/https-prefix test.
+            return true;
         }
     }
 }
