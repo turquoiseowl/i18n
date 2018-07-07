@@ -111,7 +111,7 @@ namespace i18n
 
             Uri requestUrl = context != null ? context.Request.Url : null;
 
-            // Localize any HTTP headers in the response containing URLs.
+            // Localize urls in HTTP headers.
             if (context != null) {
                 foreach (string hdr in m_httpHeadersContainingUrls) {
                     string hdrval = context.Response.Headers[hdr];
@@ -124,7 +124,7 @@ namespace i18n
                 }
             }
             
-            // Localize any nuggets in the entity.
+            // Localize urls in the entity.
             return m_regexHtmlUrls.Replace(
                 entity,
                 delegate(Match match)
