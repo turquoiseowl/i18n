@@ -14,7 +14,7 @@ namespace i18n.Tests
     [TestClass]
     public class ResponseFilterTests
     {
-        void Helper_ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, string requestUrl = null)
+        void Helper_ResponseFilter_can_patch_html_urls(string suffix, string pre, string expectedPatched, string requestUrl = "http://example.com/blog")
         {
             HttpRequestBase fakeRequest   = Substitute.For<HttpRequestBase>();
             HttpResponseBase fakeResponse = Substitute.For<HttpResponseBase>();
@@ -187,8 +187,22 @@ namespace i18n.Tests
             // Fragments.
             Helper_ResponseFilter_can_patch_html_urls(
                 "fr",
-                "<a href=\"123#foo\"></a>",
+                "<a href=\"/123#foo\"></a>",
                 "<a href=\"/fr/123#foo\"></a>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<a href=\"123#foo\"></a>", // unrooted
+                "<a href=\"/fr/123#foo\"></a>");
+
+            // Query strings and fragments.
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<script src=\"123?a=b#foo\"></script>",
+                "<script src=\"/fr/123?a=b#foo\"></script>");
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<script src=\"123?a=b&c=d#foo\"></script>",
+                "<script src=\"/fr/123?a=b&c=d#foo\"></script>");
 
             // Single full script tag.
             Helper_ResponseFilter_can_patch_html_urls(
