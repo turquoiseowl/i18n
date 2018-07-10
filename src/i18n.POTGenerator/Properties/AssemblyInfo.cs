@@ -4,9 +4,9 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("2.1.13")]
-[assembly: AssemblyFileVersion("2.1.13")]
-[assembly: AssemblyInformationalVersion("2.1.13")]
+[assembly: AssemblyVersion("2.1.14")]
+[assembly: AssemblyFileVersion("2.1.14")]
+[assembly: AssemblyInformationalVersion("2.1.14")]
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information

@@ -1060,6 +1060,10 @@ installed to build.
 
 ### Release History
 
+#### 2.1.14 (20180710)
+
+* FIX: "Localization of outgoing URIs" feature issue in version 2.1.13 ([#374](https://github.com/turquoiseowl/i18n/issues/374)).
+
 #### 2.1.13 (20180707)
 
 * FIX: performance issues related to translations in the default application language ([#368](https://github.com/turquoiseowl/i18n/issues/368)).
