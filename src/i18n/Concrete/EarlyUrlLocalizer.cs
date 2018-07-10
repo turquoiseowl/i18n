@@ -224,6 +224,13 @@ namespace i18n
             if (m_urlLocalizer.ExtractLangTagFromUrl(context, url, UriKind.RelativeOrAbsolute, incomingUrl, out urlNonlocalized) != null) {
                 return null; } // original
 
+            // If URL is invalid...leave matched token alone.
+            // NB: Uri.IsWellFormedUriString has odd URI fragment handling: if a valid URI contains a fragment 
+            // then it returns false. Go figure!
+            if (!url.Contains("#")
+                && !Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute)) {
+                return null; } // original
+
             // If URL is not local (i.e. remote host)...leave matched token alone.
             if (requestUrl != null && !requestUrl.IsLocal(url)) {
                 return null; } // original
