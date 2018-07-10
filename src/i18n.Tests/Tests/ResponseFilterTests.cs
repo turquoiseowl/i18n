@@ -50,6 +50,12 @@ namespace i18n.Tests
             Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"http://example.com/content/fred.txt\"></img>", "<img src=\"http://example.com/fr/content/fred.txt\"></img>" , "http://example.com/blog/");
             Helper_ResponseFilter_can_patch_html_urls("fr", "<img src=\"http://other.com/content/fred.txt\"></img>"  , "<img src=\"http://other.com/content/fred.txt\"></img>"      , "http://example.com/blog/"); // NB: foreign site so no langtag added
 
+            // One attribute - empty url
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                "<a href=\"\"></a>",
+                "<a href=\"\"></a>");
+
             // One attribute.
             Helper_ResponseFilter_can_patch_html_urls(
                 "fr",
@@ -396,6 +402,22 @@ namespace i18n.Tests
                 "fr",
                 string.Format("<script src=\"{0}https://example.com/fr/123\"></script>", EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix),
                 "<script src=\"https://example.com/fr/123\"></script>");
+
+
+            string strMultilineScriptWithHref = @"<script>
+  try {
+    this._baseHref="""";
+  }
+  catch (e) {
+  }
+</script>
+<div class=""page_style_a"">";
+
+            Helper_ResponseFilter_can_patch_html_urls(
+                "fr",
+                strMultilineScriptWithHref,
+                strMultilineScriptWithHref);
+
         }
     }
 }

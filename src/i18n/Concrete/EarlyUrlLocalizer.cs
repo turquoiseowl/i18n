@@ -157,7 +157,7 @@ namespace i18n
         /// Regex for finding and replacing urls in html.
         /// </summary>
         public static Regex m_regexHtmlUrls = new Regex(
-            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b.*?(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
+            "(?<pre><(?:script|img|a|area|link|base|input|frame|iframe|form)\\b[^>]*?\\b(?:src|href|action)\\s*=\\s*[\"']\\s*)(?<url>.+?)(?<post>\\s*[\"'][^>]*?>)",
             RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 // The above supports most common ways for a URI to appear in HTML/XHTML.
                 // Note that if we fail to catch a URL here, it is not fatal; it only means we don't avoid a redirect
