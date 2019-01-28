@@ -92,7 +92,7 @@ namespace i18n
             //      Matches private use subtag
             //      eg en-ABCD-GB-x-AAAA
         public static Regex s_regex_parseUrl = new System.Text.RegularExpressions.Regex(
-            @"^/([a-zA-Z]{2,3}(?:-[a-zA-Z]{4,5})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/)", 
+            @"^/([a-zA-Z]{2,3}(?:-[a-zA-Z]{4,5})?(?:-(?:[a-zA-Z]{2}|[0-9]{3}))?(?:\-x-([a-zA-Z0-9]{4,}))?)(?:$|/|\?|#)", 
             System.Text.RegularExpressions.RegexOptions.CultureInvariant);
                 // ^/
                 // (                                # begin 1st and only capture group
@@ -101,7 +101,7 @@ namespace i18n
                 // (?:-(?:[a-zA-Z]{2}|[0-9]{3}))?   # optional region code (2-letter or 3-digit) - not a capture group itself
                 // (?:\-x-([a-zA-Z0-9]{4,}))?       # optional private use tag (-x- followed by 4+ alphanumericcharacters) - not a capture group itself
                 // )                                # end 1st and only capture group
-                // (?:$|/)                          # match end of string or fwd-slash char - not a capture group itself
+                // (?:$|/|\?|#)                     # match end of string or fwd-slash char or question-mark char or hash char - not a capture group itself
         private static ConcurrentDictionary<string, LanguageTag> s_cache = new ConcurrentDictionary<string, LanguageTag>();
             // Facilitates fast and efficient re-use of languag tag instances.
             // Key = langtag string.
@@ -533,8 +533,8 @@ namespace i18n
                 string langtag = match.Groups[1].Value;
                // Patch the url.
                 urlPatched = url.Substring(langtag.Length +1);
-                if (urlPatched.Length == 0) {
-                    urlPatched = "/"; }
+                if (!urlPatched.StartsWith("/")) {
+                    urlPatched = "/" + urlPatched; }
                // Success.
                 return langtag;
             }
