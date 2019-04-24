@@ -502,6 +502,22 @@ URL localization can be disabled by setting the scheme to ```i18n.UrlLocalizatio
     }
 ```
 
+Without URL localization, i18n will rely on the cookie "i18n.langtag" to determine the current language for each request. This means that the language change/setting feature on your site should change the cookie and set the new PrincipalAppLanguage:
+
+```
+  HttpCookie c = new HttpCookie("i18n.langtag") { 
+    Value = Request.QueryString("newLanguage"), 
+    HttpOnly = true, 
+    Expires = DateTime.UtcNow.AddYears(1) 
+    };
+  Response.Cookies.Add(c);
+  i18n.ILanguageTag p = default(i18n.ILanguageTag);
+  p = i18n.LanguageTag.GetCachedInstance(Request.QueryString("newLanguage"));
+  i18n.HttpContextExtensions.SetPrincipalAppLanguageForRequest(this.Context, p);
+```
+
+If you are experiencing problems with static content, maybe also related to browser caching and are having trouble getting the rules for URL exclusion in the following paragraphs to work, the Viod scheme might we worth looking into. 
+
 #### Exclude URLs from being localized
 
 URLs to non-internationalized resources need not be localized. Typically, there
