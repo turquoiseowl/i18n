@@ -516,7 +516,7 @@ Without URL localization, i18n will rely on the cookie "i18n.langtag" to determi
   i18n.HttpContextExtensions.SetPrincipalAppLanguageForRequest(this.Context, p);
 ```
 
-If you are experiencing problems with static content, maybe also related to browser caching and are having trouble getting the rules for URL exclusion in the following paragraphs to work, the Viod scheme might we worth looking into. 
+If you are experiencing problems with static content, maybe also related to browser caching and are having trouble getting the rules for URL exclusion in the following paragraphs to work, the Void scheme might we worth looking into. Please see [ref to issue385].
 
 #### Exclude URLs from being localized
 
