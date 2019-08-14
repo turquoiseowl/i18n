@@ -126,6 +126,9 @@ namespace i18n
         {
         // Note that there is no need to serialize access to System.Web.HttpRuntime.Cache when just reading from it.
         //
+            if (!langtag.IsSet()) {
+                return false; }
+
             // Default language is always valid.
             if (LocalizedApplication.Current.MessageKeyIsValueInDefaultLanguage
                 && LocalizedApplication.Current.DefaultLanguageTag.Equals(langtag)) {
