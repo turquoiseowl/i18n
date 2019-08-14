@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Connell,Daniel Crenna,contributors")] // picked up by nuspec $author$ identifier
 [assembly: AssemblyProduct("i18n")]
-[assembly: AssemblyCopyright("Copyright (c) 2011-2017 Martin Connell, Daniel Crenna, and contributors.")]
+[assembly: AssemblyCopyright("Copyright (c) 2011-2019 Martin Connell, Daniel Crenna, and contributors.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
