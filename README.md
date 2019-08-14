@@ -1076,6 +1076,11 @@ installed to build.
 
 ### Release History
 
+#### 2.1.15 (20190814)
+
+* FIX: "NullReferenceException caused by bad langtag ([#387](https://github.com/turquoiseowl/i18n/issues/387)).
+* FIX: "LangTag extraction logic broken by URL with query string immediately after lantag ([#383](https://github.com/turquoiseowl/i18n/issues/383)).
+
 #### 2.1.14 (20180710)
 
 * FIX: "Localization of outgoing URIs" feature issue in version 2.1.13 ([#374](https://github.com/turquoiseowl/i18n/issues/374)).
