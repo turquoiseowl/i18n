@@ -399,6 +399,8 @@ Note: Refer to
 [Issue #163](https://github.com/turquoiseowl/i18n/issues/163#issuecomment-68811808) 
 for more on IIS compression settings.
 
+Note: in some scenarios, it might be desirable to localize Javascipt (.js) files, making your application case 1. To easily disable static file compression, use the IIS manager and click on site name, Compression and uncheck "Enable static content compression".
+
 Note: The Microsoft ScriptManager compresses responses to requests for ScriptResource.axd so these responses will always be 
 compressed and the script that is returned by the ScriptManager will not be localized even if you disable static file compression. 
 
