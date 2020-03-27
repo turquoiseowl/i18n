@@ -410,6 +410,11 @@ adding `i18n.PostBuild.exe` as a project reference:
 ```
     "$(TargetDir)i18n.PostBuild.exe" "$(ProjectDir)\web.config"
 ```
+You can find i18n.PostBuild.exe file under packages folder: 
+
+``` 
+    {your_solution}\packages\{package_version}\tools\i18n.PostBuild\i18n.PostBuild.exe
+```
     
 Alternatively, you may choose to install the `i18n.POTGenerator.vsix` Visual Studio extension (2012/2013).
 This installs an `i18n` button in the Solution Window for manual triggering of PO generation. Note that
