@@ -444,13 +444,19 @@ namespace i18n.Domain.Concrete
                             var flags              = new HashSet<string>();
                             var references         = new List<ReferenceContext>();
 
+                            //based on PO files format the white space is delimiter between entries http://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.html
+                            if (string.IsNullOrWhiteSpace(line))
+                            {
+                                itemStarted = true;
+                                line = fs.ReadLine();
+                            }
+
                             //read all comments, flags and other descriptive items for this string
                             //if we have #~ its a historical/log entry but it is the messageID/message so we skip this do/while
-                            if (line.StartsWith("#") && !line.StartsWith("#~"))
+                            if (line != null && line.StartsWith("#") && !line.StartsWith("#~"))
                             {
                                 do
                                 {
-                                    itemStarted = true;
                                     switch (line[1])
                                     {
                                         case '.': //Extracted comments
