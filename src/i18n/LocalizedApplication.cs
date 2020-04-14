@@ -333,8 +333,9 @@ namespace i18n
             // If the content type of the entity is eligible for processing AND the URL is not to be excluded,
             // wire up our filter to do the processing. The entity data will be run through the filter a
             // bit later on in the pipeline.
-            if (Current.ContentTypesToLocalize != null
-                    && Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
+            if (Current.ContentTypesToLocalize != null && 
+                context.Response.ContentType != null && 
+                Current.ContentTypesToLocalize.Match(context.Response.ContentType).Success) // Include certain content types from being processed
             {
                 if (Current.UrlsToExcludeFromProcessing != null
                     && Current.UrlsToExcludeFromProcessing.Match(context.Request.RawUrl).Success) // Exclude certain URLs from being processed
