@@ -110,7 +110,7 @@ namespace i18n
             if (UrlLocalizer.UrlLocalizationScheme != UrlLocalizationScheme.Void) {
                 var earlyUrlLocalizer = LocalizedApplication.Current.EarlyUrlLocalizerForApp;
                 if (earlyUrlLocalizer != null) {
-                    entity = earlyUrlLocalizer.ProcessOutgoing(
+                    entity = earlyUrlLocalizer.ProcessOutgoingNuggets(
                         entity, 
                         context.GetPrincipalAppLanguageForRequest().ToString(),
                         context); }

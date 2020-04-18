@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using i18n.Domain.Helpers;
-
-namespace i18n.Helpers
+﻿namespace i18n.Helpers
 {
     public static class StringExtensions
     {
