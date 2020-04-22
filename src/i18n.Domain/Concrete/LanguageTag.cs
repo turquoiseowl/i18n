@@ -512,15 +512,17 @@ namespace i18n
                 Uri uri;
                 if (Uri.TryCreate(url, UriKind.Absolute, out uri)) {
                     UriBuilder ub = new UriBuilder(url);
-                    string urlNew = ExtractLangTagFromUrl(ub.Path, UriKind.Relative, out urlPatched);
+                    string strPatchedPath = null;
+                    string langtag = ExtractLangTagFromUrl(ub.Path, UriKind.Relative, out strPatchedPath);
                    // Match?
-                    if (urlNew != null) {
-                        ub.Path = urlNew;
-                        return ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
+                    if (langtag != null) {
+                        ub.Path = strPatchedPath;
+                        urlPatched = ub.Uri.ToString(); // Go via Uri to avoid port 80 being added.
                     }
                    // No match.
-                    urlPatched = url;
-                    return null;
+                    else {
+                        urlPatched = url; }
+                    return langtag;
                 }
             }
 
