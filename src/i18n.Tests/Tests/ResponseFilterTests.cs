@@ -35,6 +35,15 @@ namespace i18n.Tests
         }
 
         [TestMethod]
+        [Description("Issue #337: InstallResponseFilter should not throw exception")]
+        public void Handling_null_content_type()
+        {
+            HttpContextBase fakeContext   = Substitute.For<HttpContextBase>();
+            fakeContext.Response.ContentType = null;
+            LocalizedApplication.InstallResponseFilter(fakeContext);
+        }
+
+        [TestMethod]
         public void ResponseFilter_can_patch_html_urls()
         {
             // Non-rooted path as href/src url. This should become rooted based on the path of the current request url.
