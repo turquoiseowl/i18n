@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Web;
 using i18n.Helpers;
 
 namespace i18n
@@ -89,7 +90,7 @@ namespace i18n
             // Continue handling request.
         }
 
-        public string ProcessOutgoing(
+        public string ProcessOutgoingNuggets(
             string entity, 
             string langtag, 
             System.Web.HttpContextBase context)
@@ -110,21 +111,8 @@ namespace i18n
         //
 
             Uri requestUrl = context != null ? context.Request.Url : null;
-
-            // Localize urls in HTTP headers.
-            if (context != null) {
-                foreach (string hdr in m_httpHeadersContainingUrls) {
-                    string hdrval = context.Response.Headers[hdr];
-                    if (!hdrval.IsSet()) {
-                        continue; }
-                    string urlNew = LocalizeUrl(context, hdrval, langtag, requestUrl, false);
-                    if (urlNew == null) {
-                        continue; }
-                    context.Response.Headers[hdr] = urlNew;
-                }
-            }
             
-            // Localize urls in the response body (entity).
+            // Localize any nuggets in the entity.
             return m_regexHtmlUrls.Replace(
                 entity,
                 delegate(Match match)
@@ -147,6 +135,28 @@ namespace i18n
                         return match.Groups[0].Value; // original
                     }
                 });
+        }
+
+        public void ProcessOutgoingHeaders(string langtag, HttpContextBase context)
+        {
+            Uri requestUrl = context != null ? context.Request.Url : null;
+
+            // Localize urls in HTTP headers.
+            if (context != null)
+            {
+                foreach (string headerName in m_httpHeadersContainingUrls)
+                {
+                    string value = context.Response.Headers[headerName];
+                    if (value.IsSet())
+                    {
+                        string urlNew = LocalizeUrl(context, value, langtag, requestUrl, false);
+                        if (urlNew.IsSet())
+                        {
+                            context.Response.Headers[headerName] = urlNew;
+                        }
+                    }
+                }
+            }
         }
 
     #endregion
