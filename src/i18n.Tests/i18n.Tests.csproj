@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Helpers\TextLocalizer_Mock_SingleMessage.cs" />
     <Compile Include="Helpers\TextLocalizer_Mock_PrefixSuffix.cs" />
+    <Compile Include="Tests\LanguageItemTests.cs" />
     <Compile Include="Tests\LanguageMatchingTests.cs" />
     <Compile Include="Tests\LanguageTagTests.cs" />
     <Compile Include="Tests\NuggetLocalizerTests.cs" />
