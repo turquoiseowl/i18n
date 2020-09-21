@@ -92,10 +92,19 @@ namespace i18n
         /// <param name="context">Describes the current request.</param>
         /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
         /// <returns>Localized (translated) entity.</returns>
+        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(i18n.LanguageItem[], string)"/>
         public static string ParseAndTranslate(this System.Web.HttpContext context, string entity)
         {
             return context.GetHttpContextBase().ParseAndTranslate(entity);
         }
+
+        /// <summary>
+        /// Returns the translation of the passed string entity which may contain zero or more fully-formed nugget.
+        /// </summary>
+        /// <param name="context">Describes the current request.</param>
+        /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
+        /// <returns>Localized (translated) entity.</returns>
+        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(i18n.LanguageItem[], string)"/>
         public static string ParseAndTranslate(this System.Web.HttpContextBase context, string entity)
         {
         // For impl. notes see ResponseFilter.Flush().
