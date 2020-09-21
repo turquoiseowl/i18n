@@ -840,7 +840,7 @@ that require parsing using the ```ParseAndTranslate``` extension method to HttpC
     string entity = HttpContext.ParseAndTranslate("Hi - [[[Sign in]]]");
 ```
 
-or if outside of an HttpContext — for example an emailing service running as a background job:
+or if outside of an HttpContext, for example a background job running an emailing service task:
 
 ```
     string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]");
@@ -868,7 +868,7 @@ which will use the app language that best matches those specified, or better sti
     });
 ```
 
-which will match against the languages obtained user's browser at some point earlier.
+which will match against the languages obtained from the user's browser at some point earlier.
 
 ### Language Matching
 
