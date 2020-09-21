@@ -184,8 +184,20 @@ namespace i18n
         /// into a compact string form, suitable for persisting and subsequently 're-hydrating'
         /// the value using the <see cref="HydrateLanguageItemsFromString"/> method.
         /// </summary>
-        /// <param name="languageItems">Array of languages as previously returned by <see cref="ParseHttpLanguageHeader"/>.</param>
-        /// <returns>Compact string representation of the language item array.</returns>
+        /// <param name="languageItems">
+        /// Array of languages as previously returned by <see cref="ParseHttpLanguageHeader"/>.
+        /// </param>
+        /// <returns>
+        /// Compact string representation of the language item array.
+        /// Example values:
+        ///     "fr-CA;q=1,fr;q=0.5"
+        ///     "en-CA;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1"
+        ///     "?;q=2"
+        ///     "?;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        /// </returns>
+        /// See <see cref="i18n.LanguageHelpers.ParseAndTranslate(string, string)"/>.
         public static string DehydrateLanguageItemsToString(LanguageItem[] languageItems)
         {
             return string.Join(",", languageItems.OrderBy(x => x.Ordinal).Select(x => x.ToCompactString()));
@@ -195,21 +207,40 @@ namespace i18n
         /// Helper for instantiating a LanguageItem array from a compact string form
         /// previously returned by <see cref="DehydrateLanguageItemsToString"/>.
         /// </summary>
-        /// <param name="strLanguageItems">Compact string representation of a language item array.</param>
+        /// <param name="strLanguageItems">
+        /// Compact string representation of a language item array.
+        /// May be null/empty string in which case a a single-item language item array 
+        /// representing a null PAL is returned.
+        /// Example values:
+        ///     "fr-CA;q=1,fr;q=0.5"
+        ///     "en-CA;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1"
+        ///     "?;q=2"
+        ///     "?;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     ""
+        /// </param>
         /// <returns>A language item array e.g. a UserLanguages value.</returns>
+        /// <exception cref="ArgumentException">strLanguageItems is invalid</exception>
         public static LanguageItem[] HydrateLanguageItemsFromString(string strLanguageItems)
         {
             int pos;
-           // Read PAL from the front of the compact string.
-            pos = strLanguageItems.IndexOf(';');
-            string strPal = strLanguageItems.Substring(0, pos);
-            LanguageTag pal = strPal == "?" ? null : new LanguageTag(strPal);
-           // Strip off the PAL from the front of the compact string.
-            pos = strLanguageItems.IndexOf(',');
-            if (pos != -1) {
-                strLanguageItems = strLanguageItems.Substring(pos +1); }
-            else {
-                strLanguageItems = ""; }
+            LanguageTag pal = null;
+            if (strLanguageItems.IsSet()) {
+               // Read PAL from the front of the compact string.
+                pos = strLanguageItems.IndexOf(';');
+                if (pos == -1) {
+                    throw new ArgumentException("strLanguageItems is invalid"); }
+                string strPal = strLanguageItems.Substring(0, pos);
+                if (strPal != "?") {
+                    pal = new LanguageTag(strPal); }
+               // Strip off the PAL from the front of the compact string.
+                pos = strLanguageItems.IndexOf(',');
+                if (pos != -1) {
+                    strLanguageItems = strLanguageItems.Substring(pos +1); }
+                else {
+                    strLanguageItems = ""; }
+            }
            //
             return ParseHttpLanguageHeader(strLanguageItems, pal);
         }
