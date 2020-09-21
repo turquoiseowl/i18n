@@ -840,6 +840,35 @@ that require parsing using the ```ParseAndTranslate``` extension method to HttpC
     string entity = HttpContext.ParseAndTranslate("Hi - [[[Sign in]]]");
 ```
 
+or if outside of an HttpContext — for example an emailing service running as a background job:
+
+```
+    string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]");
+```
+
+which will translate using the app's default language (i18n.LocalizedApplication.DefaultLanguage), or
+
+```
+    string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]", "fr-CA;q=1,fr;q=0.5");
+```
+
+which will use the app language that best matches those specified, or better still
+
+```
+    // During earlier HTTP request from user, save their language(s).
+    string userLanguages = HttpContext.GetRequestUserLanguagesAsString();
+
+    // Switch to background job.
+    HostingEnvironment.QueueBackgroundWorkItem(ct => {
+
+        // Translate using user's languages obtained earlier.
+        string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]", userLanguages);
+        ...
+
+    });
+```
+
+which will match against the languages obtained user's browser at some point earlier.
 
 ### Language Matching
 
