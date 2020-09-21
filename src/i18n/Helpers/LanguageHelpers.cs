@@ -40,5 +40,71 @@ namespace i18n
             LocalizedApplication.Current.TextLocalizerForApp.GetText(null, null, languages, out lt, maxPasses);
             return lt;
         }
+
+        /// <summary>
+        /// Helper for translating the passed string entity which may contain zero or more fully-formed nugget,
+        /// which may be called when an HttpContext is not available e.g. in background jobs.
+        /// </summary>
+        /// <remarks>
+        /// When translating entities when handling HTTP requests, the language to use is selected from the current UserLanguages value
+        /// which is derived from the HttpContext (that is, the request headers). In a background job, however,
+        /// we don't normally have an HttpContext. With this method, however, you can save the UserLanguages 
+        /// obtained from <see cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/> when it is available, 
+        /// i.e. prior to scheduling the background job, and pass it through to the job and then on to this method.
+        /// Note that the UserLanguages array value can be persisted as a string using the <see cref="LanguageItem.DehydrateLanguageItemsToString"/>
+        /// helper and converted back to an array using the <see cref="LanguageItem.HydrateLanguageItemsFromString"/> helper.
+        /// Note that this method does not support the localization of URLs embedded in the entity.
+        /// </remarks>
+        /// <param name="userLanguages">
+        /// A list of language preferences, sorted in order or preference (most preferred first).
+        /// </param>
+        /// <param name="entity">
+        /// Entity to be processed. E.g HTTP response entity or Javascript file.
+        /// </param>
+        /// <returns>
+        /// Processed (and possibly modified) entity.
+        /// </returns>
+        /// <seealso cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/>
+        public static string ParseAndTranslate(LanguageItem[] userLanguages, string entity)
+        {
+        // For impl. notes see ResponseFilter.Flush().
+        //
+            INuggetLocalizer nuggetLocalizer = LocalizedApplication.Current.NuggetLocalizerForApp;
+            if (nuggetLocalizer != null) {
+                entity = LocalizedApplication.Current.NuggetLocalizerForApp.ProcessNuggets(
+                    entity,
+                    userLanguages); }
+            return entity;
+        }
+
+        /// <summary>
+        /// Helper for translating the passed string entity which may contain zero or more fully-formed nugget,
+        /// which may be called when an HttpContext is not available e.g. in background jobs.
+        /// </summary>
+        /// <remarks>
+        /// When translating entities when handling HTTP requests, the language to use is selected from the current UserLanguages value
+        /// which is derived from the HttpContext (that is, the request headers). In a background job, however,
+        /// we don't normally have an HttpContext. With this method, however, you can save the UserLanguages 
+        /// obtained from <see cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/> when it is available, 
+        /// i.e. prior to scheduling the background job, and pass it through to the job and then on to this method.
+        /// Note that the UserLanguages array value can be persisted as a string using the <see cref="LanguageItem.DehydrateLanguageItemsToString"/>
+        /// helper and converted back to an array using the <see cref="LanguageItem.HydrateLanguageItemsFromString"/> helper.
+        /// Note that this method does not support the localization of URLs embedded in the entity.
+        /// </remarks>
+        /// <param name="userLanguages">
+        /// A list of language preferences, sorted in order or preference (most preferred first)
+        /// in compact string form. See <see cref="LanguageItem.DehydrateLanguageItemsToString"/>.
+        /// </param>
+        /// <param name="entity">
+        /// Entity to be processed. E.g HTTP response entity or Javascript file.
+        /// </param>
+        /// <returns>
+        /// Processed (and possibly modified) entity.
+        /// </returns>
+        /// <seealso cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/>
+        public static string ParseAndTranslate(string userLanguages, string entity)
+        {
+            return ParseAndTranslate(LanguageItem.HydrateLanguageItemsFromString(userLanguages), entity);
+        }
     }
 }
