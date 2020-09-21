@@ -92,7 +92,7 @@ namespace i18n
         /// <param name="context">Describes the current request.</param>
         /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
         /// <returns>Localized (translated) entity.</returns>
-        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(i18n.LanguageItem[], string)"/>
+        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(string, i18n.LanguageItem[])"/>
         public static string ParseAndTranslate(this System.Web.HttpContext context, string entity)
         {
             return context.GetHttpContextBase().ParseAndTranslate(entity);
@@ -104,7 +104,7 @@ namespace i18n
         /// <param name="context">Describes the current request.</param>
         /// <param name="entity">String containing zero or more fully-formed nuggets which are to be translated according to the language selection of the current request.</param>
         /// <returns>Localized (translated) entity.</returns>
-        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(i18n.LanguageItem[], string)"/>
+        /// <seealso cref="i18n.LanguageHelpers.ParseAndTranslate(string, i18n.LanguageItem[])"/>
         public static string ParseAndTranslate(this System.Web.HttpContextBase context, string entity)
         {
         // For impl. notes see ResponseFilter.Flush().
@@ -216,6 +216,35 @@ namespace i18n
                 context.Items["i18n.UserLanguages"] = UserLanguages = GetRequestUserLanguagesImplementation(context);
             }
             return UserLanguages;
+        }
+        
+        /// <summary>
+        /// Returns a string representing a collection of languages supported by the user-agent, in descending order
+        /// of preference. The first item in the collection refers to any Principle Application Language (PAL)
+        /// for the request determined by EarlyUrlLocalization (which calls SetPrincipalAppLanguageForRequest),
+        /// or is null if EarlyUrlLocalization is disabled.
+        /// </summary>
+        /// <param name="context">Context of the current request.</param>
+        /// <returns>
+        /// Compact string representation of the language item array.
+        /// Example values:
+        ///     "fr-CA;q=1,fr;q=0.5"
+        ///     "en-CA;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1"
+        ///     "?;q=2"
+        ///     "?;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        /// </returns>
+        /// <remarks>
+        /// This method is optimised such that the collection is built only once per request.
+        /// </remarks>
+        /// See <see cref="LanguageItem.ParseHttpLanguageHeader"/>.
+        /// See <see cref="LanguageItem.ParseHttpLanguageHeader"/>.
+        /// See <see cref="HttpContextExtensions.GetRequestUserLanguagesAsString"/>.
+        /// See <see cref="LanguageItem.DehydrateLanguageItemsToString"/>.
+        public static string GetRequestUserLanguagesAsString(this System.Web.HttpContextBase context)
+        {
+            return LanguageItem.DehydrateLanguageItemsToString(GetRequestUserLanguages(context));
         }
 
         /// <summary>
