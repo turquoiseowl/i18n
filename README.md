@@ -500,7 +500,7 @@ scheme, Scheme2, will show the language tag only if it is not the default.
 
 URL localization can be disabled by setting the scheme to ```i18n.UrlLocalizationScheme.Void``` in ```Application_Start```:
 
-```
+```csharp
     protected void Application_Start()
     {
         ...
@@ -511,7 +511,7 @@ URL localization can be disabled by setting the scheme to ```i18n.UrlLocalizatio
 
 Without URL localization, i18n will rely on the cookie "i18n.langtag" to determine the current language for each request. This means that the language change/setting feature on your site should change the cookie and set the new PrincipalAppLanguage:
 
-```
+```csharp
   HttpCookie c = new HttpCookie("i18n.langtag") { 
     Value = Request.QueryString("newLanguage"), 
     HttpOnly = true, 
@@ -537,7 +537,7 @@ There are two ways to instruct i18n NOT to localize a URL:
 
 Firstly, you can set a RegEx pattern to match against the localpath part of the URLs to be excluded. For instance:
 
-```
+```csharp
     protected void Application_Start()
     {
         ...
@@ -552,7 +552,7 @@ feel free to override or set to null to disable.
 For finer control, the second method is to define filter delegates that are passed the URL and return
 true if the URL is to be localized, otherwise false. For example:
 
-```
+```csharp
     protected void Application_Start()
     {
         ...
@@ -582,7 +582,7 @@ when using i18n with Scheme2.
 
 You can do this by prefixing the URL like so:
 
-```
+```xml
     <link rel="alternate" hreflang="en" href="@(EarlyUrlLocalizer.IgnoreLocalizationUrlPrefix)http://mysite.com" />
     <link rel="alternate" hreflang="fr" href="http://mysite.com/fr" />
     <link rel="alternate" hreflang="es" href="http://mysite.com/es" />
@@ -667,7 +667,7 @@ For example, suppose you wish the default language to vary as follows:
 
 This can be achieved as follows:
 
-```
+```csharp
     protected void Application_Start()
     {
         ...
@@ -805,7 +805,7 @@ There is a ```GetText``` extension method to HttpContextBase provided for this.
 For example, you can do the following from within an MVC controller action:
 
 
-```
+```csharp
 using System;
 using System.Web.Mvc;
 using i18n;
@@ -836,25 +836,25 @@ by default it is false and so msgcomment argument should be passed as null or em
 Furthermore, you can access the translation of a complete body of text containing zero or more nuggets
 that require parsing using the ```ParseAndTranslate``` extension method to HttpContextBase, as follows:
 
-```
+```csharp
     string entity = HttpContext.ParseAndTranslate("Hi - [[[Sign in]]]");
 ```
 
 or if outside of an HttpContext, for example a background job running an emailing service task:
 
-```
+```csharp
     string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]");
 ```
 
 which will translate using the app's default language (i18n.LocalizedApplication.DefaultLanguage), or
 
-```
+```csharp
     string entity = i18n.LanguageHelpers.ParseAndTranslate("[[[Thank you for your payment]]]", "fr-CA;q=1,fr;q=0.5");
 ```
 
 which will use the app language that best matches those specified, or better still
 
-```
+```csharp
     // During earlier HTTP request from user, save their language(s).
     string userLanguages = HttpContext.GetRequestUserLanguagesAsString();
 
@@ -966,7 +966,7 @@ By default, only blocks with a type of **updatePanel**, **scriptStartupBlock**, 
 localize segments in other block types by changing the value of AsyncPostbackTypesToTranslate in Application_Start. For 
 example, to include the **hiddenField** blocks, add the following to Application_Start
 
-```
+```csharp
 i18n.LocalizedApplication.Current.AsyncPostbackTypesToTranslate = "updatePanel,scriptStartupBlock,pageTitle,hiddenField";
 ```
 
@@ -984,7 +984,7 @@ Here is how to use i18n in OWIN Web API projects:
 - No need to register HttpModule in web.config file.
 - Add the following middleware registration into your startup sequence:
 
-```
+```csharp
 public partial class Startup
 {
     public void Configuration(IAppBuilder app)
@@ -1017,7 +1017,7 @@ public partial class Startup
 ```
 
 - Add the following handler to Global.asax:
-```
+```csharp
     /// <summary>
     /// Handles the ReleaseRequestState event of the Application control.
     /// </summary>
@@ -1058,7 +1058,7 @@ to this folder by adding a `Web.config` file.
 i18n provides the ```i18n.ITranslateSvc``` interface that abstracts the basic operation of parsing
 and translating a string entity that may contain one or more nuggets:
 
-```
+```csharp
     public interface ITranslateSvc
     {
         string ParseAndTranslate(string entity);
