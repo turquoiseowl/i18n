@@ -178,6 +178,14 @@ namespace i18n.Tests.Tests
                 // From compact string.
                 languageItems = LanguageItem.HydrateLanguageItemsFromString(strCompactString);
             }
+            // Hydration of null/empty language items string.
+            // Should result in a single-item language item array representing a null PAL.
+            languageItems = LanguageItem.HydrateLanguageItemsFromString(null);
+            Assert.AreEqual(1, languageItems.Length);
+            Assert.AreEqual(null, languageItems[0].LanguageTag);
+            Assert.AreEqual(   2, languageItems[0].Quality);
+            Assert.AreEqual(   0, languageItems[0].Ordinal);
+            Assert.AreEqual(   0, languageItems[0].UseCount);
         }
     }
 }
