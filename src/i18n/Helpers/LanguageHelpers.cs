@@ -65,7 +65,7 @@ namespace i18n
         /// Processed (and possibly modified) entity.
         /// </returns>
         /// <seealso cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/>
-        public static string ParseAndTranslate(LanguageItem[] userLanguages, string entity)
+        public static string ParseAndTranslate(string entity, LanguageItem[] userLanguages)
         {
         // For impl. notes see ResponseFilter.Flush().
         //
@@ -93,7 +93,19 @@ namespace i18n
         /// </remarks>
         /// <param name="userLanguages">
         /// A list of language preferences, sorted in order or preference (most preferred first)
-        /// in compact string form. See <see cref="LanguageItem.DehydrateLanguageItemsToString"/>.
+        /// in compact string form.
+        /// May be null/empty string in which case a a single-item language item array 
+        /// representing a null PAL is returned.
+        /// Example values:
+        ///     "fr-CA;q=1,fr;q=0.5"
+        ///     "en-CA;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     "en-CA;q=1"
+        ///     "?;q=2"
+        ///     "?;q=2,de;q=0.5,en;q=1,fr-FR;q=0,ga;q=0.5"
+        ///     ""
+        /// See <see cref="HttpContextExtensions.GetRequestUserLanguagesAsString"/>.
+        /// See <see cref="LanguageItem.DehydrateLanguageItemsToString"/>.
         /// </param>
         /// <param name="entity">
         /// Entity to be processed. E.g HTTP response entity or Javascript file.
@@ -102,9 +114,9 @@ namespace i18n
         /// Processed (and possibly modified) entity.
         /// </returns>
         /// <seealso cref="i18n.HttpContextExtensions.ParseAndTranslate(System.Web.HttpContextBase, string)"/>
-        public static string ParseAndTranslate(string userLanguages, string entity)
+        public static string ParseAndTranslate(string entity, string userLanguages = null)
         {
-            return ParseAndTranslate(LanguageItem.HydrateLanguageItemsFromString(userLanguages), entity);
+            return ParseAndTranslate(entity, LanguageItem.HydrateLanguageItemsFromString(userLanguages));
         }
     }
 }
