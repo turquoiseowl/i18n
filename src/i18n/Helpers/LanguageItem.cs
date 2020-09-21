@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using i18n.Helpers;
 
 namespace i18n
@@ -72,6 +73,10 @@ namespace i18n
         public override string ToString()
         {
             return string.Format("{0};q={1} ordinal = {2}, usecount = {3})", LanguageTag != null ? LanguageTag.ToString() : "", Quality, Ordinal, UseCount);
+        }
+        public string ToCompactString()
+        {
+            return string.Format("{0};q={1}", LanguageTag != null ? LanguageTag.ToString() : "?", Quality);
         }
     // Static helpers
         /// <summary>
@@ -172,6 +177,41 @@ namespace i18n
             Array.Sort(LanguageItems);
            // Done.
             return LanguageItems;
+        }
+
+        /// <summary>
+        /// Helper for converting a LanguageItem[] array value (for example a UserLanguages value)
+        /// into a compact string form, suitable for persisting and subsequently 're-hydrating'
+        /// the value using the <see cref="HydrateLanguageItemsFromString"/> method.
+        /// </summary>
+        /// <param name="languageItems">Array of languages as previously returned by <see cref="ParseHttpLanguageHeader"/>.</param>
+        /// <returns>Compact string representation of the language item array.</returns>
+        public static string DehydrateLanguageItemsToString(LanguageItem[] languageItems)
+        {
+            return string.Join(",", languageItems.OrderBy(x => x.Ordinal).Select(x => x.ToCompactString()));
+        }
+
+        /// <summary>
+        /// Helper for instantiating a LanguageItem array from a compact string form
+        /// previously returned by <see cref="DehydrateLanguageItemsToString"/>.
+        /// </summary>
+        /// <param name="strLanguageItems">Compact string representation of a language item array.</param>
+        /// <returns>A language item array e.g. a UserLanguages value.</returns>
+        public static LanguageItem[] HydrateLanguageItemsFromString(string strLanguageItems)
+        {
+            int pos;
+           // Read PAL from the front of the compact string.
+            pos = strLanguageItems.IndexOf(';');
+            string strPal = strLanguageItems.Substring(0, pos);
+            LanguageTag pal = strPal == "?" ? null : new LanguageTag(strPal);
+           // Strip off the PAL from the front of the compact string.
+            pos = strLanguageItems.IndexOf(',');
+            if (pos != -1) {
+                strLanguageItems = strLanguageItems.Substring(pos +1); }
+            else {
+                strLanguageItems = ""; }
+           //
+            return ParseHttpLanguageHeader(strLanguageItems, pal);
         }
     }
 }
