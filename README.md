@@ -789,8 +789,13 @@ On selection of a language in the above code, the AccountController.SetLanguage 
         // response (Late URL Localization).
         HttpContext.SetPrincipalAppLanguageForRequest(lt);
         // Patch in the new langtag into any return URL.
-        if (returnUrl.IsSet()) {
-            returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(HttpContext, returnUrl, UriKind.RelativeOrAbsolute, lt == null ? null : lt.ToString()).ToString(); }
+        if (returnUrl.IsSet())
+        {
+            if (LocalizedApplication.Current.UrlLocalizerForApp.FilterOutgoing(returnUrl, HttpContext.Request.Url)) // if url wants to be localized
+            {
+                returnUrl = LocalizedApplication.Current.UrlLocalizerForApp.SetLangTagInUrlPath(HttpContext, returnUrl, UriKind.RelativeOrAbsolute, lt?.ToString()).ToString();
+            }
+        }
         // Redirect user agent as approp.
         return this.Redirect(returnUrl);
     }
