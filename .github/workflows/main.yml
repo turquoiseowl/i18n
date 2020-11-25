@@ -1,0 +1,56 @@
+name: CI
+
+env:
+  config: Release
+  solutionName: src\i18n.sln
+  
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+   # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: [ windows-latest ]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+             
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+      
+      - name: echo MSBuild
+        run: msbuild -version
+              
+      - name: Setup NuGet 
+        # You may pin to the exact commit or the version.
+        # uses: NuGet/setup-nuget@255f46e14d51fbc603743e2aa2907954463fbeb9
+        uses: NuGet/setup-nuget@v1.0.5
+        
+      - name: Restore NuGet  
+        run: nuget restore ${{ env.solutionName }}
+        
+      - name: Build the Solution
+        run: msbuild  ${{ env.solutionName }} /p:Configuration=${{ env.config }}  /p:DeployExtension=False /verbosity:minimal
+        
+      - name: Run unit tests
+        run:  '& "$(vswhere -property installationPath)\Common7\IDE\MSTest.exe" /testcontainer:src\i18n.Tests\bin\Release\i18n.Tests.dll'
+      
+      - name: Artifacts
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          name: ci_${{ github.run_number }}_commit_${{ github.sha }} 
+          path: |
+            src\**\bin\Release\**
+        
+        
+        
