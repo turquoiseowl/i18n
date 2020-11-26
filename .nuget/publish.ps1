@@ -79,7 +79,7 @@ $commitMsg = '"Version number bumped to ' + $verPre +'"'
 git commit -a -m $commitMsg
 
 writeinfo "3. Rebuild All in Release mode..."
-&"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.com" ..\src\i18n.sln /rebuild `"Release`|Any CPU`"
+&"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" ..\src\i18n.sln /rebuild `"Release`|Any CPU`"
 
 writeinfo "4. Create nuget packages..."
 &.\nuget.exe pack C:\DevRoot\DevGit\i18n\src\i18n\i18n.csproj                                             -BasePath C:\DevRoot\DevGit\i18n\src\i18n                       -IncludeReferencedProjects -Prop Configuration=Release -Symbols -Verbosity Detailed -Properties OutDir=C:\DevRoot\DevGit\i18n\src\i18n\bin\Release
