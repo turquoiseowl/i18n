@@ -1111,8 +1111,7 @@ See [Dealing with line endings](https://help.github.com/articles/dealing-with-li
 
 #### Build Notes
 
-The i18n project at present targets Visual Studio 2013 / .NET Framework 4 and requires the Visual Studio 2013 SDK libraries
-installed to build.
+The i18n project at present targets .NET Framework 4 and later. To build i18n from source, Visual Studio 2019 or later is recommended.
 
 ### Known Issues
 
@@ -1120,14 +1119,23 @@ installed to build.
 
 ### Release History
 
+#### 2.1.16 (20201126)
+
+* ADDED: Enhanced support for translations invoked by background jobs (LanguageHelpers.ParseAndTranslate + HttpContextExtensions.GetRequestUserLanguagesAsString + IBackgroundTranslateSvc).
+* ADDED: i18n project automated build and test (Continuous Integration) with github actions.
+* FIX: i18n.LanguageTag.ExtractLangTagFromUrl returns/outputs incorrect values when passed an absolute url.
+* FIX: Problem with HttpContext.ParseAndTranslate helper method ([#338](https://github.com/turquoiseowl/i18n/issues/338)).
+* FIX: ArgumentNullException if the Content-Type header is not set in the response ([#337](https://github.com/turquoiseowl/i18n/issues/337)).
+* FIX: Missing PO comment lines breaks translation ([#351](https://github.com/turquoiseowl/i18n/issues/351)).
+
 #### 2.1.15 (20190814)
 
-* FIX: "NullReferenceException caused by bad langtag ([#387](https://github.com/turquoiseowl/i18n/issues/387)).
-* FIX: "LangTag extraction logic broken by URL with query string immediately after lantag ([#383](https://github.com/turquoiseowl/i18n/issues/383)).
+* FIX: NullReferenceException caused by bad langtag ([#387](https://github.com/turquoiseowl/i18n/issues/387)).
+* FIX: LangTag extraction logic broken by URL with query string immediately after lantag ([#383](https://github.com/turquoiseowl/i18n/issues/383)).
 
 #### 2.1.14 (20180710)
 
-* FIX: "Localization of outgoing URIs" feature issue in version 2.1.13 ([#374](https://github.com/turquoiseowl/i18n/issues/374)).
+* FIX: Localization of outgoing URIs" feature issue in version 2.1.13 ([#374](https://github.com/turquoiseowl/i18n/issues/374)).
 
 #### 2.1.13 (20180707)
 
