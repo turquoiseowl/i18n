@@ -1,4 +1,7 @@
 # i18n (v2)
+
+![Build Status](https://github.com/turquoiseowl/i18n/workflows/CI/badge.svg)
+
 ## Smart internationalization for ASP.NET
 ```
     PM> Install-Package i18N
