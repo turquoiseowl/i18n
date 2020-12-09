@@ -480,7 +480,7 @@ namespace i18n.Domain.Concrete
 
                             if (line != null && (itemStarted || line.StartsWith("#~")))
                             {
-                                TranslationItem item = ParseBody(fs, line, extractedComments);
+                                TranslationItem item = ParseBody(fs, ref line, extractedComments);
                                 if (item != null)
                                 {
                                     //
@@ -509,7 +509,14 @@ namespace i18n.Domain.Concrete
                                 }
                             }
 
-                            itemStarted = false;
+                            // If line is not empty here, we are skipping over some unrecognized text.
+                            // On the other hand, if the line is empty, it means we are at a delimiter
+                            // between message items so consider item as started.
+                            // Note that the ParseBody method call above now takes a ref to the 'line' variable
+                            // and on completion of successful read of a message item section it leaves line set 
+                            // to empty string, marking the start of a new item. #351, #413
+                            if (!string.IsNullOrWhiteSpace(line)) {
+                                itemStarted = false; }
                         }
                     }
                 }
@@ -546,7 +553,7 @@ namespace i18n.Domain.Concrete
         /// <param name="fs">A textreader that must be on the second line of a message body</param>
         /// <param name="line">The first line of the message body.</param>
         /// <returns>Returns a TranslationItem with only key, id and message set</returns>
-        private TranslationItem ParseBody(TextReader fs, string line, IEnumerable<string> extractedComments)
+        private TranslationItem ParseBody(TextReader fs, ref string line, IEnumerable<string> extractedComments)
         {
             string originalLine = line;
 
