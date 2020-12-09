@@ -1119,6 +1119,10 @@ The i18n project at present targets .NET Framework 4 and later. To build i18n fr
 
 ### Release History
 
+#### 2.1.17 (20201209)
+
+* FIX: Only every other nugget in messages.po is being translated ([#413](https://github.com/turquoiseowl/i18n/issues/413)). Fix for a regression introduced in v2.1.16.
+
 #### 2.1.16 (20201126)
 
 * ADDED: Enhanced support for translations invoked by background jobs (LanguageHelpers.ParseAndTranslate + HttpContextExtensions.GetRequestUserLanguagesAsString + IBackgroundTranslateSvc).
