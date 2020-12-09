@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("2.1.16")]
-[assembly: AssemblyFileVersion("2.1.16")]
-[assembly: AssemblyInformationalVersion("2.1.16")] // picked up by nuspec $version$ identifier
+[assembly: AssemblyVersion("2.1.17")]
+[assembly: AssemblyFileVersion("2.1.17")]
+[assembly: AssemblyInformationalVersion("2.1.17")] // picked up by nuspec $version$ identifier
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
